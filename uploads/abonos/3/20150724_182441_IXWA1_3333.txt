@@ -1,0 +1,74 @@
+===================================================================
+--- trunk/module/Admin/Module.php       (revisión: 46)
++++ trunk/module/Admin/Module.php       (copia de trabajo)
+@@ -96,6 +96,7 @@
+                ->addRole(new Role('Ingreso'), 'miembro')
+                ->addRole(new Role('Supervisor Plataforma'), 'miembro')
+                ->addRole(new Role('Gestor Movistar'), 'miembro')
++        ->addRole(new Role('Administrador IVR'), 'miembro')
+                 ->addRole(new Role('Supervisor Call'), 'miembro')
+                 ->addRole(new Role('Test'), 'miembro')
+                ->addRole(new Role('Root'))
+@@ -152,6 +153,10 @@
+                 ->allow('Supervisor Call', 'reportes:index', array('index','listar','estados'))
+                ->allow('Supervisor Call', 'adminplataforma:control', array('index','reinyeccion','procesaReinyeccion'))
+                ->allow('Supervisor Call', 'reportes:index', array('index','listar','estados','reinyeccion','etapas', 'detalleEtapasDiario', 'excelEtapasIvr','excelDetalleEtapasIvr'))
++        ->allow('Administrador IVR', 'reportes:index', array('index','listar','estados','reinyeccion','etapas', 'detalleEtapasDiario', 'excelEtapasIvr','excelDetalleEtapasIvr','productividad','intentos','detalleIntentos'))
++        ->allow('Administrador IVR', 'gestion:contacto', array('muestraBitacora'))
++        ->allow('Administrador IVR', 'buscar:index', array('id','fono','rut','muestraDatos'))
++        ->allow('Administrador IVR', 'mantenedores:index')
+                ->allow('Test', 'adminplataforma:control', array('index','reinyeccion','procesaReinyeccion'))
+                 ->deny('miembro', 'admin:index')
+                 ->deny('Ejecutivo', 'usuarios:index')
+
+===================================================================
+--- trunk/module/Mantenedores/src/Mantenedores/Controller/IndexController.php   (revisión: 80)
++++ trunk/module/Mantenedores/src/Mantenedores/Controller/IndexController.php   (copia de trabajo)
+@@ -254,4 +254,20 @@
+     }
+
+
++
++    public function planesAudioIvrAction()
++    {
++        $config = $this->getConfig();
++        $this->layout()->icono  = "/images/portabilidad120.png";
++        $this->layout()->titulo = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$this->config['mantenedores']['index']['planes']['titulo'];
++        $arrayParametros = array(
++                        'activos' => true
++                        );
++        return new ViewModel(
++            array(
++                    'listaPlanes' => $this->getMantenedoresDao()->listarPlanes($arrayParametros)));
++
++    }
++
++
+ }
+
+===================================================================
+--- trunk/module/Mantenedores/view/mantenedores/index/planes.phtml      (revisión: 87)
++++ trunk/module/Mantenedores/view/mantenedores/index/planes.phtml      (copia de trabajo)
+@@ -53,7 +53,6 @@
+             <th ><h3>CAMPA&Ntilde;A</h3></th>
+             <th ><h3>PLAN CROSS</h3></th>
+             <th ><h3>PERMITE AGREGAR CROSS</h3></th>
+-            <th ><h3>AUDIO IVR</h3></th>
+             <th ><h3>HABILITADO</h3></th>
+             <th class="nosort"><h3>EDITAR</h3></th>
+         </tr>
+@@ -75,14 +74,6 @@
+                 <?php $imgPermiteCross = $plan["permiteCross"] == "1" ? "on_small.png" : "off_small.png"; ?>
+                 <td align="center"><img id="imgPermiteCross-<?php echo $plan["id"];?>" onClick="activaDesactiva(this.id,'permiteCross')" src="<?php echo $this->basePath() ?>/images/<?php echo $imgPermiteCross;?>"> <input type="hidden" id="permiteCross-<?php echo $plan["id"];?>" value="<?php echo $plan["permiteCross"];?>" /></td>
+
+-
+-                <?php $imgTieneAudio = $plan["tieneAudio"] == "1" ? "on_small.png" : "off_small.png"; ?>
+-                <td align="center"><img id="imgTieneAudio-<?php echo $plan["id"];?>" onClick="activaDesactiva(this.id,'tieneAudio')" src="<?php echo $this->basePath() ?>/images/<?php echo $imgTieneAudio;?>"> <input type="hidden" id="tieneAudio-<?php echo $plan["id"];?>" value="<?php echo $plan["tieneAudio"];?>" /></td>
+-
+-                <?php //$imgPermiteIvr = $plan["permiteIvr"] == "1" ? "on_small.png" : "off_small.png"; ?>
+-                <!--td align="center"><img id="imgPermiteIvr-<?php echo $plan["id"];?>" onClick="activaDesactiva(this.id,'permiteIvr')" src="<?php echo $this->basePath() ?>/images/<?php echo $imgPermiteIvr;?>"> <input type="hidden" id="permiteIvr-<?php echo $plan["id"];?>" value="<?php echo $plan["permiteIvr"];?>" /></td-->
+-
+-
+                 <?php $img = $plan["activo"] == "1" ? "on_small.png" : "off_small.png"; ?>
+                 <td align="center"><img id="imgEstadoPlan-<?php echo $plan["id"];?>" onClick="activaDesactiva(this.id,'estadoPlan')" src="<?php echo $this->basePath() ?>/images/<?php echo $img;?>"> <input type="hidden" id="estadoPlan-<?php echo $plan["id"];?>" value="<?php echo $plan["activo"];?>" /></td>
+                 <td>

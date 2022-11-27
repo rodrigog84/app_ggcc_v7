@@ -1,0 +1,237 @@
+        <!-- Main content -->
+        <section class="content" ng-controller="add_cuentaController">
+
+         <div class="row">
+            <?php if(isset($message)): ?>
+                    <div class="alert alert-<?php echo $classmessage; ?> alert-dismissable">
+                      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                      <h4><i class="icon fa <?php echo $icon;?>"></i> Alerta!</h4>
+                      <?php echo $message;?>
+                    </div>
+            <?php endif; ?>
+
+
+            <div class="col-md-2 col-md-offset-3">
+                <input type="button" class="btn btn-block btn-default" name="ver" value="Ver" ng-click="ver()">             
+            </div><!-- /.col -->            
+            <div class="col-md-2 col-md-offset-1">
+                <input type="button" class="btn btn-block btn-default" name="ver" value="Agregar" ng-click="agregar()">             
+            </div><!-- /.col -->                        
+          </div>
+          <br><br>
+          <div class="row">
+            
+            <div class="col-md-12">
+
+              <div class="box">
+                <div class="box-header">
+                  <h3 class="box-title">{{ titulo }}</h3>  
+                </div><!-- /.box-header -->
+
+                <div class="box-body" ng-show="sel == 'ver'">
+                  <form action="<?php echo base_url();?>comunity/generar_ggcc" method="post">
+                  <table id="ggcc" class="table table-bordered table-striped dt-responsive">
+                  <thead>
+                    <tr>
+                      <th>Proveedor</th>
+                      <th>Concepto</th>
+                      <th>Fecha Vencimiento</th>
+                      <th>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="cuenta in cuentas">
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                      <td>&nbsp;</td>
+                    </tr>
+                    <tr ng-if="!cuentas || cuentas.length == 0" >
+                      <td colspan="4">No existen cuentas sin autorizar</td>
+                    </tr>
+                  </tbody>
+                  </table>
+                  <input type="hidden" name="ggcc_valido" id="ggcc_valido">
+                  </form>
+                </div><!-- /.box-body -->
+
+                <div class="box-body" ng-show="sel == 'agregar'">
+                <form id="basicBootstrapForm" class="form-horizontal" action="<?php echo base_url();?>accounts/submit_cuenta" method="post" role="form" enctype="multipart/form-data">
+                  <div class="box-body">
+                        <div class="row">
+                          <div class="col-xs-3">
+                            <label for="proveedor">Proveedor</label>    
+                            <select name="proveedor" id="proveedor"  class="form-control"  ng-options="proveedor.nombre for proveedor in proveedores track by proveedor.id" ng-model="cuenta.proveedores">
+                                <option value="">Seleccione un proveedor</option>
+                            </select>
+                          </div>
+                          <div class="col-xs-3">
+                            <label for="documento">Nro. Documento</label>    
+                            <input type="text" class="form-control" name="documento" id="documento" placeholder="Nro. de Documento">
+                          </div>    
+                          <div class="col-xs-3">                      
+                            <div class="form-group">
+                              <label for="fecdocumento">Fecha Documento</label>
+                                <div class="input-group date form_date"  data-date="" data-date-format="dd MM yyyy" data-link-format="yyyy-mm-dd" >
+                                  <input class="form-control" size="16" type="text" readonly name="fecdocumento" id="fecdocumento" value="<?php echo date('d/m/Y');?>" placeholder="dd/mm/aaaa">
+                                   <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                </div>
+                            </div>                              
+                          </div>
+
+                        </div>
+
+                        <div class="row">
+                          <div class="col-xs-3">
+                            <label for="concepto">Concepto</label>    
+                            <select name="concepto" id="concepto"  class="form-control"  ng-options="concepto.nombre for concepto in conceptos track by concepto.id" ng-model="cuenta.conceptos">
+                                <option value="">Seleccione un concepto</option>
+                            </select>
+                          </div>
+
+                          <div class="col-xs-3">
+                            <label for="monto">Monto</label>    
+                            <div class="input-group">
+                              <span class="input-group-addon">$</span>
+                              <input type="text" class="form-control" name="monto" id="monto" placeholder="Monto">
+                            </div>
+                          </div>   
+                          <div class="col-xs-3">                      
+                            <div class="form-group">
+                              <label for="fecvencimiento">Fecha Vencimiento</label>
+                                <div class="input-group date form_date"  data-date="" data-date-format="dd MM yyyy" data-link-format="yyyy-mm-dd" >
+                                  <input class="form-control" size="16" type="text" readonly name="fecvencimiento" id="fecvencimiento" value="<?php echo date('d/m/Y');?>" placeholder="dd/mm/aaaa">
+                                   <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                                </div>
+                            </div>                              
+                          </div>
+                        </div>
+
+                        <div class="row">
+                          <div class="col-xs-3">
+                            <label for="descripcion">Descripci&oacute;n</label>    
+                            <textarea class="form-control" rows="3" name="descripcion" id="descripcion" placeholder="Descripcion"></textarea>
+                          </div>    
+                          <div class="col-xs-3">                                            
+                            <div class="form-group">
+                              <label for="exampleInputFile">Adjuntar Comprobante</label>
+                              <input type="file" id="comprobante" name="comprobante">
+                            </div>
+                          </div>
+
+
+                       </div>
+
+                 </div><!-- /.box-body -->
+
+                  <div class="box-footer">
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                  </div>
+                </form>
+                </div><!-- /.box-body -->                
+
+
+              </div><!-- /.box -->
+
+            </div>
+          </div>
+        </section><!-- /.content -->
+
+
+  <script>
+
+    $(".form_date").datetimepicker({
+        format: "dd/mm/yyyy",
+        autoclose: true,
+        todayBtn: true,
+        pickerPosition: "bottom-left",
+        weekStart: true,
+        startView: 2,
+        minView: 2,
+        forceParse: 0,
+        language:  'es',     
+    });
+
+  </script>
+
+<script>
+$(document).ready(function() {
+    $('#basicBootstrapForm').formValidation({
+        framework: 'bootstrap',
+        icon: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            proveedor: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Proveedor es requerido'
+                    }
+                }
+            },
+            documento: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Documento es requerido'
+                    },
+                    regexp: {
+                        regexp: /^[0-9]/,
+                        message: 'Documento s&oacute;lo puede contener n&uacute;meros'
+                    }                    
+
+                }
+            },
+            fecdocumento: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Fecha Documento es requerida'
+                    },
+                    regexp: {
+                        regexp: /^[0-9]/,
+                        message: 'Fono 1 s&oacute;lo puede contener n&uacute;meros'
+                    }                    
+                }
+            },
+            concepto: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Concepto es requerido'
+                    }                  
+                }
+            },
+            monto: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Monto es requerido'
+                    },
+                    regexp: {
+                        regexp: /^[0-9]/,
+                        message: 'Monto s&oacute;lo puede contener n&uacute;meros'
+                    }                    
+
+                }
+            },
+            fecvencimiento: {
+                row: '.col-xs-3',
+                validators: {
+                    notEmpty: {
+                        message: 'Fecha Vencimiento es requerida'
+                    },
+                    regexp: {
+                        regexp: /^[0-9]/,
+                        message: 'Fecha Vencimiento s&oacute;lo puede contener n&uacute;meros'
+                    }                    
+                }
+            },            
+        }
+    })
+
+});
+</script>  

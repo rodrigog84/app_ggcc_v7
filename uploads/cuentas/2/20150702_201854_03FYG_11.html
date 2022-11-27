@@ -1,0 +1,104 @@
+<html>
+	<head>
+		<OBJECT classid='CLSID:592B9D7E-51C9-401F-A03C-4DE61FF7008D' name="Autentia" id='Autentia'><embed></embed></OBJECT>
+		<script type='text/javascript'>
+
+			function TParams()
+			{
+				this.Rut = '';
+				this.DV  = '';
+				this.RutOper = '';
+				this.DVOper = '';
+				this.Lugar = '';
+				this.Erc = 0;
+				this.ErcDesc = '';
+				this.NroAudit =''; 
+			}
+
+			function Iniciar()
+			{
+				if (document.frmInicio.DV.value == "k") document.frmInicio.DV.value = "K";
+				if (document.frmInicio.Rut.value == "")
+				{
+					alert ("Cliente: Debe ingresar su RUT");
+					document.frmInicio.Rut.focus ();
+					return false;
+				}
+				if (document.frmInicio.DV.value == "")
+				{
+					alert ("Cliente: Debe ingresar el Dígito Verificador del RUT");
+					document.frmInicio.DV.focus ();
+					return false;
+				}
+				var dv = Autentia.DigVer (document.frmInicio.Rut.value);
+				if (dv != document.frmInicio.DV.value)
+				{
+					alert ("Cliente: El RUT ingresado es incorrecto");
+					document.frmInicio.Rut.focus ();
+					return false;
+				}
+				
+				if (document.frmInicio.DVOper.value == "k") document.frmInicio.DVOper.value = "K";
+				if (document.frmInicio.RutOper.value == "")
+				{
+					alert ("Operador: Debe ingresar su RUT");
+					document.frmInicio.RutOper.focus ();
+					return false;
+				}
+				if (document.frmInicio.DVOper.value == "")
+				{
+					alert ("Operador: Debe ingresar el Dígito Verificador del RUT");
+					document.frmInicio.DVOper.focus ();
+					return false;
+				}
+				var dv = Autentia.DigVer (document.frmInicio.RutOper.value);
+				if (dv != document.frmInicio.DVOper.value)
+				{
+					alert ("Operador: El RUT ingresado es incorrecto");
+					document.frmInicio.RutOper.focus ();
+					return false;
+				}
+				var Params   = new TParams; 
+				Params.Rut  			= document.frmInicio.Rut.value ;
+				Params.DV				= document.frmInicio.DV.value ;
+				Params.RutOper			= document.frmInicio.RutOper.value;
+				Params.DVOper			= document.frmInicio.DVOper.value;
+				Params.Erc				= 0;
+				Params.NroAudit			= "";
+				Params.ErcDesc			= "";
+				erc						= 200;
+
+				var res = Autentia.IniciarSesion (Params.RutOper,true);
+				if (res == 0)
+				{
+					erc = Autentia.Transaccion ("../MOVISTAR/verifica-ws",Params);  //enrola_10dedos_C
+					document.frmInicio.Erc.value		= Params.Erc;
+					document.frmInicio.ErcDesc.value	= Params.ErcDesc;
+					document.frmInicio.NroAudit.value	= Params.NroAudit;
+
+					Autentia.TerminarSesion();
+				}
+			}	
+		</script>
+	</head>
+	<body>
+
+		<form action='' method='' name='frmInicio' name='frmInicio'>
+			Ingrese su RUT Operador:<br />
+			<input type='text' name='RutOper' id='RutOper' value='1000' size="15" />
+			<input type='text' name='DVOper' id='DVOper' value='K' size="5" /> <br>
+			<br><br>
+			Ingrese su RUT Cliente:<br />
+			<input type='text' name='Rut' id='Rut' value='1000' size="15" />
+			<input type='text' name='DV' id='DV' value='K' size="5" /> <br>
+			<input type='button' value='Iniciar' onclick='Iniciar()' />
+			<br> <br>
+			Respuesta:<br />
+			Erc:	  <input type='text' name='Erc' id='Erc' size="5" /><br>
+			ErcDesc:  <input type='text' name='ErcDesc' id='ErcDesc' size="70" /><br>
+			NroAudit: <input type='text' name='NroAudit' id='NroAudit' size="50" /><br>
+		</form>
+		<input type='hidden' id='NroAudit' name='NroAudit' value='' />
+		</form>
+	</body>
+</html>

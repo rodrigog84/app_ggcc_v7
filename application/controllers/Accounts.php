@@ -1581,7 +1581,7 @@ class Accounts extends CI_Controller {
 							'propiedad' => count($cuentas) == 0 ? 0 : $cuentas->idpropiedad,
 							'periodo' => count($cuentas) == 0 ? '' : $cuentas->idperiodo,
 							'fechadeuda' => count($cuentas) == 0 ? '' : $cuentas->fechadeuda,
-							'monto' => count($cuentas) == 0 ? '' : $cuentas->idconcepto == 8 ? $cuentas->monto*(-1) : $cuentas->monto,
+							'monto' => count($cuentas) == 0 ? '' : ($cuentas->idconcepto == 8 ? $cuentas->monto*(-1) : $cuentas->monto),
 							'descripcion' => count($cuentas) == 0 ? '' : $cuentas->descripcion,
 							'nombrearchivo' => count($cuentas) == 0 ? '' : $cuentas->nombrearchivo,
 							);

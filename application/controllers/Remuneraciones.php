@@ -311,7 +311,7 @@ class Remuneraciones extends CI_Controller
 
 
             $datos_form = array(
-                'iduser' => is_null($idtrabajador) ? 0 : $trabajador->iduser ? $trabajador->iduser : 0,
+                'iduser' => is_null($idtrabajador) ? 0 : ($trabajador->iduser ? $trabajador->iduser : 0),
                 'uemail' => is_null($idtrabajador) ? 0 : $trabajador->uemail,
                 'idtrabajador' =>  is_null($idtrabajador) ? 0 : $trabajador->id,
                 'rut' => is_null($idtrabajador) ? "" : number_format($trabajador->rut, 0, ".", ".") . "-" . $trabajador->dv,

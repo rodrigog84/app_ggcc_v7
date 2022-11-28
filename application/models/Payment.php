@@ -3026,6 +3026,18 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 			$datosperiodo = $this->admin->get_periodos($this->session->userdata('comunidadid'),$idperiodo);
 
+
+			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+									'margin-top' => 16,
+									'margin-bottom' => 16,
+									'margin-header' => 9,
+									'margin-footer' => 9,
+									'margin-left' => 10,
+									'margin-right' => 5,
+									]);
+
+
+			/*
 			$this->load->library("mpdf");
 			$this->mpdf->mPDF(
 				'',    // mode - default ''
@@ -3039,10 +3051,12 @@ public function comprobante_detalle_ggcc($idperiodo){
 				9,     // margin header
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
-				); 
-			$this->mpdf->SetTitle('Tu Gasto Común - Detalle Cobros');
-			$this->mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
-			$this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+				); */
+
+
+			$mpdf->SetTitle('Tu Gasto Común - Detalle Cobros');
+			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
+			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 			$content_detalle = $this->get_pdf_content_detalle($this->session->userdata('comunidadid'),$idperiodo);
 
 			if($content_detalle->pdf_content == ''  || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
@@ -3051,7 +3065,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 			}		
 
 
-			$this->mpdf->WriteHTML($content_detalle->pdf_content);			
+			$mpdf->WriteHTML($content_detalle->pdf_content);			
 
 
 
@@ -3061,7 +3075,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 
 
 
-			$this->mpdf->Output($nombre_archivo, "I");
+			$mpdf->Output($nombre_archivo, "I");
 			
 	}		
 
@@ -3094,8 +3108,19 @@ public function comprobante_detalle_ggcc($idperiodo){
 			}		
 
 
-			$this->load->library("mpdf");
-			$this->mpdf->mPDF(
+
+			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 7,
+									'margin-top' => 16,
+									'margin-bottom' => 16,
+									'margin-header' => 9,
+									'margin-footer' => 9,
+									'margin-left' => 10,
+									'margin-right' => 5,
+									]);
+
+
+			//$this->load->library("mpdf");
+			/*$this->mpdf->mPDF(
 				'',    // mode - default ''
 				'',    // format - A4, for example, default ''
 				7,     // font size - default 0
@@ -3107,19 +3132,19 @@ public function comprobante_detalle_ggcc($idperiodo){
 				9,     // margin header
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
-				);  
+				);  */
 			//echo $html; exit;
-			$this->mpdf->SetTitle('Tu Gasto Común - Comprobante');
-			$this->mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
-			$this->mpdf->WriteHTML($content->pdf_content);
-			$this->mpdf->AddPage();
-			$this->mpdf->WriteHTML($content_detalle->pdf_content);			
-			$this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+			$mpdf->SetTitle('Tu Gasto Común - Comprobante');
+			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
+			$mpdf->WriteHTML($content->pdf_content);
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($content_detalle->pdf_content);			
+			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
 			// SE ALMACENA EL ARCHIVO
 			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$datos_propiedad->numero.".pdf";
-			$this->mpdf->Output($nombre_archivo, "I");
+			$mpdf->Output($nombre_archivo, "I");
 			
 	}	
 
@@ -4074,7 +4099,18 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 			}
 
 			//var_dump($content); exit;
-			$this->load->library("mpdf");
+
+			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+									'margin-top' => 16,
+									'margin-bottom' => 16,
+									'margin-header' => 9,
+									'margin-footer' => 9,
+									'margin-left' => 10,
+									'margin-right' => 5,
+									]);
+
+
+			/*$this->load->library("mpdf");
 			$this->mpdf->mPDF(
 				'',    // mode - default ''
 				'',    // format - A4, for example, default ''
@@ -4087,25 +4123,25 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 				9,     // margin header
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
-				);  
+				);  */
 			//echo $content; exit;
-			$this->mpdf->SetTitle('Tu Gasto Común - Comprobante de Ingreso');
-			$this->mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
-			$this->mpdf->WriteHTML($content->pdf_content);
+			$mpdf->SetTitle('Tu Gasto Común - Comprobante de Ingreso');
+			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
+			$mpdf->WriteHTML($content->pdf_content);
 
 			if($content->protesto == 1){
-				$this->mpdf->SetWatermarkText('PROTESTO');
-				$this->mpdf->watermark_font = 'DejaVuSansCondensed';
-				$this->mpdf->showWatermarkText = true;
+				$mpdf->SetWatermarkText('PROTESTO');
+				$mpdf->watermark_font = 'DejaVuSansCondensed';
+				$mpdf->showWatermarkText = true;
 			}
 
 
-			$this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
 			// SE ALMACENA EL ARCHIVO
 			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_Ingreso_".$idegreso.".pdf";
-			$this->mpdf->Output($nombre_archivo, "I");
+			$mpdf->Output($nombre_archivo, "I");
 			
 	}
 

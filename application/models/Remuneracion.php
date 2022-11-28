@@ -2981,7 +2981,17 @@ limit 1		*/
             $content = $this->get_pdf_content($datos_remuneracion->id);
         }
 
-        $this->load->library("mpdf");
+
+        $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+                                'margin-top' => 16,
+                                'margin-bottom' => 16,
+                                'margin-header' => 9,
+                                'margin-footer' => 9,
+                                'margin-left' => 10,
+                                'margin-right' => 5,
+                                ]);        
+
+       /* $this->load->library("mpdf");
         $this->mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
@@ -2994,17 +3004,17 @@ limit 1		*/
             9,     // margin header
             9,     // margin footer
             'L'    // L - landscape, P - portrait
-        );
+        );*/
         //echo $html; exit;
-        $this->mpdf->SetTitle('Tu Gasto Común - Liquidación de Sueldos');
-        $this->mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
-        $this->mpdf->WriteHTML($content->pdf_content);
-        $this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+        $mpdf->SetTitle('Tu Gasto Común - Liquidación de Sueldos');
+        $mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
+        $mpdf->WriteHTML($content->pdf_content);
+        $mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
         // SE ALMACENA EL ARCHIVO
         $nombre_archivo = date("Y") . "_" . date("m") . "_" . date("d") . "_sueldos_" . $datos_remuneracion->id . ".pdf";
-        $this->mpdf->Output($nombre_archivo, "I");
+        $mpdf->Output($nombre_archivo, "I");
     }
 
 
@@ -3181,7 +3191,18 @@ limit 1		*/
 
         $content = $this->generar_contenido_comprobante_solicitud($idpersonal, $idcartola);
 
-        $this->load->library("mpdf");
+
+        $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+                                'margin-top' => 16,
+                                'margin-bottom' => 16,
+                                'margin-header' => 9,
+                                'margin-footer' => 9,
+                                'margin-left' => 10,
+                                'margin-right' => 5,
+                                ]);
+
+
+        /*$this->load->library("mpdf");
         $this->mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
@@ -3194,17 +3215,17 @@ limit 1		*/
             9,     // margin header
             9,     // margin footer
             'L'    // L - landscape, P - portrait
-        );
+        );*/
         //echo $html; exit;
-        $this->mpdf->SetTitle('Tu Gasto Común - Comprobante Solicitud Vacaciones');
-        $this->mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
-        $this->mpdf->WriteHTML($content);
-        $this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+        $mpdf->SetTitle('Tu Gasto Común - Comprobante Solicitud Vacaciones');
+        $mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
+        $mpdf->WriteHTML($content);
+        $mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
         // SE ALMACENA EL ARCHIVO
         $nombre_archivo = date("Y") . "_" . date("m") . "_" . date("d") . "_vacaciones_" . $idpersonal . ".pdf";
-        $this->mpdf->Output($nombre_archivo, "I");
+        $mpdf->Output($nombre_archivo, "I");
     }
 
 
@@ -3215,8 +3236,16 @@ limit 1		*/
         $this->load->model('admin');
         $datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
+        $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+                                'margin-top' => 16,
+                                'margin-bottom' => 16,
+                                'margin-header' => 9,
+                                'margin-footer' => 9,
+                                'margin-left' => 10,
+                                'margin-right' => 5,
+                                ]);
 
-        $this->load->library("mpdf");
+        /*$this->load->library("mpdf");
         $this->mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
@@ -3229,10 +3258,10 @@ limit 1		*/
             9,     // margin header
             9,     // margin footer
             'L'    // L - landscape, P - portrait
-        );
-        $this->mpdf->SetTitle('Tu Gasto Común - Liquidaciones de Sueldos');
-        $this->mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
-        $this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+        );*/
+        $mpdf->SetTitle('Tu Gasto Común - Liquidaciones de Sueldos');
+        $mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
+        $mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
         $cantidad = count($datos_remuneracion);
         $i = 0;
         foreach ($datos_remuneracion as $remuneracion) {
@@ -3242,12 +3271,12 @@ limit 1		*/
                 $this->generar_contenido_comprobante($remuneracion);
                 $content = $this->get_pdf_content($remuneracion->id);
             }
-            $this->mpdf->WriteHTML($content->pdf_content);
+            $mpdf->WriteHTML($content->pdf_content);
 
             $i++;
 
             if ($i < $cantidad) {
-                $this->mpdf->AddPage();
+                $mpdf->AddPage();
             }
         }
 
@@ -3261,7 +3290,7 @@ limit 1		*/
 
 
 
-        $this->mpdf->Output($nombre_archivo, "I");
+        $mpdf->Output($nombre_archivo, "I");
     }
 
 

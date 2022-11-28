@@ -3964,7 +3964,17 @@ class Admin extends CI_Model
         $this->load->model('admin');
         $datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
-        $this->load->library("mpdf");
+
+        $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+                                'margin-top' => 16,
+                                'margin-bottom' => 16,
+                                'margin-header' => 9,
+                                'margin-footer' => 9,
+                                'margin-left' => 10,
+                                'margin-right' => 5,
+                                ]);
+
+        /*$this->load->library("mpdf");
         $this->mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
@@ -3977,24 +3987,24 @@ class Admin extends CI_Model
             9,     // margin header
             9,     // margin footer
             'L'    // L - landscape, P - portrait
-        );
-        $this->mpdf->SetTitle('Tu Gasto Común - Detalle Cobros');
-        $this->mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
-        $this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+        );*/
+        $mpdf->SetTitle('Tu Gasto Común - Detalle Cobros');
+        $mpdf->SetHeader('Condominio ' . $datos_comunidad->nombre . ' - ' . $datos_comunidad->comuna . ' - RUT: ' . number_format($datos_comunidad->rut, 0, ".", ".") . '-' . $datos_comunidad->dv);
+        $mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
         $content_comprobante =  $this->generar_contenido_comprobante_muestra();
         $content_detalle =  $this->generar_contenido_detalle_muestra();
 
 
 
 
-        $this->mpdf->WriteHTML($content_comprobante);
+        $mpdf->WriteHTML($content_comprobante);
 
-        $this->mpdf->AddPage();
-        $this->mpdf->WriteHTML($content_detalle);
+        $mpdf->AddPage();
+        $mpdf->WriteHTML($content_detalle);
         // SE ALMACENA EL ARCHIVO
         $nombre_archivo = date("Y") . "_" . date("m") . "_" . date("d") . "_" . $datos_propiedad->numero . ".pdf";
 
-        $this->mpdf->Output($nombre_archivo, "I");
+        $mpdf->Output($nombre_archivo, "I");
     }
 
 

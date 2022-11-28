@@ -1,6 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 class Reports extends CI_Controller {
 
 	
@@ -974,9 +978,12 @@ class Reports extends CI_Controller {
 				redirect('reports/mensual_data/');
 			}*/
 
-	        $this->load->library('PHPExcel');
+	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle($title_libro);
 
 
@@ -1016,24 +1023,24 @@ class Reports extends CI_Controller {
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -1078,7 +1085,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1122,7 +1129,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1168,7 +1175,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1214,7 +1221,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1269,7 +1276,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1321,7 +1328,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1474,7 +1481,7 @@ class Reports extends CI_Controller {
 	            	$sheet->setCellValue("T".$i,$txt_obs);
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1485,16 +1492,16 @@ class Reports extends CI_Controller {
 
 
 			/*********************** Color Cobro Individual********************************************************/
-						$sheet->getStyle("F".$filaInicio.":F".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("F".$filaInicio.":F".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("F".$filaInicio.":F".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
-						$sheet->getStyle("N".$filaInicio.":N".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("N".$filaInicio.":N".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("N".$filaInicio.":N".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 
-						$sheet->getStyle("Q".$filaInicio.":Q".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("Q".$filaInicio.":Q".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("Q".$filaInicio.":Q".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 
-						$sheet->getStyle("B".($filaInicio+1).":". ordenLetrasExcel($columnaFinal) .($filaInicio+1))->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".($filaInicio+1).":". ordenLetrasExcel($columnaFinal) .($filaInicio+1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".($filaInicio+1).":". ordenLetrasExcel($columnaFinal) .($filaInicio+1))->getFill()->getStartColor()->setRGB('E8EDFF');
 
 
@@ -1545,7 +1552,7 @@ class Reports extends CI_Controller {
 
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 		 			}	            	
 	            	$i++;
@@ -1563,24 +1570,24 @@ class Reports extends CI_Controller {
 			$sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -1589,7 +1596,7 @@ class Reports extends CI_Controller {
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -1598,7 +1605,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde izquierdo ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -1608,7 +1615,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -1616,7 +1623,7 @@ class Reports extends CI_Controller {
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -1624,14 +1631,14 @@ class Reports extends CI_Controller {
 
 
 		/***************************** Color primera columna ********************************************************/
-						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -1641,23 +1648,23 @@ class Reports extends CI_Controller {
 
 				$sheet->getStyle("O".$filaInicio.":O".$i)->getFill()->getStartColor()->setRGB('FFFFFF');
 
-				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_NONE);
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
 
 
-				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 
-				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 
 
 
 				$sheet->getStyle("R".$filaInicio.":R".$i)->getFill()->getStartColor()->setRGB('FFFFFF');
 
-				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_NONE);
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
 
 
-				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 
-				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 
 			}
 
@@ -1672,10 +1679,10 @@ class Reports extends CI_Controller {
 	        header("Content-Type: application/vnd.ms-excel");
 			
 	        $nombreArchivo = $title_libro;
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -1710,9 +1717,12 @@ class Reports extends CI_Controller {
 
 
 
-	        $this->load->library('PHPExcel');
+	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+        	
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle("detalle_lectura");
 
 
@@ -1764,24 +1774,24 @@ class Reports extends CI_Controller {
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D9")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D9")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B9:D9")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B9")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B9")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D9")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B9:D9")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B9")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B9")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D9")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B9")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B9")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B9")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -1832,7 +1842,7 @@ class Reports extends CI_Controller {
 
 	 			if($i % 2 != 0){
 	 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	 			}	            	
             	$i++;
@@ -1849,24 +1859,24 @@ class Reports extends CI_Controller {
 			$sheet->getStyle("B7:".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -1875,7 +1885,7 @@ class Reports extends CI_Controller {
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -1884,7 +1894,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde izquierdo ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -1894,7 +1904,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -1903,7 +1913,7 @@ class Reports extends CI_Controller {
 			/***************************** Penultimo borde inferior********************************************************
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).($i-1))->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).($i-1))->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			******************************************************************************************************/
@@ -1918,7 +1928,7 @@ class Reports extends CI_Controller {
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -1928,7 +1938,7 @@ class Reports extends CI_Controller {
 		/***************************** Color fila inferior********************************************************
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 
 
@@ -1938,14 +1948,14 @@ class Reports extends CI_Controller {
 
 
 		/***************************** Color primera columna ********************************************************/
-						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -1970,10 +1980,10 @@ class Reports extends CI_Controller {
 			ob_end_clean();
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'detalle_lectura';
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -2003,9 +2013,12 @@ class Reports extends CI_Controller {
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
 
-	        $this->load->library('PHPExcel');
+	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle("detalle_saldos");
 
 
@@ -2045,24 +2058,24 @@ class Reports extends CI_Controller {
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -2100,7 +2113,7 @@ class Reports extends CI_Controller {
 
 	 			if($i % 2 != 0){
 	 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	 			}	            	
             	$i++;
@@ -2115,24 +2128,24 @@ class Reports extends CI_Controller {
 			$sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -2141,7 +2154,7 @@ class Reports extends CI_Controller {
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -2150,7 +2163,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde izquierdo ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -2160,7 +2173,7 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -2168,7 +2181,7 @@ class Reports extends CI_Controller {
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -2176,14 +2189,14 @@ class Reports extends CI_Controller {
 
 
 		/***************************** Color primera columna ********************************************************/
-						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -2195,10 +2208,10 @@ class Reports extends CI_Controller {
 			ob_end_clean();
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'saldos_propiedades';
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -2226,9 +2239,12 @@ class Reports extends CI_Controller {
 
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
-	        $this->load->library('PHPExcel');
+	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle("detalle_gc");
 
 			if($idperiodo != ''){
@@ -2307,24 +2323,24 @@ class Reports extends CI_Controller {
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D8")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D8")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B8:D8")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B8")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B8")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D8")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B8:D8")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B8")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B8")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D8")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B8")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B8")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B8")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -2402,7 +2418,7 @@ class Reports extends CI_Controller {
 	         	//echo "consulta 1: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
 	 			if($i % 2 != 0){
 	 				//echo "consulta 2: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
   					//F7F9FD
 	 			}					        	
@@ -2425,7 +2441,7 @@ class Reports extends CI_Controller {
 	            	//echo "consulta 3: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	  					//F7F9FD
 		 			}	            	
@@ -2445,7 +2461,7 @@ class Reports extends CI_Controller {
 	         	//echo "consulta 1: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
 	 			if($i % 2 != 0){
 	 				//echo "consulta 2: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
   					//F7F9FD
 	 			}					        	
@@ -2468,7 +2484,7 @@ class Reports extends CI_Controller {
 	            	//echo "consulta 3: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
 		 			if($i % 2 != 0){
 		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	  					//F7F9FD
 		 			}	            	
@@ -2510,24 +2526,24 @@ class Reports extends CI_Controller {
 			$sheet->getStyle("B7:".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -2536,7 +2552,7 @@ class Reports extends CI_Controller {
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -2545,12 +2561,12 @@ class Reports extends CI_Controller {
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal-1).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal-1).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 
 					if($this->session->userdata('level') == 2 || $this->session->userdata('level') == 3){
 						for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-							$sheet->getStyle(ordenLetrasExcel($columnaFinal-3).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+							$sheet->getStyle(ordenLetrasExcel($columnaFinal-3).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 						}
 					}
 			
@@ -2561,9 +2577,9 @@ class Reports extends CI_Controller {
 			/***************************** Penultimo borde inferior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).($i-1))->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-						$sheet->getStyle(ordenLetrasExcel($j).($i-2))->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-						$sheet->getStyle(ordenLetrasExcel($j).($i-3))->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).($i-1))->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).($i-2))->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).($i-3))->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -2578,7 +2594,7 @@ class Reports extends CI_Controller {
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -2588,7 +2604,7 @@ class Reports extends CI_Controller {
 		/***************************** Color fila inferior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle("B".($i-2).":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".($i-2).":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".($i-2).":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 
 
@@ -2598,7 +2614,7 @@ class Reports extends CI_Controller {
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -2624,10 +2640,10 @@ class Reports extends CI_Controller {
 			ob_end_clean();
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'detalle_GC';
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -3098,9 +3114,12 @@ public function mensual_data($resultid = '')
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
 
-	        $this->load->library('PHPExcel');
+	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle("egresos");
 
 
@@ -3140,24 +3159,24 @@ public function mensual_data($resultid = '')
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -3202,7 +3221,7 @@ public function mensual_data($resultid = '')
 
 	 			if($i % 2 != 0){
 	 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	 			}	            	
             	$i++;
@@ -3217,24 +3236,24 @@ public function mensual_data($resultid = '')
 			$sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -3243,7 +3262,7 @@ public function mensual_data($resultid = '')
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -3252,7 +3271,7 @@ public function mensual_data($resultid = '')
 		/***************************** Penultimo borde izquierdo ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -3262,7 +3281,7 @@ public function mensual_data($resultid = '')
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -3270,7 +3289,7 @@ public function mensual_data($resultid = '')
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -3278,14 +3297,14 @@ public function mensual_data($resultid = '')
 
 
 		/***************************** Color primera columna ********************************************************/
-						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -3297,10 +3316,10 @@ public function mensual_data($resultid = '')
 			ob_end_clean();
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'reporte_egresos';
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -3331,9 +3350,14 @@ public function export_cartola_propiedad($idpropiedad = '')
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
 
-	        $this->load->library('PHPExcel');
-	  	    $this->phpexcel->setActiveSheetIndex(0);
-	        $sheet = $this->phpexcel->getActiveSheet();
+	       // $this->load->library('PHPExcel');
+	  	   // $this->phpexcel->setActiveSheetIndex(0);
+	       // $sheet = $this->phpexcel->getActiveSheet();
+
+			$spreadsheet = new Spreadsheet();
+			$sheet = $spreadsheet->getActiveSheet();
+
+
 	        $sheet->setTitle("cartola_propiedad");
 	       	$this->load->model('report');
 	       	$this->load->model('admin');
@@ -3387,24 +3411,24 @@ public function export_cartola_propiedad($idpropiedad = '')
 			/****************** TABLA INICIAL ****************/
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
-			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
-			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 		
 			/**********************************************************************************************************/			        
 				
 			/***** COLOR TABLA ****************/
-			$sheet->getStyle("B2:D2")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
 
-			$sheet->getStyle("B2:B6")->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
 
 
@@ -3452,7 +3476,7 @@ public function export_cartola_propiedad($idpropiedad = '')
 
 	 			if($i % 2 != 0){
 	 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
-					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 					$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
 	 			}	            	
             	$i++;
@@ -3467,24 +3491,24 @@ public function export_cartola_propiedad($idpropiedad = '')
 			$sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
 
 			/*************************todos los bordes internos *************************************/
-			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
 
 			/*************************bordes cuadro principal (externo) *************************************/
 					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
-						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/**********************************************************************************************************/			        
@@ -3493,7 +3517,7 @@ public function export_cartola_propiedad($idpropiedad = '')
 			/***************************** Segundo borde superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 			/******************************************************************************************************/
@@ -3502,7 +3526,7 @@ public function export_cartola_propiedad($idpropiedad = '')
 		/***************************** Penultimo borde izquierdo ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -3512,7 +3536,7 @@ public function export_cartola_propiedad($idpropiedad = '')
 		/***************************** Penultimo borde derecho ********************************************************/
 			
 					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
-						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(PHPExcel_Style_Border::BORDER_MEDIUM);
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
 					}
 			
 		/******************************************************************************************************/			
@@ -3520,7 +3544,7 @@ public function export_cartola_propiedad($idpropiedad = '')
 			/***************************** Color fila superior********************************************************/
 			
 					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
-						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
 					}
 			
@@ -3528,14 +3552,14 @@ public function export_cartola_propiedad($idpropiedad = '')
 
 
 		/***************************** Color primera columna ********************************************************/
-						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
 
 
 		/***************************** Color montos ********************************************************/
-						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
 						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
 			
 			/******************************************************************************************************/
@@ -3547,10 +3571,10 @@ public function export_cartola_propiedad($idpropiedad = '')
 			ob_end_clean();
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'Cartola_Propiedad';
-	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xls\"");
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
-	        $writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			

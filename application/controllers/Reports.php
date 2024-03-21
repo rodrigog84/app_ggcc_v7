@@ -3567,7 +3567,9 @@ public function export_cartola_propiedad($idpropiedad = '')
 			$sheet->setSelectedCells('E1'); //celda seleccionada
 
 
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'Cartola_Propiedad';
 	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");

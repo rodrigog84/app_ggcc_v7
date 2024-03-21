@@ -112,7 +112,7 @@
                           <?php if($ggcc->periodoid == $periodo_inicial->id){ ?>                      
                             &nbsp;
                           <?php }else{ ?>                        
-                              <a href="<?php echo base_url(); ?>payments/download_ggcc/<?php echo $datospropiedad->id."/".$ggcc->periodoid;?>"><span class="glyphicon glyphicon-paperclip"></span></a>
+                              <a href="<?php echo base_url(); ?>payments/download_ggcc/<?php echo $datospropiedad->id."/".$ggcc->periodoid;?>" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a>
                           <?php } ?>                             
                       </td>
                       <!--td><a href="<?php echo base_url(); ?>uploads/ggcc/<?php echo $datospropiedad->id."/".$ggcc->nombrearchivo;?>" target="_blank"><span class="glyphicon glyphicon-paperclip"></span></a></td-->

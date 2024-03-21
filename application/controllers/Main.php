@@ -240,7 +240,8 @@ class Main extends CI_Controller
 
             $propiedades_asignadas = $unidad_id != '' ? $this->admin->propiedades_asignadas($this->session->userdata('user_id'), $unidad_id) : $this->admin->propiedades_asignadas($this->session->userdata('user_id'));
             $num_propiedades = count($this->admin->propiedades_asignadas($this->session->userdata('user_id')));
-            if (count($propiedades_asignadas) > 1) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
+           // if (count($propiedades_asignadas) > 1) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
+             if (is_array($propiedades_asignadas)) {
                 $content = array(
                     'menu' => 'Selecci&oacute;n Comunidad',
                     'title' => 'Comunidades',
@@ -252,7 +253,8 @@ class Main extends CI_Controller
                 $vars['content_view'] = 'admin/asigna_propiedad';
                 $template = "template_lock";
                 //$this->load->view('template_lock',$vars);
-            } else if (count($propiedades_asignadas) == 1) {
+            //} else if (count($propiedades_asignadas) == 1) {
+             } else if (isset($propiedades_asignadas->id)) { // SE ASOCIA COMUNIDAD
 
                 $this->session->set_userdata('comunidadid', $propiedades_asignadas->idcomunidad);
                 $this->session->set_userdata('comunidadnombre', $propiedades_asignadas->nombrecomunidad);

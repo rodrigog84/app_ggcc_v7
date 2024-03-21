@@ -1989,7 +1989,8 @@ class Remuneraciones extends CI_Controller
             $this->load->model('remuneracion');
             $remuneracion = $this->remuneracion->get_remuneraciones_by_id($idremuneracion);
 
-            if (count($remuneracion) == 0) { // SI NO ENCUENTRO NINGUNA REMUNERACION (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
+
+            if (is_null($remuneracion)) { // SI NO ENCUENTRO NINGUNA REMUNERACION (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
                 redirect('main/dashboard/');
             } else if (is_null($remuneracion->cierre)) {
                 redirect('main/dashboard/'); // SI NO ES UN PERIODO CERRADO, SE ENVÍA AL DASHBOARD

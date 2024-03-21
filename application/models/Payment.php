@@ -972,7 +972,8 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		$query = $this->db->get();
 		$datos = $query->row();
 
-		return count($query->row()) == 0 ? 0 : $datos->monto;
+
+		return is_null($query->row()) ? 0 : $datos->monto;
 
 	}		
 

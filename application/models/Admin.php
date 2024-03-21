@@ -4043,6 +4043,117 @@ public function envia_mail($from, $toList, $subject, $content, $type, $alias = "
 
 
 
+
+public function envia_mail_prueba($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común", $attachments = null)
+    {
+
+
+                // Configure API key authorization: api-key
+                $credentials = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', 'xkeysib-'.API_KEY_MAIL);
+
+                $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(new GuzzleHttp\Client(),$credentials);
+
+
+
+                if (is_array($toList)) {
+
+                    $toList = array_unique($toList);
+                    foreach ($toList as $destiny) {
+
+
+                          $sendSmtpEmail = new \SendinBlue\Client\Model\SendSmtpEmail([
+                             'subject' => $subject,
+                             'sender' => ['name' => $alias, 'email' => $from],
+                             'replyTo' => ['name' => $alias, 'email' => $from],
+                             'to' => [['email' => $destiny]],
+                             'htmlContent' => $content
+                        ]);                     
+
+                        $array_attachments = array();
+                        if(!is_null($attachments)){
+                            foreach ($attachments as $attachment) {
+                                $array_archivo = explode('/',$attachment);
+                                $array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment))),'name' => $array_archivo[count($array_archivo)-1]);
+                                array_push($array_attachments,$array_fila);
+                            }
+                                
+                        }     
+
+                        if(count($array_attachments) > 0){
+                            $sendSmtpEmail['attachment'] = $array_attachments;  
+                        }
+                        
+
+
+                        try {
+                            $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+
+                          $data_envio = array(
+                                'email' => $destiny,
+                                'messageid' => $result['messageId'],
+                                'idcomunidad' => $this->session->userdata('comunidadid')
+                            );
+
+                            $this->db->insert('gc_log_envio_mail', $data_envio);    
+
+
+                        } catch (Exception $e) {
+                            echo $e->getMessage(),PHP_EOL;
+                        }
+
+                    }
+                } else {
+
+                        $sendSmtpEmail = new SendinBlue\Client\Model\SendSmtpEmail([
+                             'subject' => $subject,
+                             'sender' => ['name' => $alias, 'email' => $from],
+                             'replyTo' => ['name' => $alias, 'email' => $from],
+                             'to' => [['email' => $toList]],
+                             'htmlContent' => $content
+                        ]);
+
+
+                        $array_attachments = array();
+                        if(!is_null($attachments)){
+                            foreach ($attachments as $attachment) {
+                                $array_archivo = explode('/',$attachment);
+                                $array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment))),'name' => $array_archivo[count($array_archivo)-1]);
+                                array_push($array_attachments,$array_fila);
+                            }
+                                
+                        }     
+
+                        if(count($array_attachments) > 0){
+                            $sendSmtpEmail['attachment'] = $array_attachments;  
+                        }
+                        
+                        
+
+
+                    try {
+                            $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+
+                          $data_envio = array(
+                                'email' => $destiny,
+                                'messageid' => $result['messageId'],
+                                'idcomunidad' => $this->session->userdata('comunidadid')
+                            );
+
+                            $this->db->insert('gc_log_envio_mail', $data_envio);    
+
+                        } catch (Exception $e) {
+                            echo $e->getMessage(),PHP_EOL;
+                        }
+
+
+                }
+
+
+
+    }
+
+
+
  /*public function envia_mail($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común")
     {
 

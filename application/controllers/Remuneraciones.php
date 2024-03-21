@@ -297,7 +297,8 @@ class Remuneraciones extends CI_Controller
             //var_dump($causales_finiquito); exit;
             /**** CARGA DE DATOS TRABAJADOR ****/
             $trabajador = is_null($idtrabajador) ?  array() : $this->remuneracion->get_personal_total($idtrabajador);
-            if (!is_null($idtrabajador) && count($trabajador) == 0) { // si estoy editando, pero ingreso un trabajador que no está, vuelvo al principio
+
+            if (!is_null($idtrabajador) && is_null($trabajador)) { // si estoy editando, pero ingreso un trabajador que no está, vuelvo al principio
                 redirect('remuneraciones/personal');
             }
             $bonos = is_null($idtrabajador) ?  array() : $this->remuneracion->get_bonos($idtrabajador);

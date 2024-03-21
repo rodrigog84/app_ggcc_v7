@@ -1675,7 +1675,9 @@ class Reports extends CI_Controller {
 
 			$sheet->setSelectedCells('E1'); //celda seleccionada
 
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 			
 	        $nombreArchivo = $title_libro;
@@ -1978,7 +1980,9 @@ class Reports extends CI_Controller {
 			    foreach ($cellIterator as $cell) {
 			        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
 			    }*/
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'detalle_lectura';
 	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
@@ -2205,8 +2209,9 @@ class Reports extends CI_Controller {
 
 			$sheet->setSelectedCells('E1'); //celda seleccionada
 
-
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'saldos_propiedades';
 	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
@@ -2638,7 +2643,9 @@ class Reports extends CI_Controller {
 			        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
 			    }*/
 	
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'detalle_GC';
 	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
@@ -3314,7 +3321,9 @@ public function mensual_data($resultid = '')
 			$sheet->setSelectedCells('E1'); //celda seleccionada
 
 
-			ob_end_clean();
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
 	        header("Content-Type: application/vnd.ms-excel");
 	        $nombreArchivo = 'reporte_egresos';
 	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");

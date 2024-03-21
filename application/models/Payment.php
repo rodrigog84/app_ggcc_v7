@@ -4498,7 +4498,7 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 				}
 				  //$this->admin->envia_mail('robot@tugastocomun.cl',$datos_propiedad->mail,'Comprobante de Pago',$messageBody,'html');
 				//$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
-				$this->admin->envia_mail_sb('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
+				$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
 				}
                   /*$this->email->set_mailtype("html");
                   $this->email->from('robot@tugastocomun.cl', 'Tu Gasto Común');

@@ -1635,8 +1635,9 @@ class Ion_auth_model extends CI_Model
         $level_data = $this->db->get_where($this->tables['level'], array('id' => $user->level))->row();
 
         // si no existe foto de perfil, se deja foto genérica
-        $arrayResponse = @get_headers(base_url() . 'dist/img/' . $user->photo);
-        $photo = strpos($arrayResponse[0], '200') ? $user->photo : 'user9-128x128.jpg';
+       // $arrayResponse = @get_headers(base_url() . 'dist/img/' . $user->photo);
+       // $photo = strpos($arrayResponse[0], '200') ? $user->photo : 'user9-128x128.jpg';
+        $photo = 'user9-128x128.jpg';
         $session_data = array(
             'identity'             => $user->{$this->identity_column},
             'username'             => $user->username,

@@ -1880,6 +1880,63 @@ class Remuneraciones extends CI_Controller
     }
 
 
+    public function remuneraciones_personal($idperiodo = null)
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+           // var_dump($this->session->userdata('user_id')); exit;
+            $this->load->model('remuneracion');
+
+            $userid = $this->session->userdata('user_id');
+            $personal = $this->remuneracion->get_trabajador_by_userid($userid);
+
+            if(count($personal) > 0){
+                $trabajador = $personal[0];
+                $idtrabajador = $trabajador->id;
+
+              //  var_dump($idtrabajador); exit;
+                $datosperiodo = $this->remuneracion->get_periodos_cerrados_personal($idtrabajador,$this->session->userdata('comunidadid'));
+               // echo '<pre>';
+               // var_dump($datosperiodo); exit;
+            }else{
+                $datosperiodo = array();
+            }
+
+            $content = array(
+                'menu' => 'Remuneraciones',
+                'title' => 'Remuneraciones',
+                'subtitle' => 'Detalle Remuneraciones'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'remuneraciones/remuneraciones_personal';
+            $vars['datosperiodo'] = $datosperiodo;
+            $vars['idperiodo'] = $idperiodo;
+
+
+            $vars['dataTables'] = true;
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
     public function ver_remuneraciones_periodo($idperiodo = '')
     {
 
@@ -2151,6 +2208,169 @@ class Remuneraciones extends CI_Controller
             $this->load->view('template', $vars);
         }
     }
+
+    public function correccion_monetaria()
+    {
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+            $resultid = $this->session->flashdata('correccion_monetaria_result');
+            if ($resultid == 1) {
+                $vars['message'] = "Correcci&oacute;n Monetaria actualizada correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            }
+
+
+            $anno_guarda = $this->session->flashdata('correccion_monetaria_anno');
+
+
+
+            $this->load->model('remuneracion');
+
+
+            $anno = $anno_guarda == '' ? date('Y') - 1 : $anno_guarda;
+
+            $tabla_correccion_monetaria = $this->remuneracion->get_tabla_correccion_monetaria($anno);
+
+          //    echo '<pre>';
+            $array_tabla_correccion_monetaria = array();
+            foreach ($tabla_correccion_monetaria as $tabla) {
+
+
+                $array_tabla_correccion_monetaria[$tabla->mes_orig] = $tabla->dic;
+
+
+              //  var_dump($tabla);
+             //   var_dump($array_tabla_correccion_monetaria);
+
+
+            }
+
+           
+            //var_dump($anno);
+           // var_dump($tabla_correccion_monetaria); 
+           //  var_dump($array_tabla_correccion_monetaria);exit;
+            $meses = array(1 => 'Enero',
+                           2 => 'Febrero',
+                           3 => 'Marzo',
+                           4 => 'Abril',
+                           5 => 'Mayo',
+                           6 => 'Junio',
+                           7 => 'Julio',
+                           8 => 'Agosto',
+                           9 => 'Septiembre',
+                           10 => 'Octubre',
+                           11 => 'Noviembre',
+                           12 => 'Diciembre',
+                          );
+
+            $content = array(
+                'menu' => 'Remuneraciones',
+                'title' => 'Remuneraciones',
+                'subtitle' => 'Correcci&oacute;n Monetaria'
+            );
+
+
+            $vars['formValidation'] = true;
+            $vars['mask'] = true;
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'remuneraciones/correccion_monetaria';
+            $vars['tabla_correccion_monetaria'] = $array_tabla_correccion_monetaria;
+            $vars['anno'] = $anno;
+            $vars['meses'] = $meses;
+            $vars['maleta'] = true;
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+
+    public function get_correccion_monetaria()
+    {
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+         
+            
+            $anno = $this->input->post('anno');
+            $this->load->model('remuneracion');
+            $tabla_correccion_monetaria = $this->remuneracion->get_tabla_correccion_monetaria($anno);
+
+            echo json_encode($tabla_correccion_monetaria);
+
+
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+    public function submit_correccion_monetaria()
+    {
+
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $array_datos = $this->input->post(NULL, true);
+            $anno = $this->input->post('anno');
+
+
+            $array_factores = array();
+            foreach ($array_datos as $key => $dato) {
+                if($key != 'anno'){
+
+                    $array_elem = explode("_", $key);
+                    $mes = $array_elem[1];
+                    $array_factores[$mes] = $dato;
+
+                }
+
+            }
+
+            //echo '<pre>';
+            //var_dump($array_factores); exit;
+
+            $this->load->model('remuneracion');
+            $this->remuneracion->edit_tabla_correccion_monetaria($anno, $array_factores);
+            $this->session->set_flashdata('correccion_monetaria_result', 1);
+            $this->session->set_flashdata('correccion_monetaria_anno', $anno);
+            redirect('remuneraciones/correccion_monetaria');
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
 
 
     public function impuesto_unico()
@@ -3494,6 +3714,121 @@ class Remuneraciones extends CI_Controller
     }
 
 
+
+public function cartola_vacaciones_personal()
+    {
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $resultid = $this->session->flashdata('cartola_vacaciones_result');
+            if ($resultid == 1) {
+                $vars['message'] = "Solicitud de Vacaciones eliminadas correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 2) {
+                $vars['message'] = "Error al eliminar vacaciones.  Solicitud no existe o no corresponde";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            } elseif ($resultid == 3) {
+                $vars['message'] = "Error al editar vacaciones.  Solicitud no existe o no corresponde";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            } elseif ($resultid == 4) {
+                $vars['message'] = "D&iacute;as progresivos eliminados correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 5) {
+                $vars['message'] = "Error al eliminar d&iacute;as progresivos.  Cartola no existe no existe o no corresponde";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            } elseif ($resultid == 6) {
+                $vars['message'] = "Error al eliminar d&iacute;as progresivos.  D&iacute;as ya fueron tomados";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            }
+
+            $this->load->model('remuneracion');
+
+            $userid = $this->session->userdata('user_id');
+            $personal_trabajo = $this->remuneracion->get_trabajador_by_userid($userid);
+
+
+
+            if(count($personal_trabajo) > 0){
+                $trabajador = $personal_trabajo[0];
+                $idpersonal = $trabajador->id;
+
+
+
+                            
+                $personal = $this->remuneracion->get_personal($idpersonal, 'todos');
+                $cartola = $this->remuneracion->get_cartola_vacaciones($idpersonal);
+                $dias_progresivos = $this->remuneracion->get_dias_progresivos($idpersonal);
+
+                //echo "<pre>";
+                //print_r($personal); exit;
+                $content = array(
+                    'menu' => 'Remuneraciones',
+                    'title' => 'Remuneraciones',
+                    'subtitle' => 'Cartola Vacaciones'
+                );
+
+                $dias_vacaciones = dias_vacaciones($personal->fecinicvacaciones, $personal->saldoinicvacaciones);
+
+                $cartola_progresivos = cartola_dias_progresivos($personal->fecinicvacaciones, $personal->saldoinicvacprog, $dias_progresivos);
+
+
+
+                $cartola_devengada = cartola_vacaciones($personal->fecinicvacaciones, $personal->saldoinicvacaciones, $cartola_progresivos);
+
+                $num_dias_progresivos = num_dias_progresivos($personal->fecinicvacaciones, $personal->saldoinicvacprog, $dias_progresivos);
+
+                $saldo_vacaciones = $dias_vacaciones - $personal->diasvactomados;
+
+            }else{
+                $cartola = array();
+                $dias_vacaciones = 0;
+                $num_dias_progresivos = 0;
+                $dias_progresivos = 0;
+                $saldo_vacaciones = 0;
+                $vars['oculta'] = true;
+            }
+
+            
+            //$saldo_vacaciones = 0;
+            $vars['classinfo'] = $saldo_vacaciones <= 0 ? 'danger' : 'success';
+            $vars['content_menu'] = $content;
+            $vars['personal'] = $personal;
+            $vars['cartola'] = $cartola;
+            $vars['cartola_devengada'] = $cartola_devengada;
+            $vars['dias_vacaciones'] = $dias_vacaciones;
+            $vars['num_dias_progresivos'] = $num_dias_progresivos;
+
+            $vars['cartola_dias_progresivos'] = $dias_progresivos;
+            $vars['saldo_vacaciones'] = $saldo_vacaciones;
+            $vars['content_view'] = 'remuneraciones/cartola_vacaciones';
+            $vars['formValidation'] = true;
+            $vars['link'] = '';
+            //$vars['moment'] = true;
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }    
+
+
     public function cartola_vacaciones($idpersonal = '', $link = '')
     {
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
@@ -4293,13 +4628,17 @@ class Remuneraciones extends CI_Controller
     {
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
+            $encabezado = array();
             if ($this->input->post('anno') != '') {
                 $anno = $this->input->post('anno');
                 $this->load->model('remuneracion');
-                $descjurada_data = $this->remuneracion->get_decjurada_rentas($anno);
-                $vars['descjurada_data'] = $descjurada_data;
+
+                $descjurada_data = $this->remuneracion->calculo_declaracion_jurada($anno);
+                $encabezado = $this->remuneracion->get_decjurada_rentas_encabezado($anno);
+                //$descjurada_data = $this->remuneracion->archivo_decjurada_rentas($anno);
+                
             } else {
-                $anno = date('Y');
+                $anno = date('Y') - 1 ;
             }
 
 
@@ -4312,6 +4651,49 @@ class Remuneraciones extends CI_Controller
             $vars['content_menu'] = $content;
 
             $vars['anno'] = $anno;
+            $vars['encabezado'] = $encabezado;
+            $vars['content_view'] = 'remuneraciones/decjurada_rentas';
+            $vars['formValidation'] = true;
+            $vars['dataTables'] = true;
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+    public function decjurada_rentas_exportar($anno)
+    {
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $this->load->model('remuneracion');
+
+            $descjurada_data = $this->remuneracion->archivo_decjurada_rentas($anno);
+
+
+            $content = array(
+                'menu' => 'Remuneraciones',
+                'title' => 'Remuneraciones',
+                'subtitle' => 'Declaraci&oacute;n Jurada Rentas '
+            );
+
+            $vars['content_menu'] = $content;
+
+            $vars['anno'] = $anno;
+            $vars['encabezado'] = $encabezado;
             $vars['content_view'] = 'remuneraciones/decjurada_rentas';
             $vars['formValidation'] = true;
             $vars['dataTables'] = true;

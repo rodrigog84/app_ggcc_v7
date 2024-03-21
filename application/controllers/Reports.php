@@ -978,6 +978,7 @@ class Reports extends CI_Controller {
 				redirect('reports/mensual_data/');
 			}*/
 
+
 	        /*$this->load->library('PHPExcel');
 	  	    $this->phpexcel->setActiveSheetIndex(0);
 	        $sheet = $this->phpexcel->getActiveSheet();*/
@@ -985,7 +986,6 @@ class Reports extends CI_Controller {
         	$spreadsheet = new Spreadsheet();
         	$sheet = $spreadsheet->getActiveSheet();	        
 	        $sheet->setTitle($title_libro);
-
 
 			
 			
@@ -1377,7 +1377,7 @@ class Reports extends CI_Controller {
 				 $sheet->setCellValue('L'.$i, 'Cuotas Especiales');					 
 				 $sheet->mergeCells('M'.$i . ':M' . ($i+1));
 				 $sheet->getColumnDimension('M')->setWidth(17);
-				 $sheet->setCellValue('M'.$i, 'Otros Cobros');					 
+				 $sheet->setCellValue('M'.$i, 'Intereses');					 
 
 				 $sheet->mergeCells('N'.$i . ':N' . ($i+1));
 				 $sheet->getColumnDimension('N')->setWidth(17);
@@ -1683,6 +1683,7 @@ class Reports extends CI_Controller {
 	        header("Cache-Control: max-age=0");
 	        // Genera Excel
 	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
+	        //$writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
 	        // Escribir
 	        //$writer->setIncludeCharts(TRUE);			
@@ -3350,14 +3351,12 @@ public function export_cartola_propiedad($idpropiedad = '')
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
 
-	       // $this->load->library('PHPExcel');
+       // $this->load->library('PHPExcel');
 	  	   // $this->phpexcel->setActiveSheetIndex(0);
 	       // $sheet = $this->phpexcel->getActiveSheet();
 
 			$spreadsheet = new Spreadsheet();
 			$sheet = $spreadsheet->getActiveSheet();
-
-
 	        $sheet->setTitle("cartola_propiedad");
 	       	$this->load->model('report');
 	       	$this->load->model('admin');
@@ -3441,13 +3440,13 @@ public function export_cartola_propiedad($idpropiedad = '')
 			 $sheet->getColumnDimension('B')->setWidth(10);
 			 $sheet->setCellValue('B'.$i, 'Fecha Ingreso');
 			 $sheet->getColumnDimension('C')->setWidth(15);
-			 $sheet->setCellValue('C'.$i, 'Cargo');
+			 $sheet->setCellValue('C'.$i, 'Gastos Comunes');
 			 $sheet->getColumnDimension('D')->setWidth(15);
-			 $sheet->setCellValue('D'.$i, 'Abono');
+			 $sheet->setCellValue('D'.$i, 'Abonos');
 			 $sheet->getColumnDimension('E')->setWidth(55);
 			 $sheet->setCellValue('E'.$i, 'Descripción');
 			 $sheet->getColumnDimension('F')->setWidth(15);
-			 $sheet->setCellValue('F'.$i, 'Saldo');
+			 $sheet->setCellValue('F'.$i, 'Saldo Acumulado');
 
 
 			 $columnaFinal = 5;

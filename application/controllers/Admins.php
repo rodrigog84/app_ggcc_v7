@@ -2054,6 +2054,7 @@ class Admins extends CI_Controller
                 'numero' => count($propiedad) == 0 ? '' : $propiedad->numero,
                 'direccion' => count($propiedad) == 0 ? '' : $propiedad->direccion,
                 'responsable' => count($propiedad) == 0 ? '' : $propiedad->responsable,
+                'rutresponsable' => count($propiedad) == 0 ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
                 'mail' => count($propiedad) == 0 ? '' : $propiedad->mail,
                 'fono' => count($propiedad) == 0 ? '' : $propiedad->fono,
                 'suscrito' => count($propiedad) == 0 ? '' : $propiedad->suscrito,
@@ -2076,6 +2077,8 @@ class Admins extends CI_Controller
             $vars['formValidation'] = true;
             $vars['icheck'] = true;
             $vars['mask'] = true;
+            $vars['maleta'] = true;
+            $vars['jqueryRut'] = true;
 
             $template = "template";
 
@@ -2195,6 +2198,19 @@ class Admins extends CI_Controller
             $suscrito = $this->input->post('suscrito') == 'on' ? 1 : 0;
             $idpropiedad = $this->input->post('idpropiedad');
             $lista_email = $this->input->post('emailnuevo');
+            $rutresponsablecompleto = str_replace(".", "", $this->input->post("rutresponsable"));
+
+
+            if($rutresponsablecompleto != ''){
+                    $arrayRutresponsable = explode("-", $rutresponsablecompleto);
+                    $rutresponsable = $arrayRutresponsable[0];
+                    $dvresponsable = $arrayRutresponsable[1];
+            }else{
+                    $rutresponsable = '';
+                    $dvresponsable ='';
+
+            }
+            
 
 
             $array_email = array();
@@ -2219,6 +2235,8 @@ class Admins extends CI_Controller
                 'numpropiedad' => $numpropiedad,
                 'direccion' => $direccion,
                 'responsable' => $responsable,
+                'rutresponsable' => $rutresponsable,
+                'dvresponsable' => $dvresponsable,                
                 'email' => $email,
                 'fono' => $fono,
                 'prorrateo' => $prorrateo,
@@ -2394,7 +2412,8 @@ class Admins extends CI_Controller
                                 $error_carga = true;
                                 $dato_error = "Prorrateo";
                                 $tipo_error = "debe ser num&eacute;rico";
-                            } else if ($prorrateo == '') {
+                            } else if ($prorrateo == '' && $prorrateo != '0') {
+
                                 $error_carga = true;
                                 $dato_error = "Prorrateo";
                                 $tipo_error = "es requerido";
@@ -2415,7 +2434,7 @@ class Admins extends CI_Controller
                                 $dato_error = "Suscrito";
                                 $tipo_error = "es requerido";
                             }
-
+     
                             if ($error_carga) {
                                 $msg = "Error en fila " . $fila . ": Campo '" . $dato_error . "' " . $tipo_error;
 
@@ -4213,10 +4232,40 @@ class Admins extends CI_Controller
                 'idpropiedad' => $idpropiedad
             );
 
+
+
+            $array_comunidades_2 = array();
+            if($this->session->userdata('comunidadid') == ''){
+                $array_comunidades_2 = $array_comunidades;
+            }else{
+                foreach($array_comunidades as $list_comunidad){
+                    if($list_comunidad == $this->session->userdata('comunidadid')){
+                        array_push($array_comunidades_2,$list_comunidad);    
+                    }
+                    
+                }
+            }
+            
+            $array_propiedades_2 = array();
+           // var_dump($this->session->userdata('comunidadid'));
+
+            if($this->session->userdata('comunidadid') == ''){
+                $array_propiedades_2 = $array_propiedades;
+            }else{
+                foreach($array_propiedades as $list_propiedad){
+                    if($list_propiedad['idcomunidad'] == $this->session->userdata('comunidadid')){
+                        array_push($array_propiedades_2,$list_propiedad);    
+                    }
+                    
+                }
+            }
+
+
+            //var_dump($array_propiedades_2); exit;
             $vars['content_menu'] = $content;
             $vars['comunidades'] = $comunidades;
-            $vars['listado_comunidades'] = $array_comunidades;
-            $vars['listado_propiedades'] = $array_propiedades;
+            $vars['listado_comunidades'] = $array_comunidades_2;
+            $vars['listado_propiedades'] = $array_propiedades_2;
             $vars['perfiles'] = $perfiles;
             $vars['content_view'] = 'admin/add_user';
             $vars['titulo'] = $iduser == '' ? "Agregar Usuario" : "Editar Usuario";
@@ -4935,6 +4984,106 @@ class Admins extends CI_Controller
     }
 
 
+
+ public function editar_mail_vencimiento($tipo = 1)
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $this->load->model('admin');
+
+            $comunidad = $this->admin->get_comunidades($this->session->userdata('comunidadid'));
+
+
+           // var_dump($comunidad); exit;
+            //$comunicados = $this->admin->get_comunicados($idcomunicado);
+
+
+            $tipo_mail = $tipo == 1 ? 'Antes' : 'Despu&eacute;s';
+            $txt_mail = $tipo == 1 ? $comunidad->txt_mail_antes_vencimiento : $comunidad->txt_mail_despues_vencimiento;
+
+
+            $array_datos = array(
+                'tipo' => $tipo,
+                'txt_mail' => $txt_mail,
+                'txt_encabeza' => 'Editar Mail ' . $tipo_mail . ' Vencimiento ',
+                'txt_button' => 'Editar'
+            );
+
+
+
+            $agrega =  true;
+            $content = array(
+                'menu' => 'Configuraci&oacute;n',
+                'title' => 'Configuraci&oacute;n',
+                'subtitle' => 'Editar Mail '. $tipo_mail . ' Vencimiento'
+            );
+
+            $vars['wysihtml5'] = true;
+            $vars['formValidation'] = true;
+            $vars['content_menu'] = $content;
+            $vars['agrega'] = $agrega;
+            $vars['datos_comunicado'] = $array_datos;
+            $vars['content_view'] = 'admin/editar_mail_vencimiento';
+            $vars['permite'] = true;
+
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+
+  public function submit_envio_mail_vencimiento()
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $txt_mail = $this->input->post('txt_mail');
+            $tipo = $this->input->post('tipo');
+
+            $datos_mail = array(
+                'txt_mail' => $txt_mail,
+                'tipo' => $tipo
+            );
+
+
+
+            $this->load->model('admin');
+            $this->admin->save_mail_vencimiento($datos_mail);
+
+            $this->session->set_flashdata('accion_mora_result', 3);
+
+
+            redirect('admins/accion_mora');
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
     public function ver_envio_comunicado($idcomunicado = null)
     {
 
@@ -5146,6 +5295,10 @@ class Admins extends CI_Controller
                 $vars['classmessage'] = 'danger';
                 $vars['message'] = "Error al ingresar Par&aacute;metros Acci&oacute;n. Se ingresaron valores repetidos";
                 $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 3) {
+                $vars['message'] = "Mail Vencimiento editado correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
             }
 
             $this->load->model('admin');
@@ -5163,6 +5316,8 @@ class Admins extends CI_Controller
                 'mes_corteluz' => count($comunidad) == 0 ? '-1' : $comunidad->mes_corteluz,
                 'mes_prejudicial' => count($comunidad) == 0 ? '-1' : $comunidad->mes_prejudicial,
                 'mes_judicial' => count($comunidad) == 0 ? '-1' : $comunidad->mes_judicial,
+                'mail_morosidad_antes_vencimiento' => count($comunidad) == 0 ? '-1' : $comunidad->mail_morosidad_antes_vencimiento,
+                'mail_morosidad_despues_vencimiento' => count($comunidad) == 0 ? '-1' : $comunidad->mail_morosidad_despues_vencimiento,
             );
 
 
@@ -5248,6 +5403,8 @@ class Admins extends CI_Controller
                 'mes_corteluz' => $this->input->post('mes_corteluz') == '' ? -1 : $this->input->post('mes_corteluz'),
                 'mes_prejudicial' => $this->input->post('mes_prejudicial') == '' ? -1 : $this->input->post('mes_prejudicial'),
                 'mes_judicial' => $this->input->post('mes_judicial') == '' ? -1 : $this->input->post('mes_judicial'),
+                'mail_morosidad_antes_vencimiento' => $this->input->post('mail_morosidad_antes_vencimiento') == '' ? -1 : $this->input->post('mail_morosidad_antes_vencimiento'),
+                'mail_morosidad_despues_vencimiento' => $this->input->post('mail_morosidad_despues_vencimiento') == '' ? -1 : $this->input->post('mail_morosidad_despues_vencimiento'),
             );
             $this->load->model('admin');
             $this->admin->edit_accion_mora($parametros);

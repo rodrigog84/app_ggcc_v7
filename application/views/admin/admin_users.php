@@ -33,9 +33,9 @@
                         <th>Nombre</th>
                         <th>Email</th>
                         <th>Perfil</th>
-                        <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                        <?php //if($this->session->userdata('comunidadid') == ''){ ?>
                         <th>&nbsp;</th>   
-                        <?php } ?>                     
+                        <?php //} ?>                     
                       </tr>
                     </thead>
                     <tbody>
@@ -47,7 +47,7 @@
                           <td><?php echo $user->nombre;?></td>
                           <td><?php echo $user->email;?></td>
                           <td><?php echo $user->levelname;?></td>
-                          <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                          <?php //if($this->session->userdata('comunidadid') == ''){ ?>
                           <td>
 
                           <a href="<?php echo base_url();?>admins/add_user/<?php echo $user->id;?>" data-toggle="tooltip" title="Editar" ><span class="glyphicon glyphicon-edit"></span></a>
@@ -56,7 +56,7 @@
                           <a href="<?php echo base_url();?>admins/delete_user/<?php echo $user->id;?>" data-toggle="tooltip" title="Eliminar" ><span class="glyphicon glyphicon-trash"></span></a>
                           
                           </td>                          
-                          <?php } ?>
+                          <?php //} ?>
                         </tr>
                         <?php $i++;?>
                         <?php } ?>

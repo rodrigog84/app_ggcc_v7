@@ -12,26 +12,65 @@ class Main extends CI_Controller
         $this->load->library('form_validation');
         $this->load->helper('format');
 
-        if (!$this->ion_auth->logged_in()) {
-            $this->session->set_userdata('uri_array', $this->uri->rsegment_array());
-            redirect('auth/login', 'refresh');
-        } else {
-            if (!$this->session->userdata('menu_list')) {
-                $this->session->set_userdata('menu_list', json_decode($this->ion_auth_model->get_menu($this->session->userdata('user_id'))));
+
+
+
+            if (!$this->ion_auth->logged_in()) {
+                $this->session->set_userdata('uri_array', $this->uri->rsegment_array());
+                redirect('auth/login', 'refresh');
+            } else {
+                if (!$this->session->userdata('menu_list')) {
+                    $this->session->set_userdata('menu_list', json_decode($this->ion_auth_model->get_menu($this->session->userdata('user_id'))));
+                }
+
+
+                if ($this->router->fetch_class() . "/" . $this->router->fetch_method() != "main/dashboard" && !$this->session->userdata('comunidadid') && ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 3)) {
+                    redirect('main/dashboard');
+                }
             }
-            if ($this->router->fetch_class() . "/" . $this->router->fetch_method() != "main/dashboard" && !$this->session->userdata('comunidadid') && ($this->session->userdata('level') == 1 || $this->session->userdata('level') == 3)) {
-                redirect('main/dashboard');
-            }
-        }
+
+
+
     }
 
 
     public function index()
     {
 
-        $this->load->model('ion_auth_model');
-        redirect('main/dashboard');
+        if(MANTENCION){
+            //echo 'asdasda'; exit;
+
+            redirect('main/dashboard');            
+
+        }else{
+
+            $this->load->model('ion_auth_model');
+            redirect('main/dashboard');
+
+
+        }
+
+
+
     }
+
+
+
+    public function mantencion()
+    {
+
+        $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'mantencion';
+            $this->load->view('template_guest', $vars);
+    }
+
 
 
     //TODOS TIENEN ACCESO AL DASHBOARD
@@ -107,7 +146,8 @@ class Main extends CI_Controller
 
             $comunidades_asignadas = $unidad_id != '' ? $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'), $unidad_id) : $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'));
             $num_comunidades = count($this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level')));
-            if (count($comunidades_asignadas) > 1) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
+
+            if (is_array($comunidades_asignadas)) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
                 $content = array(
                     'menu' => 'Selecci&oacute;n Comunidad',
                     'title' => 'Comunidades',
@@ -119,9 +159,8 @@ class Main extends CI_Controller
                 $vars['content_view'] = 'admin/asigna_comunidad';
                 $template = "template_lock";
                 //$this->load->view('template_lock',$vars);
-            } else if (count($comunidades_asignadas) == 1) { // SE ASOCIA COMUNIDAD
-
-                $comunidades_asignadas = $comunidades_asignadas[0];
+            //} else if (count(get_object_vars($comunidades_asignadas)) == 1) { // SE ASOCIA COMUNIDAD
+            } else if (isset($comunidades_asignadas->id)) { // SE ASOCIA COMUNIDAD
                 $this->session->set_userdata('comunidadid', $comunidades_asignadas->id);
                 $this->session->set_userdata('comunidadnombre', $comunidades_asignadas->nombre);
                 $this->session->set_userdata('diasvencsuscripcion', $comunidades_asignadas->vencsuscripcion);
@@ -295,6 +334,7 @@ class Main extends CI_Controller
                     'level' => $this->session->userdata('level')
                 );
                 $vars['datos_dashboard'] = $datos_dashboard;
+                $vars['pagoonline'] = $datoscomunidad->pagoonline;
 
 
                 $vars['content_view'] = 'dashboard2';

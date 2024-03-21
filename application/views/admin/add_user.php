@@ -108,9 +108,11 @@
                             <div class="box-header">
                                 <h3 class="box-title">Asociar Comunidad y Propiedades</h3>
                                 <!-- tools box -->
+                                <?php //if($this->session->userdata('comunidadid') == ''){ ?>
                                 <div class="pull-right box-tools">
                                     <a id="add_row" class="btn btn-info btn-sm" data-toggle="tooltip" title="Agregar"><i class="fa fa-plus"></i></a>
                                 </div><!-- /. tools -->
+                                <?php //} ?>
                             </div><!-- /.box-header -->
                             <!-- form start -->
 
@@ -130,9 +132,16 @@
                                             <td class="form-group" data-name="comunidad-">
                                                 <!-- DEFINE EL NOMBRE QUE TENDRAN LOS ELEMENTOS CREADOS -->
                                                 <select name="comunidad-0" id="comunidad-0" class="form-control comunidad">
-                                                    <option value="">Seleccione Comunidad</option>
+                                                    <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                                                                <option value="">Seleccione Comunidad</option>
+                                                    <?php } ?>
                                                     <?php foreach ($comunidades as $comunidad) { ?>
-                                                        <?php $comunidadselected = $comunidad->id == $datos_form['idcomunidad'] ? "selected" : ""; ?>
+                                                        
+                                                        <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                                                            <?php $comunidadselected = $comunidad->id == $datos_form['idcomunidad'] ? "selected" : ""; ?>
+                                                        <?php }else{ ?>
+                                                            <?php $comunidadselected = $comunidad->id == $this->session->userdata('comunidadid') ? "selected" : ""; ?>
+                                                        <?php } ?>
                                                         <?php $muestracomunidad = $this->session->userdata('comunidadid') == '' || $this->session->userdata('comunidadid') == $comunidad->id ? true : false; ?>
 
                                                         <?php if ($muestracomunidad) { ?>
@@ -160,7 +169,9 @@
                                                     <td class="form-group" data-name="comunidad-">
                                                         <!-- DEFINE EL NOMBRE QUE TENDRAN LOS ELEMENTOS CREADOS -->
                                                         <select name="comunidad-<?php echo $i; ?>" id="comunidad-<?php echo $i; ?>" class="form-control comunidad">
-                                                            <option value="">Seleccione Comunidad</option>
+                                                            <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                                                                <option value="">Seleccione Comunidad</option>
+                                                            <?php } ?>
                                                             <?php foreach ($comunidades as $comunidad) { ?>
                                                                 <?php $comunidadselected = $comunidad->id == $comunidad_sel ? "selected" : ""; ?>
                                                                 <?php $muestracomunidad = $this->session->userdata('comunidadid') == '' || $this->session->userdata('comunidadid') == $comunidad->id ? true : false; ?>
@@ -190,7 +201,9 @@
                                                     <td class="form-group" data-name="comunidad-">
                                                         <!-- DEFINE EL NOMBRE QUE TENDRAN LOS ELEMENTOS CREADOS -->
                                                         <select name="comunidad-<?php echo $i; ?>" id="comunidad-<?php echo $i; ?>" class="form-control comunidad">
-                                                            <option value="">Seleccione Comunidad</option>
+                                                            <?php if($this->session->userdata('comunidadid') == ''){ ?>
+                                                                <option value="">Seleccione Comunidad</option>
+                                                            <?php } ?>
                                                             <?php foreach ($comunidades as $comunidad) { ?>
                                                                 <?php $comunidadselected = $comunidad->id == $propiedad_sel['idcomunidad'] ? "selected" : ""; ?>
                                                                 <?php $muestracomunidad = $this->session->userdata('comunidadid') == '' || $this->session->userdata('comunidadid') == $comunidad->id ? true : false; ?>
@@ -232,6 +245,8 @@
         </section><!-- /.content -->
 
         <script>
+
+
             $("#tab_logic").on('change', '.comunidad', function(event) {
                 var select_comunidad = $(this);
 
@@ -261,6 +276,7 @@
 
 
             $("#perfil").on('change', function(event) {
+
                 $(".comunidad").prop('selectedIndex', 0);
                 $(".propiedad").prop('selectedIndex', 0);
                 if ($(this).val() == 1) {
@@ -270,6 +286,7 @@
                     $("#add_row").prop("disabled", false);
                     // $('#basicBootstrapForm').formValidation('revalidateField', 'comunidad');
                 } else if ($(this).val() == 3 || $(this).val() == 2) {
+                    $('.comunidad').trigger('change')
                     $(".comunidad").prop("disabled", false);
                     $(".propiedad").prop("disabled", false);
                     $("#add_row").prop("disabled", false);

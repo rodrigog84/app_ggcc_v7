@@ -977,6 +977,73 @@ class Payments extends CI_Controller {
 
 
 
+public function pagoonlineprop()
+	{
+
+		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
+
+
+			$etapaproceso = $this->input->post('etapaproceso');
+			$this->load->model('admin');
+
+			if($etapaproceso == 1){
+				//var_dump($_POST); exit;
+				//$fecpago = $this->input->post('fecpago');
+				$monto = $this->input->post('monto');
+				$comision = $this->input->post('comision');
+				$total = $this->input->post('total');
+				$token = $this->input->post('token');
+				$tokentgc = $this->input->post('tokentgc');
+				$deudatotal = $this->input->post('deudatotal');
+				$idperiodo = $this->input->post('idperiodo');
+				$pagototal = $this->input->post('pagototal');
+
+				$array_datos = array(
+									'fecpago' => date('Y-m-d'),
+									'idcomunidad' => $this->session->userdata('comunidadid'),
+									'idpropiedad' => $this->session->userdata('propiedadid'),
+									'montopago' => $monto,
+									'comision' => $comision,
+									'total' => $total,
+									'tokentranskbank' => $token,
+									'tokentgc' => $tokentgc,
+									'deudatotal' => $deudatotal,
+									'idperiodo' => $idperiodo,
+									'pagototal' => $pagototal,
+									);
+
+				
+				$result = $this->admin->add_payprop($array_datos);	
+				echo json_encode($result);
+
+
+			}else if($etapaproceso == 2){
+
+				$token = $this->input->post('token');
+				$payment = $this->input->post('payment');
+				$result = $this->admin->add_payprop_info($token,$payment);
+				$this->admin->accept_payprop($token);
+			}
+		            
+
+
+
+		}else{
+			$content = array(
+						'menu' => 'Error 403',
+						'title' => 'Error 403',
+						'subtitle' => '403 error');
+
+
+			$vars['content_menu'] = $content;				
+			$vars['content_view'] = 'forbidden';
+			$this->load->view('template',$vars);
+
+		}
+
+	}
+
+
 
 public function pagoreturn($tokentgc = null)
 	{
@@ -1030,6 +1097,61 @@ public function pagoreturn($tokentgc = null)
 
 	}
 
+
+
+	public function pagoreturnprop($tokentgc = null)
+	{
+
+
+		// no, no esta bien, porque si no hago nada, igual retorna para aca.  Tengo que ver si envia algo a pagonotify
+
+		$this->load->model('admin');
+
+
+
+		$tokentgc = $this->input->get('orderClient');
+		//var_dump($tokentgc);
+		$datatoken = $this->admin->get_pagos_webpayprop_by_tokentgc($tokentgc);
+		//var_dump($datatoken); 
+		if(isset($datatoken->tokentranskbank)){
+			$token = $datatoken->tokentranskbank;
+
+		}else{
+
+			$token = '';
+		}
+
+		//var_dump($token); exit;
+		/* validar si esta ok con conexion a api*/
+
+		$datos_comunidad = $this->admin->get_comunidades($this->session->userdata('comunidadid'));
+
+		//$vars['classmessage'] = 'success';
+		//$vars['icon'] = 'fa-check';
+
+
+ 		//$message = "Pago ACEPTADO. Para continuar servicio de comunidad: " . $datos_comunidad->nombre. ", hasta el d&iacute;a " . $datos_comunidad->fecvencimiento;
+
+
+			$content = array(
+						'menu' => 'Pago Online',
+						'title' => 'Pago Online',
+						'subtitle' => 'Resultado Pago');
+
+
+
+		$vars['content_menu'] = $content;				
+		$vars['content_view'] = "payment/pagoreturnprop";
+		//$vars['message'] = $message;
+		$vars['datoscomunidad'] = $datos_comunidad;
+		$vars['token'] = $token;
+
+		$template = "template";
+		
+
+		$this->load->view($template,$vars);	
+
+	}
 
 
 
@@ -1353,6 +1475,9 @@ public function pagoreturn($tokentgc = null)
 			$propiedadid = $this->session->userdata('propiedadid');
 			//echo "<pre>";
 			//var_dump($propiedadid); exit;
+			$this->load->model('admin');
+			$datoscomunidad = $this->admin->get_comunidad_by_id($this->session->userdata('comunidadid'));
+
 
 			if(is_null($propiedadid)){
 				$this->session->set_flashdata('abonar_ggcc_result',4);
@@ -1363,9 +1488,22 @@ public function pagoreturn($tokentgc = null)
 			$datosdeuda = $this->payment->get_deuda_by_propiedad($propiedadid);
 			$datosperiodo = $this->payment->get_periodos_publicados_by_propiedad($propiedadid);
 
+
+			$lista_email = $this->admin->get_propiedad_email_by_id($propiedadid);
+			$array_email = array();
+			foreach ($lista_email as $lista) {
+				array_push($array_email,$lista->email);
+			}
+
+
 			$this->load->model('admin');
 			$formas_pago = $this->admin->get_forma_pago('abono');
 			$bancos = $this->admin->get_banco();
+
+
+			$token_tgc = str_pad($propiedadid,5,"0",STR_PAD_LEFT).randomstring_mm(12).str_pad($this->session->userdata('comunidadid'),3,"0",STR_PAD_LEFT);
+
+
 
 			$vars['content_view'] = 'payment/add_abono_webpay';
 			$vars['formValidation'] = true;
@@ -1373,12 +1511,14 @@ public function pagoreturn($tokentgc = null)
 			$vars['icheck'] = true;
 			$vars['jqueryRut'] = true;
 			$vars['mask'] = true;
+			$vars['maleta'] = true;
 			//$vars['moment'] = true;
-
+			$vars['token_pagoonline'] = $datoscomunidad->token_pagoonline;
 			$vars['datosdeuda'] = $datosdeuda;
 			$vars['datosperiodo'] = $datosperiodo;
 			$vars['formas_pago'] = $formas_pago;
 			$vars['bancos'] = $bancos;
+			$vars['token_tgc'] = $token_tgc;
 
 
 

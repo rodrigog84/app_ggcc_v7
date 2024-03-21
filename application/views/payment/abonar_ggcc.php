@@ -32,6 +32,7 @@
                     <tr>
                       <th>Nro. Propiedad</th>
                       <th>Responsable</th>
+                      <th>Direcci&oacute;n</th>
                       <th>Saldo Deuda</th>
                       <?php if($abono){ ?>
                           <th>Abonar</th>
@@ -47,6 +48,7 @@
                     <tr>
                       <td><?php echo $deuda->numero;?></td>
                       <td><?php echo $deuda->responsable;?></td>
+                      <td><?php echo $deuda->direccion;?></td>
                       <td><span class="label <?php echo $deuda->saldo <= 0 ? 'label-success' : 'label-danger'; ?>"><i class="fa fa-dollar">&nbsp;<?php echo number_format($deuda->saldo,0,".",".");?></i></span></td>
                       <?php if($abono){ ?>
                       <td>

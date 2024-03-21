@@ -346,7 +346,7 @@ class Report extends CI_Model
 											END AS Descripcion
 								FROM 		gc_ggcc_propiedad g
 								INNER JOIN 	gc_periodo p ON g.idperiodo = p.id
-								INNER JOIN 	gc_periodo_estado e ON p.id = e.idperiodo AND e.idcomunidad = '" . $idcomunidad . "'
+								INNER JOIN 	gc_periodo_estado e ON p.id = e.idperiodo AND e.idcomunidad = '" . $idcomunidad . "'   AND e.publica IS NOT null
 								WHERE 	g.idpropiedad = '" . $idpropiedad . "'
 								AND 		g.monto > 0
 								union

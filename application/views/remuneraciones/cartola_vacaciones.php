@@ -1,4 +1,7 @@
         <!-- Main content -->
+
+
+        <?php if(!isset($oculta)){ ?>
         <section class="content">
         <?php if(isset($message)): ?>
          <div class="row">
@@ -129,7 +132,9 @@
                             <th>#</th>
                             <th>Per&iacute;odo</th>
                             <th>D&iacute;as</th>
+                            <?php if($this->session->userdata('level') != 5){ ?>
                             <th>Acci&oacute;n</th>
+                            <?php } ?>
                           </tr>
                         </thead>
                         <tbody>
@@ -142,10 +147,12 @@
                                 <td><?php echo $i; ?></td>
                                 <td><?php echo $dia_progresivo->fechainicio; ?></td>
                                 <td><?php echo $dia_progresivo->dias; ?></td>
+                                <?php if($this->session->userdata('level') != 5){ ?>
                                 <td>
                            <a href="<?php echo base_url();?>remuneraciones/add_dia_progresivo/<?php echo $personal->id;?>/<?php echo $dia_progresivo->id;?>" data-toggle="tooltip" title="Editar D&iacute;as Progresivos Autorizados" ><span class="glyphicon glyphicon-edit"></span></a>&nbsp;&nbsp;
                            <a href="<?php echo base_url();?>remuneraciones/delete_dias_progresivos/<?php echo $personal->id;?>/<?php echo $dia_progresivo->id;?>" data-toggle="tooltip" title="Eliminar D&iacute;as Progresivos Autorizados" ><span class="glyphicon glyphicon-trash"></span></a>                           
                                 </td>
+                                 <?php } ?>
                                 <?php $dias_total += $dia_progresivo->dias; ?>
                               </tr>
                              <?php $i++; ?>  
@@ -193,7 +200,9 @@
                             <th>D&iacute;as</th>
                             <th>Comentario</th>
                             <th>Comprobante</th>
+                            <?php if($this->session->userdata('level') != 5){ ?>
                             <th>Acci&oacute;n</th>
+                            <?php } ?>
                           </tr>
                         </thead>
                         <tbody>
@@ -210,10 +219,12 @@
                                 <td><?php echo $linea_cartola->comentarios; ?></td>
                                 <td><a href="<?php echo base_url();?>remuneraciones/comprobante_solicitud/<?php echo $personal->id;?>/<?php echo $linea_cartola->id;?>" data-toggle="tooltip" title="Editar Solicitud" target="_blank" ><i class="fa  fa-file-o"></i></a></td>
                                  <?php if($i == count($cartola) && $personal->active == 1){ ?>
+                                  <?php if($this->session->userdata('level') != 5){ ?>
                                 <td>
                            <a href="<?php echo base_url();?>remuneraciones/solicita_vacaciones/<?php echo $personal->id;?>/<?php echo $linea_cartola->id;?>" data-toggle="tooltip" title="Editar Solicitud" ><span class="glyphicon glyphicon-edit"></span></a>&nbsp;&nbsp;
                            <a href="<?php echo base_url();?>remuneraciones/delete_vacaciones/<?php echo $personal->id;?>/<?php echo $linea_cartola->id;?>" data-toggle="tooltip" title="Eliminar Solicitud" ><span class="glyphicon glyphicon-trash"></span></a>                           
                                 </td>
+                                <?php } ?>
                                 <?php }else{ ?>
                                   <td>&nbsp;</td>
 
@@ -246,7 +257,9 @@
 
                   </div><!-- /.box-body -->
                   <div class="box-footer">
+                    <?php if($this->session->userdata('level') != 5){ ?>
                     <a href="<?php echo base_url();?>remuneraciones/vacaciones/<?php echo $link;?>" class="btn btn-default">Volver</a> 
+                    <?php } ?>
                   </div>
               </div><!-- /.box -->
 
@@ -254,5 +267,27 @@
           </div> 
         </section><!-- /.content -->
  
+      <?php }else{ ?>
+        <section class="content">
+        <div class="row">
 
- 
+            <div class="col-md-9">
+              <div class="box box-solid ">
+                <div class="box-header">
+                  <h3 class="box-title">Informaci&oacute;n Trabajador</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                  <table class="table">
+                    <tr>
+                    <td>
+                    No existe Informaci&oacute;n de Trabajador asociada
+                    </td>
+                    </tr>
+                    </table>
+                </div><!-- /.box-body -->
+              </div><!-- /.box -->
+            </div><!-- /.col (left) -->
+          </div>
+        </section>
+      <?php } ?>
+  

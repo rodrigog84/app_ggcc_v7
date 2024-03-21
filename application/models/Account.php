@@ -690,6 +690,12 @@ class Account extends CI_Model
 
 				}
 
+				// SI LA CUENTA TIENE ASOCIADO ALGO EN EL FONDO DE RESERVA, SE BORRA TAMBIÉN
+				$this->db->where('idcomunidad',$this->session->userdata('comunidadid'));
+				$this->db->where('idcuenta',$idcuenta);
+				$this->db->delete('gc_cartola_fondo_reserva');
+
+
 
 				$this->db->where('idcomunidad',$this->session->userdata('comunidadid'));
 				$this->db->where('id',$idcuenta);

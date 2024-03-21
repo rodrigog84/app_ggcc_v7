@@ -2182,8 +2182,17 @@ class Ion_auth_model extends CI_Model
         //var_dump($userid);
       //  var_dump($array_comunidades); exit;
         if ($elimina_anterior) {
-            $elimina = $this->db->where('idusuario', $userid);
-            $elimina = count($array_comunidades) == 1 ? $elimina->where('idcomunidad', $array_comunidades[0]) : $elimina;
+
+            if($this->session->userdata('comunidadid') != ''){
+                $elimina = $this->db->where('idcomunidad', $this->session->userdata('comunidadid'));
+            }else{
+
+                if(count($array_comunidades) == 1){
+                    $elimina = $elimina->where('idcomunidad', $array_comunidades[0]);
+                }
+                //$elimina = count($array_comunidades) == 1 ? $elimina->where('idcomunidad', $array_comunidades[0]) : $elimina;
+            }
+            $elimina = $this->db->where('idusuario', $userid);   
             $this->db->delete('gc_usuario_comunidad');
         }
 
@@ -2225,6 +2234,19 @@ class Ion_auth_model extends CI_Model
     {
 
         if ($replace) {
+
+
+            if($this->session->userdata('comunidadid') != ''){
+                $this->load->model('admin');
+                $propiedades_comunidad = $this->admin->get_propiedades($this->session->userdata('comunidadid'));
+                $array_propiedades_elimina = array();
+                foreach($propiedades_comunidad as $propiedad_comunidad){
+                    array_push($array_propiedades_elimina,$propiedad_comunidad->id);
+                }
+
+                $elimina = $this->db->where_in('idpropiedad', $array_propiedades_elimina);
+            }
+
             $this->db->where('idusuario', $userid);
             $this->db->delete('gc_usuario_propiedad');
         }
@@ -2268,9 +2290,27 @@ class Ion_auth_model extends CI_Model
     public function delete_user($userid)
     {
 
+        if($this->session->userdata('comunidadid') == ''){
+            $this->db->where('id', $userid);
+            $this->db->update('gc_users', array('active' => '0'));
 
-        $this->db->where('id', $userid);
-        $this->db->update('gc_users', array('active' => '0'));
+        }else{
+            $this->load->model('admin');
+            $propiedades_comunidad = $this->admin->get_propiedades($this->session->userdata('comunidadid'));
+            $array_propiedades_elimina = array();
+            foreach($propiedades_comunidad as $propiedad_comunidad){
+                array_push($array_propiedades_elimina,$propiedad_comunidad->id);
+            }
+            $elimina = $this->db->where_in('idpropiedad', $array_propiedades_elimina);            
+            $this->db->where('idusuario', $userid);
+            $this->db->delete('gc_usuario_propiedad');
+
+            $elimina = $this->db->where('idcomunidad', $this->session->userdata('comunidadid'));
+            $elimina = $this->db->where('idusuario', $userid);
+            $this->db->delete('gc_usuario_comunidad');
+
+        }
+
 
 
         if ($this->db->affected_rows() > 0) { // se eliminó proveedor correctamente

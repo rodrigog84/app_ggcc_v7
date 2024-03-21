@@ -110,17 +110,42 @@
               </div>
             </div><!-- ./col -->                              
             <?php if($num_propiedades > 1){ ?>
+
+
               <div class="col-lg-2  pull-right divBottom">
                     <a href="<?php echo base_url();?>main/destroy_data_session" class="btn btn-app">
                       <i class="fa fa-repeat"></i> Cambiar Propiedad
                     </a>
               </div>
               <?php } ?>
+
+
           </div>
+             <?php if($pagoonline == 1){ ?>
+                <div class="row">
+                  <div class="col-lg-2  ">
+                        <a href="<?php echo base_url();?>payments/add_abono_webpay"  class="btn bg-purple">
+                          <i class="fa fa-money"></i> Paga tu Deuda Aqu&iacute;
+                        </a>&nbsp;<br><br>
+                        <img src="<?php echo base_url();?>img/webpay_una_fila.png" height="25" ><br><br>
+                        <?php //} ?>
+                  </div>
+                </div>
+              <?php } ?>             
           <?php }else{ ?>
             <?php if($num_propiedades > 1){ ?>
           <div class="row">
 
+              <?php if($pagoonline == 1){ ?>
+                  <div class="col-lg-2  ">
+                        <a href="<?php echo base_url();?>payments/add_abono_webpay"  class="btn bg-purple">
+                          <i class="fa fa-money"></i> Paga tu Deuda Aqu&iacute;
+                        </a>&nbsp;<br><br>
+                        <img src="<?php echo base_url();?>img/webpay_una_fila.png" height="25" ><br><br>
+                        <?php //} ?>
+                  </div>
+
+              <?php } ?>
               <div class="col-lg-2  pull-right divBottom">
                     <a href="<?php echo base_url();?>main/destroy_data_session" class="btn btn-app">
                       <i class="fa fa-repeat"></i> Cambiar Propiedad
@@ -128,6 +153,21 @@
               </div>
 
           </div>
+            <?php }else{ ?>
+
+
+              <?php if($pagoonline == 1){ ?>
+                <div class="row">
+                  <div class="col-lg-2  ">
+                        <a href="<?php echo base_url();?>payments/add_abono_webpay"  class="btn bg-purple">
+                          <i class="fa fa-money"></i> Paga tu Deuda Aqu&iacute;
+                        </a>&nbsp;<br><br>
+                        <img src="<?php echo base_url();?>img/webpay_una_fila.png" height="25" ><br><br>
+                        <?php //} ?>
+                  </div>
+                </div>
+              <?php } ?>              
+
             <?php } ?>
           <?php } ?>
           <div class="row">

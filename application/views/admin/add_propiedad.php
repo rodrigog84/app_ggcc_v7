@@ -45,16 +45,23 @@
                               <label for="responsable">Direcci&oacute;n</label>    
                               <input type="text" class="form-control" name="direccion" id="direccion" placeholder="Ingrese Direcci&oacute;n Propiedad" value="<?php echo $datos_form['direccion']; ?>">
                         </div>   
-                      </div>                    
+                      </div>   
                       <div class='col-md-6'>
                         <div class="form-group">
-                              <label for="responsable">Responsable</label>    
-                              <input type="text" class="form-control" name="responsable" id="responsable" placeholder="Ingrese Nombre Responsable" value="<?php echo $datos_form['responsable']; ?>">
+                              <label for="responsable">Rut Responsable</label>    
+                              <input type="text" class="form-control" name="rutresponsable" id="rutresponsable" placeholder="Ingrese Rut Responsable" value="<?php echo $datos_form['rutresponsable']; ?>">
                         </div>   
-                      </div>
+                      </div>                                       
+
                     </div>
 
                     <div class='row'>
+                      <div class='col-md-6'>
+                        <div class="form-group">
+                              <label for="responsable">Nombre Responsable</label>    
+                              <input type="text" class="form-control" name="responsable" id="responsable" placeholder="Ingrese Nombre Responsable" value="<?php echo $datos_form['responsable']; ?>">
+                        </div>   
+                      </div>                      
                       <div class='col-md-6'>
                         <div class="form-group">
                               <label for="email">Email</label>    
@@ -64,6 +71,12 @@
                               </div>
                         </div> 
                       </div>
+
+
+
+                    </div>
+
+                    <div class='row'>
                       <div class='col-md-6'>
                         <div class="form-group">
                                 <label for="fono">Fono</label>
@@ -72,12 +85,7 @@
                                   <input type="text" class="form-control" name="fono" id="fono" placeholder="Ingrese Fono" value="<?php echo $datos_form['fono']; ?>">
                                 </div>
                         </div> 
-                      </div> 
-
-
-                    </div>
-
-                    <div class='row'>
+                      </div>                       
                       <div class='col-md-6'>
                         <div class="form-group">
                               <label for="prorrateo">Prorrateo</label>    
@@ -87,6 +95,12 @@
                               </div>
                         </div>   
                       </div>                    
+
+
+ 
+                    </div>
+
+                    <div class="row">
                       <div class='col-md-6'>
                         <div class="form-group">
                               <label for="saldo">Saldo Inicial Propiedad</label>    
@@ -96,13 +110,7 @@
                               </div>
                               <p class="help-block">(*) Saldo inicial s&oacute;lo es modificable en caso no de existir Gastos Comunes generados ni abonos.</p> 
                         </div> 
-                      </div>  
-
- 
-                    </div>
-
-                    <div class="row">
-                      
+                      </div>                        
                       <div class='col-md-6'>
                         <div class="form-group">
                               <label for="email">Agregar Email</label>    
@@ -113,6 +121,12 @@
                               </div> 
                         </div>   
                       </div>
+                    
+                    </div>                     
+
+
+
+                    <div class="row">
 
                       <div class='col-md-6'>
                         <div class="form-group">
@@ -120,13 +134,7 @@
                             <label for="suscrito">Suscrito a Env&iacute;os mediante correo electr&oacute;nico</label> 
                             &nbsp;&nbsp;<input type="checkbox" name="suscrito" id="suscrito" <?php if($datos_form['suscrito'] == 1) echo "checked"; ?> class="minimal" />  
                         </div>   
-                      </div>                      
-                    </div>                     
-
-
-
-                    <div class="row">
-                      
+                      </div>                        
                       <div class='col-md-6'>
                       <?php $i = 0; ?>
                         <?php foreach ($array_email as $data_email) { ?>
@@ -213,6 +221,36 @@ $(document).ready(function() {
 
     })*/
 
+        FormValidation.Validator.validateRut = {
+            validate: function(validator, $field, options) {
+                var validador = true;
+                $field.Rut();
+                var rut = $field.val();
+
+                if(rut != ''){
+
+                  var cleanRut = replaceAll(rut, ".", "");
+                  var cleanRut = replaceAll(cleanRut, "-", "");
+                  if (VerificaRut(cleanRut)) {
+                      return true;
+
+                  } else {
+                      return {
+                          valid: false
+                      }
+
+                  }
+
+
+                }else{
+                  return true;
+
+                }
+
+
+            }
+        };
+
 
     $('#basicBootstrapForm').formValidation({
         framework: 'bootstrap',
@@ -245,6 +283,21 @@ $(document).ready(function() {
                     blank: {}                 
                 }
             }, 
+
+            rutresponsable: {
+                row: '.form-group',
+                validators: {
+                    stringLength: {
+                        min: 0,
+                        max: 12,
+                        message: 'El largo del Rut es Incorrecto'
+                    },
+                    validateRut: {
+                        message: 'Rut Incorrecto'
+                    }
+
+                }
+            },
 
             responsable: {
                 row: '.form-group',
@@ -402,4 +455,55 @@ $(document).ready(function() {
         })
 
 
+</script>
+
+
+<script language="Javascript">
+    function VerificaRut(rut) {
+        if (rut.toString().trim() != '') {
+
+            var caracteres = new Array();
+            var serie = new Array(2, 3, 4, 5, 6, 7);
+            var dig = rut.toString().substr(rut.toString().length - 1, 1);
+            rut = rut.toString().substr(0, rut.toString().length - 1);
+            for (var i = 0; i < rut.length; i++) {
+                caracteres[i] = parseInt(rut.charAt((rut.length - (i + 1))));
+            }
+
+            var sumatoria = 0;
+            var k = 0;
+            var resto = 0;
+
+            for (var j = 0; j < caracteres.length; j++) {
+                if (k == 6) {
+                    k = 0;
+                }
+                sumatoria += parseInt(caracteres[j]) * parseInt(serie[k]);
+                k++;
+            }
+
+            resto = sumatoria % 11;
+            dv = 11 - resto;
+
+            if (dv == 10) {
+                dv = "K";
+            } else if (dv == 11) {
+                dv = 0;
+            }
+
+            if (dv.toString().trim().toUpperCase() == dig.toString().trim().toUpperCase())
+                return true;
+            else
+                return false;
+        } else {
+            return false;
+        }
+    }
+
+
+    function replaceAll(text, busca, reemplaza) {
+        while (text.toString().indexOf(busca) != -1)
+            text = text.toString().replace(busca, reemplaza);
+        return text;
+    }
 </script>

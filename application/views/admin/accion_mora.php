@@ -19,6 +19,8 @@
                   <h3 class="box-title">Par&aacute;metros Mora&nbsp;&nbsp;<i class="fa fa-question-circle" data-toggle="popover" data-placement="bottom" data-content="Se deben ingresar los meses desde cuando se tomar&aacute;n las acciones indicadas" title="Atenci&oacute;n"></i></h3>
                 </div><!-- /.box-header -->
                   <div class="box-body">
+                    <div class="row">
+                      <div class="col-md-12">                    
                         <div class="form-group">
                               <label for="sueldominimo">Al d&iacute;a</label>    
                               <select name="mes_aldia" id="mes_aldia"  class="form-control">
@@ -32,6 +34,11 @@
                                <option value="6" <?php echo $datos_form['mes_aldia'] == 6 ? 'selected' : '';?>>6</option>
                             </select> 
                         </div> 
+                    </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">   
+
                         <div class="form-group">
                               <label for="uf">Moroso</label>    
                                <select name="mes_moroso" id="mes_moroso"  class="form-control">
@@ -44,7 +51,14 @@
                                 <option value="5" <?php echo $datos_form['mes_moroso'] == 5 ? 'selected' : '';?>>5</option>
                                 <option value="6" <?php echo $datos_form['mes_moroso'] == 6 ? 'selected' : '';?>>6</option>
                             </select> 
-                        </div> 
+                        </div>
+
+                    </div>
+                  </div> 
+
+                  <div class="row">
+                      <div class="col-md-12">   
+
                         <div class="form-group">
                               <label for="uf">Corte de Luz</label>    
                               <select name="mes_corteluz" id="mes_corteluz"  class="form-control">
@@ -57,7 +71,14 @@
                                <option value="5" <?php echo $datos_form['mes_corteluz'] == 5 ? 'selected' : '';?>>5</option>
                                <option value="6" <?php echo $datos_form['mes_corteluz'] == 6 ? 'selected' : '';?>>6</option>
                             </select> 
-                        </div>       
+                        </div>  
+
+                    </div>
+                  </div>   
+                  
+                  <div class="row">
+                      <div class="col-md-12">  
+
                         <div class="form-group">
                               <label for="uf">Cobranza Prejudicial</label>    
                                <select name="mes_prejudicial" id="mes_prejudicial"  class="form-control">
@@ -70,7 +91,14 @@
                                <option value="5" <?php echo $datos_form['mes_prejudicial'] == 5 ? 'selected' : '';?>>5</option>
                                <option value="6" <?php echo $datos_form['mes_prejudicial'] == 6 ? 'selected' : '';?>>6</option>
                             </select>
-                        </div>     
+                        </div>
+
+                    </div>
+                  </div>  
+
+                  <div class="row">
+                      <div class="col-md-12"> 
+
                         <div class="form-group">
                               <label for="uf">Cobranza Judicial</label>    
                                <select name="mes_judicial" id="mes_judicial"  class="form-control">
@@ -83,8 +111,56 @@
                                <option value="5" <?php echo $datos_form['mes_judicial'] == 5 ? 'selected' : '';?>>5</option>
                                <option value="6" <?php echo $datos_form['mes_judicial'] == 6 ? 'selected' : '';?>>6</option>
                             </select>
-                        </div>                                           
+                        </div> 
 
+                    </div>
+                  </div> 
+
+                  <div class="row">
+                      <div class="col-md-10"> 
+
+                        <div class="form-group">
+                              <label for="uf">Mail Morosidad Antes del Vencimiento</label>    
+                               <select name="mail_morosidad_antes_vencimiento" id="mail_morosidad_antes_vencimiento"  class="form-control">
+                                <option value="">Seleccione D&iacute;as</option>
+                               <option value="1" <?php echo $datos_form['mail_morosidad_antes_vencimiento'] == 1 ? 'selected' : '';?>>1</option>
+                               <option value="3" <?php echo $datos_form['mail_morosidad_antes_vencimiento'] == 3 ? 'selected' : '';?>>3</option>
+                               <option value="5" <?php echo $datos_form['mail_morosidad_antes_vencimiento'] == 5 ? 'selected' : '';?>>5</option>
+                            </select>
+                        </div> 
+
+ 
+
+                    </div>
+                    <div class="col-md-2"> 
+                       <div class="form-group">
+                              <br>    
+                               <a href='<?php echo base_url(); ?>admins/editar_mail_vencimiento/1' class='btn btn-info'>Editar Mail</a>
+                        </div> 
+                    </div>
+                  </div>
+
+                   <div class="row">
+                      <div class="col-md-10"> 
+
+                        <div class="form-group">
+                              <label for="uf">Mail Morosidad Despu&eacute;s del Vencimiento</label>    
+                               <select name="mail_morosidad_despues_vencimiento" id="mail_morosidad_despues_vencimiento"  class="form-control">
+                                <option value="">Seleccione D&iacute;as</option>
+                               <option value="1" <?php echo $datos_form['mail_morosidad_despues_vencimiento'] == 1 ? 'selected' : '';?>>1</option>
+                               <option value="3" <?php echo $datos_form['mail_morosidad_despues_vencimiento'] == 3 ? 'selected' : '';?>>3</option>
+                               <option value="5" <?php echo $datos_form['mail_morosidad_despues_vencimiento'] == 5 ? 'selected' : '';?>>5</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="col-md-2"> 
+                       <div class="form-group">
+                              <br>    
+                               <a href='<?php echo base_url(); ?>admins/editar_mail_vencimiento/2' class='btn btn-info'>Editar Mail</a>
+                        </div> 
+                    </div>                    
+                  </div>
 
                   </div><!-- /.box-body -->
                   <div class="box-footer">

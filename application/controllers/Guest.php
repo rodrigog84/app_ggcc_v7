@@ -276,6 +276,29 @@ class Guest extends CI_Controller {
 	}	
 
 
+
+
+	public function revision_pagos_online()
+	{
+
+			set_time_limit(0); // quita limite de tiempo al hacer carga
+			$this->load->model('admin');
+			$comunidades = $this->admin->get_comunidades(null,true);
+			//$fecproceso = date('Y-m-d');
+			$fecproceso = '2024-01-19';
+			
+			$this->load->model('payment');
+			foreach ($comunidades as $comunidad) {
+				$comunidades = $this->payment->revisa_pagos_online($comunidad,$fecproceso);
+			}
+
+			exit;
+	
+	}	
+
+
+
+
 	public function asocia_saldos_positivos()
 	{
 
@@ -344,12 +367,65 @@ class Guest extends CI_Controller {
 	}	
 
 
-public function pagonotify($tokentgc = null)
+
+
+public function pagonotifyprop($tokentgc = null)
 	{
 
 		$tokentgc = $this->input->get('orderClient');
 
 
+		$this->load->model('admin');
+		//$datos_result = $this->admin->accept_payprop(null,$tokentgc);
+
+
+		exit;
+
+
+		/*$this->load->database();
+
+		$string_get = implode(',',$_GET);
+		$string_post = implode(',',$_POST);
+
+		$array_datos = array(
+								'get' => $string_get,
+								'post' => $string_post
+
+						);
+		$this->db->insert('gc_tabla_prueba_pago', $array_datos);
+
+		$f_archivo = fopen('./sql/archivo.txt','w');
+		fwrite($f_archivo,$string_get.'-'.$string_post);
+		fclose($f_archivo);		
+
+
+		var_dump($_GET);
+		var_dump($_POST);
+		exit;
+
+		*/
+
+/*
+		$content = array(
+					'menu' => 'Pago Online',
+					'title' => 'Pago Online',
+					'subtitle' => 'Resultado Pago');		
+
+		$vars['content_menu'] = $content;				
+		$vars['content_view'] = "payment/pagonotify";
+
+		$template = "template_guest";
+		$this->load->view($template,$vars);	*/
+	}
+
+
+
+public function pagonotify($tokentgc = null)
+	{
+
+		$tokentgc = $this->input->get('orderClient');
+
+		//al terminar llama a esto
 		$this->load->model('admin');
 		$datos_result = $this->admin->accept_pay(null,$tokentgc);
 

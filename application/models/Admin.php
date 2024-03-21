@@ -43,10 +43,10 @@ class Admin extends CI_Model
 
 
 
-    public function get_comunidades($idcomunidad = null)
+    public function get_comunidades($idcomunidad = null, $pagoonline = null)
     {
 
-        $comunidades_data = $this->db->select("c.id , c.nombre, c.rut, c.dv, c.direccion, c.fono, c.fono2, c.idregion, c.idcomuna, c.email, c.saldo, c.caja, c.fondoreserva, c.fondoreservainicial, c.idcaja, c.idmutual, c.porcmutual, c.cajainicial, date_format(c.fecinicio,'%d/%m/%Y') as fecinicio, date_format(c.fecvencimiento,'%d/%m/%Y') as fecvencimiento, fecvencimiento as fecvencimiento_sformat, c.fecinicio as fecinicio_sformat, c.idperiodoinicio, c.logo, c.firma, c.obscomprobante, mes_aldia, mes_moroso, mes_corteluz, mes_prejudicial, mes_judicial,
+        $comunidades_data = $this->db->select("c.id , c.nombre, c.rut, c.dv, c.direccion, c.fono, c.fono2, c.idregion, c.idcomuna, c.email, c.saldo, c.caja, c.fondoreserva, c.fondoreservainicial, c.idcaja, c.idmutual, c.porcmutual, c.cajainicial, date_format(c.fecinicio,'%d/%m/%Y') as fecinicio, date_format(c.fecvencimiento,'%d/%m/%Y') as fecvencimiento, fecvencimiento as fecvencimiento_sformat, c.fecinicio as fecinicio_sformat, c.idperiodoinicio, c.logo, c.firma, c.obscomprobante, mes_aldia, mes_moroso, mes_corteluz, mes_prejudicial, mes_judicial, mail_morosidad_antes_vencimiento, txt_mail_antes_vencimiento, mail_morosidad_despues_vencimiento, txt_mail_despues_vencimiento, token_pagoonline, 
 				(
 					select count(u.id) from gc_users u
 					inner join gc_usuario_propiedad up on u.id = up.idusuario
@@ -61,6 +61,7 @@ class Admin extends CI_Model
             ->order_by('c.nombre asc');
 
         $comunidades_data = is_null($idcomunidad) ? $comunidades_data : $comunidades_data->where('id', $idcomunidad);
+        $comunidades_data = is_null($pagoonline) ? $comunidades_data : $comunidades_data->where('pagoonline', 1);
         $query = $this->db->get();
         $datos = is_null($idcomunidad) ? $query->result() : $query->row();
         return $datos;
@@ -129,9 +130,9 @@ class Admin extends CI_Model
                 ->order_by('c.nombre asc');
             $comunidad_data = is_null($comunidadid) ? $comunidad_data : $comunidad_data->where('c.id', $comunidadid);
             $query = $this->db->get();
-            //$datos = $query->num_rows() == 1 ? $datos = $query->row() : $query->result();
-            $datos = $query->result();
+            $datos = $query->num_rows() == 1 ? $datos = $query->row() : $query->result();
         } else {
+
             $comunidad_data = $this->db->select('c.id, c.nombre, datediff(c.fecvencimiento,now()) as vencsuscripcion', false)
                 ->from('gc_comunidad as c')
                 ->join('gc_usuario_comunidad as uc', 'c.id = uc.idcomunidad')
@@ -141,8 +142,7 @@ class Admin extends CI_Model
                 ->order_by('c.nombre asc');
             $comunidad_data = is_null($comunidadid) ? $comunidad_data : $comunidad_data->where('c.id', $comunidadid);
             $query = $this->db->get();
-            //$datos = $query->num_rows() == 1 ? $datos = $query->row() : $query->result();
-            $datos = $query->result();
+            $datos = $query->num_rows() == 1 ? $datos = $query->row() : $query->result();
         }
         return $datos;
     }
@@ -1121,7 +1121,7 @@ class Admin extends CI_Model
     public function get_comunidad_by_id($comunidadid)
     {
 
-        $this->db->select('c.id, c.nombre, c.rut,  c.dv, c.direccion, c.fono, c.fono2, c.idregion, c.idcomuna, c.fax, date_format(c.fecconstitucion,"%d/%m/%Y") as fecconstitucion, c.email, c.saldo, c.caja, c.fondoreserva ')
+        $this->db->select('c.id, c.nombre, c.rut,  c.dv, c.direccion, c.fono, c.fono2, c.idregion, c.idcomuna, c.fax, date_format(c.fecconstitucion,"%d/%m/%Y") as fecconstitucion, c.email, c.saldo, c.caja, c.fondoreserva, c.pagoonline, c.token_pagoonline ')
             ->from('gc_comunidad as c')
             ->where('c.id', $comunidadid);
         $query = $this->db->get();
@@ -1223,7 +1223,7 @@ class Admin extends CI_Model
     public function get_propiedad_by_id($propiedadid)
     {
 
-        $this->db->select('p.id, p.idcomunidad, p.numero, p.direccion, p.responsable, p.mail, p.fono, p.suscrito, p.prorrateo, p.prorrateo_propiedad, p.saldo, p.saldo_publicado, p.saldoinicial, c.codigo_comercio, c.enviroment, c.private_key, c.public_cert, c.webpay_cert')
+        $this->db->select('p.id, p.idcomunidad, p.numero, p.direccion, p.responsable, p.rutresponsable, p.dvresponsable, p.mail, p.fono, p.suscrito, p.prorrateo, p.prorrateo_propiedad, p.saldo, p.saldo_publicado, p.saldoinicial, c.codigo_comercio, c.enviroment, c.private_key, c.public_cert, c.webpay_cert')
             ->from('gc_propiedad as p')
             ->join('gc_comunidad as c', 'p.idcomunidad = c.id')
             ->where('p.id', $propiedadid);
@@ -1552,6 +1552,45 @@ class Admin extends CI_Model
 
 
 
+public function add_payprop($array_datos)
+    {
+
+
+        $this->db->trans_start();
+        //$fecpago = substr($array_datos['fecpago'], 6, 4) . "-" . substr($array_datos['fecpago'], 3, 2) . "-" . substr($array_datos['fecpago'], 0, 2);
+        $data = array(
+            'idcomunidad' => $array_datos['idcomunidad'],
+            'idpropiedad' => $array_datos['idpropiedad'],
+            'idperiodo' => $array_datos['idperiodo'],
+            'deudatotal' => $array_datos['deudatotal'],
+            'fechapago' => $array_datos['fecpago'],
+            'pagototal' => $array_datos['pagototal'],
+            'montopago' => isset($array_datos['montopago']) ? $array_datos['montopago'] : 0,
+            'comision' => isset($array_datos['comision']) ? $array_datos['comision'] : 0,
+            'total' => isset($array_datos['total']) ? $array_datos['total'] : 0,
+            'tokentranskbank' => isset($array_datos['tokentranskbank']) ? $array_datos['tokentranskbank'] : null,
+            'tokentgc' => isset($array_datos['tokentgc']) ? $array_datos['tokentgc'] : null
+        );
+
+        $this->db->insert('gc_log_pagos_prop', $data);
+        $idpago = $this->db->insert_id();
+
+        if (!isset($array_datos['tokentranskbank'])) {
+
+
+            //aca se deberia guardar el pago en bd y descontar deuda
+            //$this->generar_mail_pago_servicio($array_datos['idcomunidad'], $fecvencimientonuevo);
+        }
+
+
+        $this->db->trans_complete();
+
+
+        return $idpago;
+    }
+
+
+
     public function add_pay_info($token,$payment)
     {
 
@@ -1568,6 +1607,20 @@ class Admin extends CI_Model
     }
 
 
+ public function add_payprop_info($token,$payment)
+    {
+
+        $this->db->trans_start();
+  
+            $this->db->where('tokentranskbank', $token);
+            $this->db->update('gc_log_pagos_prop', array('paymentinfo' => json_encode($payment)));
+
+
+        $this->db->trans_complete();
+
+
+        return 1;
+    }
 
 
     public function add_trans_abono($array_datos)
@@ -1714,6 +1767,98 @@ class Admin extends CI_Model
     }
 
 
+public function get_pay_for_token($tokentgc){
+
+
+            $this->db->select('gp.pagototal, gp.idpropiedad, gp.idperiodo, gp.deudatotal, gp.montopago, gp.tokentgc, gp.aceptacionpago')
+                              ->from('gc_log_pagos_prop as gp')
+                              ->where('gp.tokentgc', $tokentgc);
+            $query = $this->db->get();
+            $response = $query->row(); 
+            return $response;
+}
+
+
+public function accept_payprop($token = null,$tokentgc = null)
+    {
+
+
+        $this->db->trans_start();
+
+
+        if(!is_null($token)){
+            $data_comunidad = array(
+                'aceptacionpago' => date('Y-m-d H:i:s')
+            );
+
+            $this->db->where('tokentranskbank', $token);
+            $this->db->update('gc_log_pagos_prop', $data_comunidad);
+
+            $this->db->select('gp.pagototal, gp.idpropiedad, gp.idperiodo, gp.deudatotal, gp.montopago')
+                              ->from('gc_log_pagos_prop as gp')
+                              ->where('gp.tokentranskbank', $token);
+            $query = $this->db->get();
+            $ggcc_log = $query->row(); 
+
+            $pagototal = $ggcc_log->pagototal;
+            $idpropiedad = $ggcc_log->idpropiedad;
+            $idperiodo = $ggcc_log->idperiodo;
+            $deudatotal = $ggcc_log->deudatotal;  
+            $montopago = $ggcc_log->montopago;           
+
+        }else if(!is_null($tokentgc)){
+
+              $data_comunidad = array(
+                'aceptacionpago' => date('Y-m-d H:i:s')
+            );
+
+            $this->db->where('tokentgc', $tokentgc);
+            $this->db->update('gc_log_pagos_prop', $data_comunidad);
+
+            $this->db->select('gp.pagototal, gp.idpropiedad, gp.idperiodo, gp.deudatotal, gp.montopago')
+                              ->from('gc_log_pagos_prop as gp')
+                              ->where('gp.tokentgc', $tokentgc);
+            $query = $this->db->get();
+            $ggcc_log = $query->row(); 
+
+            $pagototal = $ggcc_log->pagototal;
+            $idpropiedad = $ggcc_log->idpropiedad;
+            $idperiodo = $ggcc_log->idperiodo;
+            $deudatotal = $ggcc_log->deudatotal; 
+            $montopago = $ggcc_log->montopago;             
+
+        }
+
+        //pagototal
+        //idpropiedad
+        //periododeudatotal
+
+        $parametros = array(
+                        'pagototal' => $pagototal,
+                        'idpropiedad' => $idpropiedad,
+                        'idperiodo' => $idperiodo == null ? null : $idperiodo,
+                        'monto' => $pagototal == 'on' ? $deudatotal : $montopago,
+                        'fechapago' => date('d/m/Y'),
+                        'idformapago' => 4,
+                        'idbanco' => null,
+                        'cheque' => null,
+                        'ruttitular' => null,
+                        'dvtitular' => null,
+                        'fechadeposito' => '00/00/0000',
+                        'nombrearchivo' => '',
+                        'nombrerealarchivo' => ''
+                        );
+        
+
+        $this->load->model('payment');
+        $this->payment->add_abono($parametros);
+
+
+
+        $this->db->trans_complete();
+
+        return 1;
+    }
 
     public function accept_pay($token = null,$tokentgc = null)
     {
@@ -2490,6 +2635,8 @@ class Admin extends CI_Model
                     'numero' => $array_datos['numpropiedad'],
                     'direccion' => $array_datos['direccion'],
                     'responsable' => $array_datos['responsable'],
+                    'rutresponsable' => $array_datos['rutresponsable'],
+                    'dvresponsable' => $array_datos['dvresponsable'],
                     'mail' => $array_datos['email'],
                     'fono' => $array_datos['fono'],
                     'suscrito' => $array_datos['suscrito'],
@@ -2560,6 +2707,8 @@ class Admin extends CI_Model
                     'numero' => $array_datos['numpropiedad'],
                     'direccion' => $array_datos['direccion'],
                     'responsable' => $array_datos['responsable'],
+                    'rutresponsable' => $array_datos['rutresponsable'],
+                    'dvresponsable' => $array_datos['dvresponsable'],                    
                     'mail' => $array_datos['email'],
                     'fono' => $array_datos['fono'],
                     'suscrito' => $array_datos['suscrito'],
@@ -2646,6 +2795,8 @@ class Admin extends CI_Model
                     'numero' => $array_datos['numpropiedad'],
                     'direccion' => $array_datos['direccion'],
                     'responsable' => $array_datos['responsable'],
+                    'rutresponsable' => $array_datos['rutresponsable'],
+                    'dvresponsable' => $array_datos['dvresponsable'],                    
                     'mail' => $array_datos['email'],
                     'fono' => $array_datos['fono'],
                     'suscrito' => $array_datos['suscrito'],
@@ -3800,6 +3951,9 @@ class Admin extends CI_Model
                 if (is_array($toList)) {
                     //array_push($toList,'rodrigog.84@gmail.com');
                     $toList = array_unique($toList);
+
+
+
                     foreach ($toList as $destiny) {
 
 
@@ -3810,6 +3964,8 @@ class Admin extends CI_Model
                              'to' => [['email' => $destiny]],
                              'htmlContent' => $content
                         ]);
+
+
 
                         try {
                             $result = $smtp_instance->sendTransacEmail($sendSmtpEmail);
@@ -3964,7 +4120,6 @@ class Admin extends CI_Model
         $this->load->model('admin');
         $datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
-
         $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
                                 'margin-top' => 16,
                                 'margin-bottom' => 16,
@@ -3975,7 +4130,7 @@ class Admin extends CI_Model
                                 ]);
 
         /*$this->load->library("mpdf");
-        $this->mpdf->mPDF(
+        $mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
             8,     // font size - default 0
@@ -4560,6 +4715,45 @@ class Admin extends CI_Model
     }
 
 
+
+  public function save_mail_vencimiento($datos_mail)
+    {
+
+
+        $this->db->trans_start();
+
+
+
+        if($datos_mail['tipo'] == 1){
+
+
+            $array_datos = array(
+                'txt_mail_antes_vencimiento' => $datos_mail['txt_mail']
+            );
+
+        }else if($datos_mail['tipo'] == 2){
+
+            $array_datos = array(
+                'txt_mail_despues_vencimiento' => $datos_mail['txt_mail']
+            );
+
+
+
+        }
+
+        $this->db->where('id', $this->session->userdata('comunidadid'));
+        $this->db->update('gc_comunidad', $array_datos);
+
+
+
+
+        $this->db->trans_complete();
+        //echo $this->db->last_query(); exit;
+        return 1;
+    }
+
+
+
     public function send_comunicado($idcomunicado)
     {
 
@@ -4936,6 +5130,24 @@ class Admin extends CI_Model
 
 
 
+
+    public function get_pagos_webpayprop_by_tokentgc($tokentgc)
+    {
+
+        $notificaciones_data = $this->db->select("p.id, p.idcomunidad, c.nombre as comunidad, p.idpropiedad, pr.numero as numpropiedad, p.montopago, p.fechapago, date_format(p.aceptacionpago,'%d/%m/%Y') as aceptacionpago, tokentranskbank", false)
+            ->from('gc_log_pagos_prop p')
+            ->join('gc_comunidad c', 'p.idcomunidad = c.id')
+            ->join('gc_propiedad pr', 'p.idpropiedad = pr.id')
+            ->where('p.tokentgc', $tokentgc);
+
+        $query = $this->db->get();
+
+        $datos = $query->row();
+        return $datos;
+    }
+
+
+
     public function enviar_notificaciones_pendientes()
     {
 
@@ -5009,12 +5221,13 @@ class Admin extends CI_Model
         $this->load->model('payment');
 
         $com_prox_vencer = $this->get_comunidad_prox_vencer();
-        //print_r($com_prox_vencer);
+
 
         foreach ($com_prox_vencer as $comunidad) {
             $datos_propiedades = $this->get_propiedades_prox_vencimiento($comunidad->idcomunidad);
+            //echo '<pre>';
             //print_r($comunidad);
-            //print_r($datos_propiedades);
+            //print_r($datos_propiedades); exit;
             foreach ($datos_propiedades as $propiedad) {
                 $this->payment->generar_mail_vencimiento_propiedad($comunidad, $propiedad);
                 exit;
@@ -5022,17 +5235,59 @@ class Admin extends CI_Model
             }
         }
 
+
+
+        $com_prox_vencida = $this->get_comunidad_prox_vencer('despues');
+        foreach ($com_prox_vencida as $comunidad) {
+            $datos_propiedades = $this->get_propiedades_prox_vencimiento($comunidad->idcomunidad);
+            //echo '<pre>';
+            //print_r($comunidad);
+            //print_r($datos_propiedades); exit;
+            foreach ($datos_propiedades as $propiedad) {
+                $this->payment->generar_mail_vencimiento_propiedad($comunidad, $propiedad,'despues');
+                exit;
+                //print_r($propiedad);
+            }
+        }
+
+
+
+
         $this->db->trans_complete();
     }
 
-    public function get_comunidad_prox_vencer()
+    public function get_comunidad_prox_vencer($tipo = 'antes')
     {
+  
+        if($tipo == 'antes'){
 
-        $ggcc_data = $this->db->select("distinct idcomunidad,  date_format(fecha_vencimiento,'%d/%m/%Y') fecha_vencimiento ", false)
-            ->from('gc_periodo_estado as p')
-            ->where('datediff(fecha_vencimiento,\'2019-11-20\') in (10,5,1)');
+            $ggcc_data = $this->db->select("distinct p.idcomunidad,  date_format(p.fecha_vencimiento,'%d/%m/%Y') fecha_vencimiento, r.mes, r.anno ", false)
+                ->from('gc_periodo_estado p')
+                ->join('gc_periodo r','p.idperiodo = r.id')
+                ->join('gc_comunidad g','p.idcomunidad = g.id AND g.active = 1 AND g.mail_morosidad_antes_vencimiento != -1')
+                ->where('p.fecha_vencimiento > CURDATE()')
+                ->where('datediff(p.fecha_vencimiento,CURDATE()) = g.mail_morosidad_antes_vencimiento')
+                ->where('p.publica IS NOT null');
+
+        }else if($tipo == 'despues'){
+     
+            $ggcc_data = $this->db->select("distinct p.idcomunidad,  date_format(p.fecha_vencimiento,'%d/%m/%Y') fecha_vencimiento, r.mes, r.anno ", false)
+                ->from('gc_periodo_estado p')
+                ->join('gc_periodo r','p.idperiodo = r.id')
+                ->join('gc_comunidad g','p.idcomunidad = g.id AND g.active = 1 AND g.mail_morosidad_despues_vencimiento != -1')
+                ->where('p.fecha_vencimiento < CURDATE()')
+                ->where('datediff(CURDATE(),p.fecha_vencimiento) = g.mail_morosidad_despues_vencimiento')
+                ->where('p.publica IS NOT null');
+
+              
+        }
+   
+
+
 
         $query = $this->db->get();
+
+        //var_dump($query->result()); exit;
         return $query->result();
     }
 

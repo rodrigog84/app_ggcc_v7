@@ -27,9 +27,9 @@
  */
 
 
+
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 
 class Remuneracion extends CI_Model
 {
@@ -86,6 +86,51 @@ class Remuneracion extends CI_Model
 
         return 1;
     }
+
+
+
+
+    public function edit_tabla_correccion_monetaria($anno, $array_factores)
+    {
+
+        foreach ($array_factores as $key => $mes) {
+
+               $this->db->select('dic')
+                ->from('gc_tabla_correccion_monetaria')
+                ->where('anno',$anno)
+                ->where('mes_orig',$key);
+                $query = $this->db->get();
+                $data_factor =  $query->result();         
+
+                if(count($data_factor) > 0){
+
+                    $array_data_factor = array(
+                                                'dic' => $mes
+                                        );
+
+                    $this->db->where('anno', $anno);
+                    $this->db->where('mes_orig', $key);
+                    $this->db->update('gc_tabla_correccion_monetaria', $array_data_factor);
+
+
+                }else{
+
+
+                    $array_data_factor = array(
+                                                'anno' => $anno,
+                                                'mes_orig' => $key,
+                                                'dic' => $mes
+                                        );
+
+                    $this->db->insert('gc_tabla_correccion_monetaria', $array_data_factor);
+
+                }
+
+        }
+
+        return 1;
+    }
+
 
 
     public function edit_tabla_asig_familiar($array_asig_familiar)
@@ -1392,6 +1437,20 @@ class Remuneracion extends CI_Model
     }
 
 
+    public function get_tabla_correccion_monetaria($anno)
+    {
+
+        $this->db->select('id, anno, mes_orig, dic')
+            ->from('gc_tabla_correccion_monetaria')
+            ->where('anno',$anno)
+            ->order_by('anno', 'asc')
+            ->order_by('mes_orig', 'asc');
+
+        $query = $this->db->get();
+        return $query->result();
+    }    
+
+
     public function get_tabla_asig_familiar($idtramo = null)
     {
 
@@ -1630,10 +1689,13 @@ class Remuneracion extends CI_Model
                 $cot_inp = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * 0.031, 0) : 0;
                 */
 
-                $cot_fonasa = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * 0.0055, 0) : 0;
-                $cot_inp = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * 0.0645, 0) : 0;
+                //$cot_fonasa = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * 0.0055, 0) : 0;
+                //$cot_inp = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * 0.0645, 0) : 0;
                 
+                $cot_fonasa = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * PORCT_FONASA, 0) : 0;
+                $cot_inp = $trabajador->idisapre == 1 ? round($sueldo_imponible_imposiciones * PORCT_INP, 0) : 0;
                 
+
                 $dif_salud = $salud_total - ($cot_fonasa + $cot_inp);
                 $cot_fonasa += $dif_salud;
             } else {
@@ -2401,6 +2463,42 @@ limit 1		*/
     }
 
 
+     public function get_trabajador_by_userid($userid)
+    {
+
+        $periodo_data = $this->db->select('p.id', false)
+            ->from('gc_personal as p')
+            ->where('p.idcomunidad', $this->session->userdata('comunidadid'))
+            ->where('p.iduser', $userid);
+        $query = $this->db->get();
+        $datos = $query->result();
+        return $datos;
+    }
+
+
+    public function get_periodos_cerrados_personal($idtrabajador,$comunidadid)
+    {
+        $periodo_data = $this->db->select('p.id, 
+                                            p.mes, 
+                                            p.anno, 
+                                            pr.cierre, 
+                                            pr.aprueba, 
+                                            r.sueldoimponible,
+                                            r.sueldoliquido,
+                                            r.id as idremuneracion,
+                                            date_format(pr.cierre, "%d/%m/%Y") as cierre', false)
+            ->from('gc_periodo as p')
+            ->join('gc_periodo_remuneracion as pr', 'p.id = pr.idperiodo')
+            ->join('gc_remuneracion as r', 'pr.idperiodo = r.idperiodo AND r.idpersonal = ' . $idtrabajador)
+            ->where('pr.idcomunidad', $comunidadid)
+            ->where('pr.cierre is not null')
+            ->where('pr.aprueba is not null')
+            ->order_by('p.updated_at desc');
+        $query = $this->db->get();
+        $datos = $query->result();
+        return $datos;
+    }
+
     public function get_remuneraciones_by_periodo($idperiodo, $sinsueldo = null)
     {
         //$periodo_data = $this->db->select('r.id, pe.id as idtrabajador, pe.nombre, pe.apaterno, pe.amaterno, r.sueldobase, r.totalhaberes, r.totaldescuentos, r.sueldoliquido')
@@ -2986,7 +3084,6 @@ limit 1		*/
             $content = $this->get_pdf_content($datos_remuneracion->id);
         }
 
-
         $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
                                 'margin-top' => 16,
                                 'margin-bottom' => 16,
@@ -2997,7 +3094,7 @@ limit 1		*/
                                 ]);        
 
        /* $this->load->library("mpdf");
-        $this->mpdf->mPDF(
+        $mpdf->mPDF(
             '',    // mode - default ''
             '',    // format - A4, for example, default ''
             8,     // font size - default 0
@@ -3195,7 +3292,6 @@ limit 1		*/
         $datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
         $content = $this->generar_contenido_comprobante_solicitud($idpersonal, $idcartola);
-
 
         $mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
                                 'margin-top' => 16,
@@ -3646,6 +3742,7 @@ public function lre($datos_remuneracion,$periodo)
 
         fputs($file, utf8_decode($encabezado));
 
+
         foreach ($datos_remuneracion as $remuneracion) {
 
                // echo $remuneracion->codlrecaja."<br>";
@@ -3670,6 +3767,7 @@ public function lre($datos_remuneracion,$periodo)
 
 
                 $ahorrovol = $remuneracion->montoahorrovol > 0 ? 1 : 0;
+
 
 
                 // Categoría 1: Identificación del Trabajador
@@ -3718,7 +3816,7 @@ public function lre($datos_remuneracion,$periodo)
                 //Subcategoría N°1: Haberes imponibles y tributables
 
                 $linea .= $remuneracion->sueldobase.";"; //  Sueldo
-                $linea .= "0;"; //  Sobresueldo
+                $linea .= ($remuneracion->montohorasextras50 + $remuneracion->montohorasextras100).";"; //  Sobresueldo
                 $linea .= "0;"; //  Comisiones (mensual) 
                 $linea .= "0;"; //  Semana corrida mensual (Art. 45) 
                 $linea .= "0;"; //  Participación (mensual) 
@@ -4946,19 +5044,63 @@ public function lre($datos_remuneracion,$periodo)
     {
 
 
-        $movimiento_data = $this->db->select('p.id, p.rut, p.dv, p.nombre, p.apaterno, p.amaterno, sum(r.sueldoliquido) as sueldoliquido, sum(r.sueldoimponible) as sueldoimponible, sum(r.impuesto) as impuesto, r.active,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 1)) > 0,"C","") as renta_enero,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 2)) > 0,"C","") as renta_febrero,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 3)) > 0,"C","") as renta_marzo,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 4)) > 0,"C","") as renta_abril,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 5)) > 0,"C","") as renta_mayo,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 6)) > 0,"C","") as renta_junio,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 7)) > 0,"C","") as renta_julio,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 8)) > 0,"C","") as renta_agosto,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 9)) > 0,"C","") as renta_septiembre,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 10)) > 0,"C","") as renta_octubre,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 11)) > 0,"C","") as renta_noviembre,
-						if((select sum(sueldoliquido) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 12)) > 0,"C","") as renta_diciembre
+        $movimiento_data = $this->db->select('p.id, 
+                                             p.rut, 
+                                             p.dv, 
+                                             p.nombre, 
+                                             p.apaterno, 
+                                             p.amaterno, 
+                                             p.horassemanales,
+                                             sum(r.sueldoliquido) as sueldoliquidonoactualiza, 
+                                             sum(r.totalleyessociales - r.montoahorrovol - r.impuesto) as leyessociales, 
+                                             sum((r.sueldoimponible - (r.totalleyessociales - r.montoahorrovol - r.impuesto))) as rentatotalsinactualizar, 
+                                             round(sum((r.sueldoimponible - (r.totalleyessociales - r.montoahorrovol - r.impuesto))*(SELECT       1 + (t.dic/100) 
+                                            FROM            gc_periodo p
+                                            left JOIN   gc_tabla_correccion_monetaria t  ON p.mes = t.mes_orig AND p.anno = t.anno
+                                            WHERE       p.id = r.idperiodo  )),0) as rentatotalneta, 
+                                             sum(r.sueldoimponible) as sueldoimponible, 
+                                             sum(r.impuesto) as impuesto, 
+                                            ROUND(sum(r.impuesto*(SELECT       1 + (t.dic/100) 
+                                            FROM            gc_periodo p
+                                            left JOIN   gc_tabla_correccion_monetaria t  ON p.mes = t.mes_orig AND p.anno = t.anno
+                                            WHERE       p.id = r.idperiodo  )),0) as impuestoactualizado,                                              
+                                            round(SUM((IFNULL((SELECT    sum(monto)
+                                                    from gc_bonos_remuneracion                      
+                                                    WHERE idremuneracion = r.id
+                                                    AND     imponible = 0),0) + IFNULL(r.movilizacion,0) + IFNULL(r.colacion,0) + IFNULL(r.asigfamiliar,0))*(SELECT       1 + (t.dic/100) 
+                                                                        FROM            gc_periodo p
+                                                                        left JOIN   gc_tabla_correccion_monetaria t  ON p.mes = t.mes_orig AND p.anno = t.anno
+                                                                        WHERE       p.id = r.idperiodo  )),0) AS bonosnoimponibles,  
+                                            round(SUM((IFNULL((SELECT    sum(monto)
+                                                    from gc_bonos_remuneracion                      
+                                                    WHERE idremuneracion = r.id
+                                                    AND     imponible = 0),0) + IFNULL(r.movilizacion,0) + IFNULL(r.colacion,0) + IFNULL(r.asigfamiliar,0))),0) AS bonosnoimponiblessinactualizar,                                                                          
+
+                                             r.active,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 1)) > 0,"C","") as renta_enero_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 2)) > 0,"C","") as renta_febrero_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 3)) > 0,"C","") as renta_marzo_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 4)) > 0,"C","") as renta_abril_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 5)) > 0,"C","") as renta_mayo_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 6)) > 0,"C","") as renta_junio_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 7)) > 0,"C","") as renta_julio_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 8)) > 0,"C","") as renta_agosto_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 9)) > 0,"C","") as renta_septiembre_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 10)) > 0,"C","") as renta_octubre_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 11)) > 0,"C","") as renta_noviembre_ind,
+						if((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 12)) > 0,"C","") as renta_diciembre_ind,
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 1)),0) as renta_enero, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 2)),0) as renta_febrero, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 3)),0) as renta_marzo, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 4)),0) as renta_abril, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 5)),0) as renta_mayo, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 6)),0) as renta_junio, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 7)),0) as renta_julio, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 8)),0) as renta_agosto,
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 9)),0) as renta_septiembre, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 10)),0) as renta_octubre, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 11)),0) as renta_noviembre, 
+                        IFNULL((select sum(sueldoimponible - (totalleyessociales - montoahorrovol - impuesto)) as cantidad from gc_remuneracion where idpersonal = p.id and idperiodo = (select id from gc_periodo where anno = ' . $anno . ' and mes = 12)),0) as renta_diciembre                                                                                                                                                                                                                                                                         
 									', false)
             ->from('gc_personal p')
             ->join('gc_remuneracion r', 'p.id = r.idpersonal')
@@ -4969,11 +5111,242 @@ public function lre($datos_remuneracion,$periodo)
             ->order_by('p.nombre');
 
         //$movimiento_data = is_null($idmovimiento) ? $movimiento_data : $movimiento_data->where('lm.id',$idmovimiento);
-
+             
 
         $query = $this->db->get();
+              // echo $this->db->last_query(); exit;
         return $query->result();
     }
+
+
+
+    public function calculo_declaracion_jurada($anno){
+
+
+        $this->db->trans_start();
+
+        $this->db->select("id")
+            ->from('gc_declaracion_jurada d')
+            ->where("d.anno", $anno)
+            ->where("d.idcomunidad", $this->session->userdata('comunidadid'));
+
+        $query = $this->db->get();
+        $declaracion_existe = $query->result();
+
+        //eliminar y calcular 
+        if(count($declaracion_existe) > 0){
+
+            $declaracion = $declaracion_existe[0];     
+            $this->db->where('iddeclaracion', $declaracion->id);
+            $this->db->delete('gc_declaracion_jurada_detalle');            
+
+
+            $this->db->where('id', $declaracion->id);
+            $this->db->delete('gc_declaracion_jurada');   
+
+
+        }     
+
+        $descjurada_data = $this->remuneracion->get_decjurada_rentas($anno);
+
+        $array_declaracion_jurada = array(
+                                            'anno' => $anno,
+                                            'idcomunidad' => $this->session->userdata('comunidadid')
+
+                                         );
+
+        $this->db->insert('gc_declaracion_jurada',$array_declaracion_jurada);
+        $declaracion_id = $this->db->insert_id();
+        $i = 1;
+        $rentatotalsinactualizar = 0;
+        $rentatotalneta = 0;
+        $impuestosinactualizar = 0;
+        $impuestoactualizado = 0;
+        $bonosnoimponiblessinactualizar = 0;
+        $bonosnoimponibles = 0;
+        $leyessociales = 0;
+         foreach ($descjurada_data as $data) {
+            $array_detalle_declaracion_jurada = array(
+                                                    'iddeclaracion' => $declaracion_id,
+                                                    'idpersonal' => $data->id,
+                                                    'rut' => $data->rut,
+                                                    'dv' => $data->dv,
+                                                    'rentatotalsinactualizar' => $data->rentatotalsinactualizar,
+                                                    'rentatotalneta' => $data->rentatotalneta,
+                                                    'impuestosinactualizar' => $data->impuesto,
+                                                    'impuestoactualizado' => $data->impuestoactualizado,
+                                                    'bonosnoimponibles' => $data->bonosnoimponibles,
+                                                    'bonosnoimponiblessinactualizar' => $data->bonosnoimponiblessinactualizar,
+                                                    'leyessociales' => $data->leyessociales,
+                                                    'eneroind' => $data->renta_enero_ind,
+                                                    'febreroind' => $data->renta_febrero_ind,
+                                                    'marzoind' => $data->renta_marzo_ind,
+                                                    'abrilind' => $data->renta_abril_ind,
+                                                    'mayoind' => $data->renta_mayo_ind,
+                                                    'junioind' => $data->renta_junio_ind,
+                                                    'julioind' => $data->renta_julio_ind,
+                                                    'agostoind' => $data->renta_agosto_ind,
+                                                    'septiembreind' => $data->renta_septiembre_ind,
+                                                    'octubreind' => $data->renta_octubre_ind,
+                                                    'noviembreind' => $data->renta_noviembre_ind,
+                                                    'diciembreind' => $data->renta_diciembre_ind,
+                                                    'correlativo' => $i,
+                                                    'enerorenta' => $data->renta_enero,
+                                                    'febrerorenta' => $data->renta_febrero,
+                                                    'marzorenta' => $data->renta_marzo,
+                                                    'abrilrenta' => $data->renta_abril,
+                                                    'mayorenta' => $data->renta_mayo,
+                                                    'juniorenta' => $data->renta_junio,
+                                                    'juliorenta' => $data->renta_julio,
+                                                    'agostorenta' => $data->renta_agosto,
+                                                    'septiembrerenta' => $data->renta_septiembre,
+                                                    'octubrerenta' => $data->renta_octubre,
+                                                    'noviembrerenta' => $data->renta_noviembre,
+                                                    'diciembrerenta' => $data->renta_diciembre,
+                                                    'horassemanales' => $data->horassemanales
+                                                );
+                $this->db->insert('gc_declaracion_jurada_detalle',$array_detalle_declaracion_jurada);
+
+                $impuestosinactualizar += $data->impuesto;
+                $rentatotalsinactualizar += $data->rentatotalsinactualizar;
+                $rentatotalneta += $data->rentatotalneta;
+                $impuestoactualizado += $data->impuestoactualizado;
+                $bonosnoimponibles += $data->bonosnoimponibles;
+                $bonosnoimponiblessinactualizar += $data->bonosnoimponiblessinactualizar;
+                $leyessociales += $data->leyessociales;
+                $i++;
+
+
+        }
+
+        $array_actualiza_dj = array(
+                                    'rentatotalsinactualizar' => $rentatotalsinactualizar,
+                                    'rentatotalneta' => $rentatotalneta,
+                                    'impuestorentasinactualizar' => $impuestosinactualizar,
+                                    'impuestorentapagada' => $impuestoactualizado,
+                                    'rentanogravada' => $bonosnoimponibles,
+                                    'rentanogravadasinactualizar' => $bonosnoimponiblessinactualizar,
+                                    'leyessociales' => $leyessociales
+                                );
+        $this->db->where('id',$declaracion_id);
+        $this->db->update('gc_declaracion_jurada', $array_actualiza_dj);
+
+        $this->db->trans_complete();
+
+
+    }
+
+
+
+     public function get_decjurada_rentas_encabezado($anno){
+
+            $this->db->select("anno, rentatotalsinactualizar, rentatotalneta, impuestorentapagada, impuestorentasinactualizar, impuestorentaaccesoria, rentanogravada, rentanogravadasinactualizar, rentaexenta, rebajazonasextremas, leyessociales")
+                ->from('gc_declaracion_jurada d')
+                ->where("d.anno", $anno)
+                ->where("d.idcomunidad", $this->session->userdata('comunidadid'));
+
+            $query = $this->db->get();
+            $declaracion = $query->result();
+
+            return $declaracion;
+     }
+
+
+
+     public function get_decjurada_rentas_detalle($anno){
+
+            $this->db->select("d.rut, d.dv, d.rentatotalneta, d.impuestoactualizado, d.bonosnoimponibles, d.eneroind, d.febreroind, d.marzoind, d.abrilind, d.mayoind, d.junioind, d.julioind, d.agostoind, d.septiembreind, d.octubreind, d.noviembreind, d.diciembreind, d.correlativo, d.enerorenta, d.febrerorenta, d.marzorenta, d.abrilrenta, d.mayorenta, d.juniorenta, d.juliorenta, d.agostorenta, d.septiembrerenta, d.octubrerenta, d.noviembrerenta, d.diciembrerenta, d.horassemanales ")
+                ->from('gc_declaracion_jurada_detalle d')
+                ->join('gc_declaracion_jurada j', 'd.iddeclaracion = j.id')
+                ->where("j.anno", $anno)
+                ->where("j.idcomunidad", $this->session->userdata('comunidadid'));
+
+            $query = $this->db->get();
+            $declaracion = $query->result();
+
+            return $declaracion;
+     }
+
+
+     public function archivo_decjurada_rentas($anno){
+
+        $nombre_archivo = $this->session->userdata('comunidadid') . "_dj_" . $anno . ".csv";
+        $path_archivo = "./uploads/tmp/";
+        $file = fopen($path_archivo . $nombre_archivo, "w");
+
+
+
+
+
+        $this->load->model('remuneracion');
+        $descjurada_data = $this->remuneracion->get_decjurada_rentas_detalle($anno);
+       // echo '<pre>';
+       // var_dump($descjurada_data); exit;
+        $i = 1;
+
+        foreach ($descjurada_data as $data) {
+                $linea  = $data->rut.';'; // rut.dv
+                $linea .= $data->dv.';'; // rut.dv
+                $linea .= $data->rentatotalneta.';'; // sueldo liquido
+                $linea .= $data->impuestoactualizado.';'; // impuesto
+                $linea .= '0;'; // mayor retencion
+                $linea .= $data->bonosnoimponibles.';'; // renta total no gravada
+                $linea .= '0;'; // renta total exenta
+                $linea .= '0;'; // rebaja zonas extremas
+                $linea .= '0;'; // 3% prestamos
+                $linea .= $data->eneroind.';'; // IND ENERO
+                $linea .= $data->febreroind.';'; // IND FEBRERO
+                $linea .= $data->marzoind.';'; // IND MARZO
+                $linea .= $data->abrilind.';'; // IND ABRIL
+                $linea .= $data->mayoind.';'; // IND MAYO
+                $linea .= $data->junioind.';'; // IND JUNIO
+                $linea .= $data->julioind.';'; // IND JULIO
+                $linea .= $data->agostoind.';'; // IND AGOSTO
+                $linea .= $data->septiembreind.';'; // IND SEPTIEMBRE
+                $linea .= $data->octubreind.';'; // IND OCTUBRE
+                $linea .= $data->noviembreind.';'; // IND NOVIEMBRE
+                $linea .= $data->diciembreind.';'; // IND DICIEMBRE
+                $linea .= $data->correlativo. ';'; // correlativo      
+                $linea .= $data->enerorenta.';'; // IND ENERO
+                $linea .= $data->febrerorenta.';'; // IND FEBRERO
+                $linea .= $data->marzorenta.';'; // IND MARZO
+                $linea .= $data->abrilrenta.';'; // IND ABRIL
+                $linea .= $data->mayorenta.';'; // IND MAYO
+                $linea .= $data->juniorenta.';'; // IND JUNIO
+                $linea .= $data->juliorenta.';'; // IND JULIO
+                $linea .= $data->agostorenta.';'; // IND AGOSTO
+                $linea .= $data->septiembrerenta.';'; // IND SEPTIEMBRE
+                $linea .= $data->octubrerenta.';'; // IND OCTUBRE
+                $linea .= $data->noviembrerenta.';'; // IND NOVIEMBRE
+                $linea .= $data->diciembrerenta.';'; // IND DICIEMBRE
+                $linea .= $data->horassemanales.';'; // IND DICIEMBRE
+
+                $i++;
+
+                $linea .= "\r\n";
+                //$linea = $rut.$dv.$apaterno.$amaterno.$nombres."\r\n";
+                fputs($file, $linea);
+
+
+        }
+
+
+
+
+        fclose($file);
+
+        $data_archivo = basename($path_archivo . $nombre_archivo);
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename=' . $data_archivo);
+        header('Content-Length: ' . filesize($path_archivo . $nombre_archivo));
+        readfile($path_archivo . $nombre_archivo);
+
+
+        unlink($path_archivo . $nombre_archivo);
+
+
+
+     }
 
     public function asocia_id_personal($iduser, $idpersonal)
     {

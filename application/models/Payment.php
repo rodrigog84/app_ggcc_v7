@@ -57,7 +57,7 @@ class Payment extends CI_Model
 
 	public function get_deuda_publicada_by_comunidad($comunidadid){
 
-		$this->db->select('p.id, p.numero, p.responsable, p.saldo_publicado as saldo ')
+		$this->db->select('p.id, p.numero, p.responsable, p.direccion, p.saldo_publicado as saldo ')
 						  ->from('gc_propiedad as p')
 		                  ->where('p.idcomunidad', $comunidadid)
 		                  ->where('p.active = 1')
@@ -199,6 +199,90 @@ public function get_saldo_contable_by_comunidad($comunidadid){
 	}				
 
 
+
+public function get_ingresos_totales_by_periodo($comunidadid,$idperiodo){
+
+
+		$this->load->model('admin');
+
+		$periodo = $this->admin->get_periodo_by_id($idperiodo);
+		
+		$mes = str_pad($periodo->mes,2,'0',STR_PAD_LEFT);
+		$anno = $periodo->anno;
+
+		$fecha_desde = $anno.'-'.$mes.'-01';
+		$fecha_hasta = $anno.'-'.$mes.'-' . date("d",(mktime(0,0,0,$mes+1,1,$anno)-1));
+
+
+		//echo date("d",(mktime(0,0,0,$month+1,1,$year)-1));
+
+		$this->db->select('ifnull(SUM(la.monto),0) AS monto',false)
+						  ->from('gc_listado_abonos la')
+						  ->where('la.idcomunidad', $comunidadid)
+		                  ->where('la.activo', 1)
+		                  ->where('la.fechaconciliacion is not NULL')
+		                  ->where("la.fechapago between '" . $fecha_desde . "' and '" . $fecha_hasta . "'");
+		$query = $this->db->get();
+		$datos_abonos = $query->row();
+
+		$abonos = $datos_abonos->monto;
+
+
+
+
+		$this->db->select('ifnull(SUM(cc.monto),0) AS monto',false)
+						  ->from('gc_cartola_caja cc')
+						  ->join('gc_ingresos i','cc.idingreso = i.id','LEFT')
+						  ->where('cc.idcomunidad', $comunidadid)
+		                  ->where('cc.activo', 1)
+		                  ->where('cc.fechaconciliacion is not NULL')
+		                  ->where("cc.fechapago between '" . $fecha_desde . "' and '" . $fecha_hasta . "'")
+		                  ->where("(cc.idingreso is not null or cc.exingreso = 1)")
+		                  ->where("(i.tipoingreso <> 'na' OR i.tipoingreso IS NULL)");
+
+		$query = $this->db->get();
+		$datos_ingresos = $query->row();
+
+		$ingresos = $datos_ingresos->monto;
+
+
+		return $abonos + $ingresos;
+
+	}				
+
+
+
+public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
+
+
+		$this->load->model('admin');
+
+		$periodo = $this->admin->get_periodo_by_id($idperiodo);
+		
+		$mes = str_pad($periodo->mes,2,'0',STR_PAD_LEFT);
+		$anno = $periodo->anno;
+
+		$fecha_desde = $anno.'-'.$mes.'-01';
+		$fecha_hasta = $anno.'-'.$mes.'-' . date("d",(mktime(0,0,0,$mes+1,1,$anno)-1));
+
+
+		//echo date("d",(mktime(0,0,0,$month+1,1,$year)-1));
+
+		$this->db->select('ifnull(SUM(lp.monto),0) AS monto',false)
+						  ->from('gc_listado_pagos lp')
+						  ->where('lp.idcomunidad', $comunidadid)
+		                  ->where('lp.activo', 1)
+		                  ->where('lp.fechaconciliacion is not NULL')
+		                  ->where("lp.fechapago between '" . $fecha_desde . "' and '" . $fecha_hasta . "'");
+		$query = $this->db->get();
+		$datos_egresos = $query->row();
+
+		$egresos = $datos_egresos->monto;
+
+
+		return $egresos;
+
+	}		
 
 	public function get_saldo_contable($fecha = null){
 
@@ -2164,7 +2248,7 @@ public function get_saldo_contable_by_comunidad($comunidadid){
 			$html .=	"</body>
 						</html>";
 			$this->load->library("mpdf");
-			$this->mpdf->mPDF(
+			$mpdf->mPDF(
 				'',    // mode - default ''
 				'',    // format - A4, for example, default ''
 				8,     // font size - default 0
@@ -2178,9 +2262,9 @@ public function get_saldo_contable_by_comunidad($comunidadid){
 				'L'    // L - landscape, P - portrait
 				);  
 			//echo $html; exit;
-			$this->mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
-			$this->mpdf->WriteHTML($html);
-			$this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
+			$mpdf->WriteHTML($html);
+			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
 			// SI NO EXISTE EL DIRECTORIO, LO CREAMOS
@@ -2190,7 +2274,7 @@ public function get_saldo_contable_by_comunidad($comunidadid){
 
 			// SE ALMACENA EL ARCHIVO
 			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$datos_propiedad->numero.".pdf";
-			$this->mpdf->Output($nombre_archivo, "I");
+			$mpdf->Output($nombre_archivo, "I");
 			
 
 
@@ -2299,6 +2383,12 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 
 
 			$datos_periodo = $this->admin->get_periodo_by_id($idperiodo);
+
+
+
+			$ingresos = $this->get_ingresos_totales_by_periodo($comunidadid,$idperiodo);
+			$egresos = $this->get_egresos_totales_by_periodo($comunidadid,$idperiodo);
+
 
 
 			$datos_propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
@@ -2511,7 +2601,7 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 							$dato_extra = " ( ".$detalle->descripcion . " )";
 						}else if($detalle->itemid == 7){ # SI ES CUOTA ESPECIAL SE MUESTRA LA DESCRIPCION
 							$cobro_mes = false;					
-							$dato_extra = "";							
+							$dato_extra = " ( ".$detalle->descripcion . " )";						
 						}else if($detalle->itemid == 12){ # SI ES INTERESES SE MUESTRA EL PORCENTAJE
 							$dato_extra = is_null($detalle->interes) ? "" : " ( ".$detalle->interes . " % )";
 						}else{
@@ -2581,13 +2671,13 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 							<h4><b>Ultimos Cobros</b></h4>
 							<table width="100%">
 								<tr>
-									<td width="40%">	
+									<td width="30%">	
 										<table>
-											<tr><td><img src="graph/ggcc/'.$idpropiedad.'/graph_'.$idperiodo.'.png" width="40%"></td>/tr>
+											<tr><td><img src="graph/ggcc/'.$idpropiedad.'/graph_'.$idperiodo.'.png" width="60%"></td>/tr>
 										</table>										
 									</td>
-									<td align="center" width="60%">	
-										<table width="50%">
+									<td align="center" width="35%">	
+										<table width="100%">
 											<thead class="theadClass">
 											<tr class="headerRow">
 												<th><p>Periodo</p></th>
@@ -2626,7 +2716,37 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 
 									$html .='</tbody>										
 										</table>										
-									</td>									
+									</td>
+
+									<td align="center" width="35%">	
+										<table width="100%">
+											<thead class="theadClass">
+											<tr class="headerRow">
+												<th><p>Informaci&oacute;n</p></th>
+												<th><p>Monto</p></th>
+											</tr>
+											</thead>
+											<tbody>
+																<tr>
+																	<td class="tdClassCenter" >Total Ingresos</td>
+																	<td class="tdClass tdClassNumber" >$ ' . number_format($ingresos,0,".",".") . '</td>
+																</tr>
+																<tr>
+																	<td class="tdClassCenter" >Total Egresos</td>
+																	<td class="tdClass tdClassNumber" >$ ' . number_format($egresos,0,".",".") . '</td>
+																</tr>
+																<tr>
+																	<td class="tdClassCenter" >Saldo Mes</td>
+																	<td class="tdClass tdClassNumber" >$ ' . number_format($ingresos - $egresos,0,".",".") . '</td>
+																</tr>
+											</tbody>										
+										</table>										
+									</td>
+
+
+
+
+
 								</tr>															
 							</table>
 							
@@ -2805,9 +2925,12 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 						<table class="" width="100%"  >
 						<thead class="theadClass">
 						<tr class="headerRow">
-						<th width="40%"><p>Concepto</p></th>
-						<th width="40%"><p>Proveedor</p></th>
-						<th width="20%">Valor</th>
+						<th width="25%"><p>Concepto/Proveedor</p></th>
+						<th width="30%"><p>Descripci&oacute;n</p></th>
+						<th width="15%"><p>N. Doc</p></th>
+						<th width="15%"><p>Fecha</p></th>
+						<!--th width="40%"><p>Proveedor</p></th-->
+						<th width="15%">Valor</th>
 						</tr>
 						</thead>
 						<tbody>';
@@ -2818,16 +2941,21 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 			$html .= 	'<tr>
 							<td class="tdClass"><b>' . $key_padre .'</b></td>
 							<td>&nbsp;</td>
-							<td class="tdClass tdClassNumber"><b>$ ' . number_format($value_padre,0,".",".") . '</b></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td class="tdClass tdClassNumber" style="font-size: 6pt;"><b>$ ' . number_format($value_padre,0,".",".") . '</b></td>
 						</tr>';
 
 
 							foreach ($detalle[$key_padre] as $cuenta) {
 								if($cuenta->concepto != "Sueldos"){
 									$html .= 	'<tr>
-													<td class="tdClass">&nbsp;&nbsp;&nbsp;&nbsp;' . $cuenta->concepto .'</td>
-													<td class="tdClass">' . $cuenta->proveedor .'</td>
-													<td class="tdClass tdClassNumber">$ ' . number_format($cuenta->monto,0,".",".") . '</td>
+													<td class="tdClass" style="font-size: 6pt;">&nbsp;&nbsp;&nbsp;&nbsp;' . $cuenta->proveedor .'</td>
+													<td class="tdClass" style="font-size: 6pt;">' . $cuenta->descripcion .'</td>
+													<td class="tdClass" style="font-size: 6pt;">' . $cuenta->nrodocumento .'</td>
+													<td class="tdClass" style="font-size: 6pt;">' . $cuenta->fecdocumento .'</td>
+													<!--td class="tdClass" style="font-size: 6pt;>' . $cuenta->proveedor .'</td-->
+													<td class="tdClass tdClassNumber" style="font-size: 6pt;">$ ' . number_format($cuenta->monto,0,".",".") . '</td>
 												</tr>';
 
 								}else{
@@ -2840,9 +2968,11 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 							if($tiene_remuneracion && $remuneraciones > 0){ //AGRUPA TODOS LOS MONTOS DE REMUNERACIONES Y LOS MUESTRA COMO UN SÓLO ITEM
 								$tiene_remuneracion = false;
 								$html .= 	'<tr>
-												<td class="tdClass">&nbsp;&nbsp;&nbsp;&nbsp;Sueldos</td>
-												<td class="tdClass">Remuneraciones de ' . date2string($datosperiodo->mes,$datosperiodo->anno) . '</td>
-												<td class="tdClass tdClassNumber">$ ' . number_format($remuneraciones,0,".",".") . '</td>
+												<td class="tdClass" style="font-size: 6pt;">&nbsp;&nbsp;&nbsp;&nbsp;Sueldos</td>
+												<td class="tdClass" style="font-size: 6pt;">Remuneraciones de ' . date2string($datosperiodo->mes,$datosperiodo->anno) . '</td>
+												<td>&nbsp;</td>
+												<td>&nbsp;</td>
+												<td class="tdClass tdClassNumber" style="font-size: 6pt;">$ ' . number_format($remuneraciones,0,".",".") . '</td>
 											</tr>';
 
 							}							
@@ -2856,14 +2986,19 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 			$html .= 	'<tr>
 							<td class="tdClass"><b>' . $key_padre_ingreso .'</b></td>
 							<td>&nbsp;</td>
-							<td class="tdClass tdClassNumber"><b>$ - ' . number_format($value_padre_ingreso,0,".",".") . '</b></td>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+							<td class="tdClass tdClassNumber" style="font-size: 6pt;"><b>$ - ' . number_format($value_padre_ingreso,0,".",".") . '</b></td>
 						</tr>';
 
 
 							foreach ($detalle_ingresos[$key_padre_ingreso] as $ingreso) {
 									$html .= 	'<tr>
-													<td class="tdClass">&nbsp;&nbsp;&nbsp;&nbsp;' . $ingreso->concepto .'</td>
-													<td class="tdClass">' . $ingreso->proveedor .'</td>
+													<td class="tdClass">&nbsp;&nbsp;&nbsp;&nbsp;' . $ingreso->proveedor .'</td>
+													<td class="tdClass">' . $ingreso->descripcion .'</td>
+													<td class="tdClass">' . $ingreso->nrodocumento .'</td>
+													<td class="tdClass">' . $ingreso->fecdocumento .'</td>
+													<!--td class="tdClass">' . $ingreso->proveedor .'</td-->
 													<td class="tdClass tdClassNumber">$ - ' . number_format($ingreso->monto,0,".",".") . '</td>
 												</tr>';
 
@@ -2875,21 +3010,29 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 							<td class="tdClass">&nbsp;</td>
 							<td class="tdClass">&nbsp;</td>
 							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
 						</tr>
 						<tr>
 							<td class="tdClass"><b>Total Gasto Com&uacute;n</b></td>
 							<td class="tdClass">&nbsp;</td>
-							<td class="tdClass tdClassNumber"><b>$ ' . number_format($datosperiodo->deuda,0,".",".") . '</b></td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass tdClassNumber" style="font-size: 6pt;"><b>$ ' . number_format($datosperiodo->deuda,0,".",".") . '</b></td>
 						</tr>
 						<tr>
 							<td class="tdClass"><b>Fondo de Reserva</b></td>
 							<td class="tdClass">&nbsp;</td>
-							<td class="tdClass tdClassNumber"><b>$ ' . number_format($datosperiodo->fondo_reserva,0,".",".") . '</b></td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass tdClassNumber" style="font-size: 6pt;"><b>$ ' . number_format($datosperiodo->fondo_reserva,0,".",".") . '</b></td>
 						</tr>						
 						<tr>
 							<td class="tdClass"><b>Total</b></td>
 							<td class="tdClass">&nbsp;</td>
-							<td class="tdClass tdClassNumber"><b>$ ' . number_format($datosperiodo->deuda+$datosperiodo->fondo_reserva,0,".",".") . '</b></td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass tdClassNumber" style="font-size: 6pt;"><b>$ ' . number_format($datosperiodo->deuda+$datosperiodo->fondo_reserva,0,".",".") . '</b></td>
 						</tr>												
 						</tbody>
 						</table>
@@ -2953,9 +3096,8 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 			$this->load->model('admin');
 			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
-
 			/*$this->load->library("mpdf");
-			$this->mpdf->mPDF(
+			$mpdf->mPDF(
 				'',    // mode - default ''
 				'',    // format - A4, for example, default ''
 				8,     // font size - default 0
@@ -2978,7 +3120,7 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 									'margin-left' => 10,
 									'margin-right' => 5,
 									]);
-			//var_dump($mdf); exit;
+
 
 			$mpdf->SetTitle('Tu Gasto Común - Comprobantes');
 			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
@@ -2993,12 +3135,12 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 					$content = $this->get_pdf_content($propiedad->id,$idperiodo);
 
 				}
-				$this->mpdf->WriteHTML($content->pdf_content);
+				$mpdf->WriteHTML($content->pdf_content);
 
 				$i++;
 
 				if($i < $cantidad){
-					$this->mpdf->AddPage();
+					$mpdf->AddPage();
 				}
 			} 
 
@@ -3026,7 +3168,6 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 			$datosperiodo = $this->admin->get_periodos($this->session->userdata('comunidadid'),$idperiodo);
 
-
 			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
 									'margin-top' => 16,
 									'margin-bottom' => 16,
@@ -3052,6 +3193,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
 				); */
+
 
 
 			$mpdf->SetTitle('Tu Gasto Común - Detalle Cobros');
@@ -3092,6 +3234,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$datos_propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
 			$datosperiodo = $this->admin->get_periodos($comunidadid,$idperiodo);
 
+
 			$content = $this->get_pdf_content($idpropiedad,$idperiodo);
 
 			if($content->pdf_content == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
@@ -3099,7 +3242,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 				$content = $this->get_pdf_content($idpropiedad,$idperiodo);
 			}
 
-
+			//$this->generar_contenido_detalle($comunidadid,$idperiodo);
 			$content_detalle = $this->get_pdf_content_detalle($comunidadid,$idperiodo);
 
 			if($content_detalle->pdf_content == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
@@ -3133,6 +3276,8 @@ public function comprobante_detalle_ggcc($idperiodo){
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
 				);  */
+
+				
 			//echo $html; exit;
 			$mpdf->SetTitle('Tu Gasto Común - Comprobante');
 			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
@@ -3482,7 +3627,7 @@ public function comprobante_detalle_ggcc($idperiodo){
   						<li>Rut Empresa: 76.563.795-3</li>
   						<li>Raz&oacute;n Social: TECNOLOGIA VIRTUAL LTDA.</li>
   						<li>Correo Electr&oacute;nico: contacto@tugastocomun.cl</li>
-  						<li>Monto: $27.500</li>
+  						<li>Monto: 1 UF Mensual</li>
 					</ul>&#13;<br>&#13;<br>		
                 	Si usted ya realiz&oacute; este pago, o no continuar&aacute; utilizando el software, favor omita este mensaje.<br><br>
 
@@ -3688,136 +3833,145 @@ public function generar_mail_aviso_pago($idpago = null){
 
 
 
-public function generar_mail_vencimiento_propiedad($comunid,$propiedad = null){
+public function generar_mail_vencimiento_propiedad($comunid,$propiedad = null,$tipo = 'antes'){
 				$this->db->trans_start();
 				$this->load->model('admin');
 				$comunidad = $this->admin->get_comunidades($comunid->idcomunidad);
-
+				//var_dump($comunid); exit;
 
 				
 
 				  $this->load->library('email');
 				   //por un monto de $55.600. 
 				   //a la cuenta 88888888888-88 de Banco Santander
-                  
-                  $messageBody = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0072)http://tutsplus.github.io/a-simple-responsive-html-email/HTML/index.html -->
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>A Simple Responsive HTML Email</title>
-  </head>
-  <body yahoo="" bgcolor="#f6f8f1" style="min-width: 100% !important; margin: 0; padding: 0;">&#13;
-<table width="100%" bgcolor="#f6f8f1" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td>&#13;
-    <!--[if (gte mso 9)|(IE)]>
-      <table width="600" align="center" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td>
-    <![endif]-->     &#13;
-    <table bgcolor="#ffffff" class="content" align="center" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px;"><tbody><tr><td bgcolor="#605ca8" class="header" style="padding: 40px 30px 20px;">&#13;
-          <table width="70" align="left" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td height="70" style="padding: 0 20px 20px 0;">&#13;
-                <!--img class="fix" src="./mail_completo_files/logo4_1.png" width="70" height="70" border="0" alt=""-->&#13;
-              </td>&#13;
-            </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
-            <table width="425" align="left" cellpadding="0" cellspacing="0" border="0">
-              <tr>
-                <td>
-          <![endif]--><table class="col425" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 425px;"><tbody><tr><td height="70">&#13;
-                <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="subhead" style="font-size: 14px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px; padding: 0 0 0 3px;">&#13;
-                      <center>Aviso de Vencimiento Pago</center>&#13;
-                    </td>&#13;
-                  </tr><tr><td class="h1" style="color: #153643; font-family: sans-serif; font-size: 33px; line-height: 38px; font-weight: bold; padding: 5px 0 0;">&#13;
-                      <center><img class="fix" src="http://www.tugastocomun.cl/app/img/logo4_1.png" border="0" alt="" style="height: auto;" /></center>&#13;
-                    </td>&#13;
-                  </tr></tbody></table></td>&#13;
-            </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
-                </td>
-              </tr>
-          </table>
-          <![endif]--></td>&#13;
-      </tr><tr><td class="innerpadding borderbottom" style="border-bottom-width: 1px; border-bottom-color: #f2eeed; border-bottom-style: solid; padding: 30px;">&#13;
-          <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="h2" style="color: #153643; font-family: sans-serif; font-size: 18px; line-height: 28px; font-weight: bold; padding: 0 0 15px;">&#13;
-                Comunidad ' . $comunidad->nombre . '
-              </td>&#13;
-            </tr><tr><td class="h2" style="color: #153643; font-family: sans-serif; font-size: 18px; line-height: 28px; font-weight: bold; padding: 0 0 15px;">&#13;
-                ' . $propiedad->responsable . '
-              </td>&#13;
-            </tr><tr><td class="h2" style="color: #153643; font-family: sans-serif; font-size: 18px; line-height: 28px; font-weight: bold; padding: 0 0 15px;">&#13;
-                Propiedad ' . $propiedad->numero . '
-              </td>&#13;
-            </tr><tr><td class="bodycopy" style="color: #153643; font-family: sans-serif; font-size: 13px; line-height: 22px;text-align: justify">&#13;
-                El Equipo Tu Gasto Com&uacute;n le informa que su &uacute;ltima cuota de Gasto Com&uacute;n se encuentra pr&oacute;xima a vencer, con fecha ' . $comunid->fecha_vencimiento . '.  Asimismo, le recordamos que su deuda asciende a un monto de <b>$' . number_format($propiedad->saldo,0,".",".") . '</b>.<br>&#13;<br>&#13;<br>		
-                	Si usted ya realiz&oacute; este pago, favor omita este mensaje.<br><br>
+	$tipodeuda = $tipo == 'antes' ? 'pr&oacute;xima a vencer' : 'vencida';
+	$txt_email = $tipo == 'antes' ? $comunidad->txt_mail_antes_vencimiento : $comunidad->txt_mail_despues_vencimiento;
 
-                	Le saluda cordialmente,<br>
-                	Equipo de Tu Gasto Común
-              </td>&#13;
-            </tr></tbody></table></td>&#13;
-      			</tr>
-          </table>
-          <![endif]--></td>&#13;
-      </tr><!--tr>
-        <td class="innerpadding borderbottom">
-          <img class="fix" src="./mail_completo_files/wide.png" width="100%" border="0" alt="">
-        </td>
-      </tr--><tr><td class="innerpadding bodycopy" style="color: #153643; font-family: sans-serif; font-size: 10px; line-height: 22px; padding: 30px;">&#13;
-			  Para m&aacute;s informaci&oacute;n vis&iacute;tenos en nuestro sitio web http://www.tugastocomun.cl
-        </td>&#13;
-      </tr><tr><td class="footer" bgcolor="#44525f" style="padding: 20px 30px 15px;">&#13;
-          <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td align="center" class="footercopy" style="font-family: sans-serif; font-size: 14px; color: #ffffff;">&#13;
-                Copyright © ' . date('Y') . '-' . (date('Y') + 1) . ' Tu Gasto Común.<br />
-                <span class="hide">Si no desea seguir recibiendo correos de Tu Gasto Comun, por favor </span>&#13;
-                <a href="' . base_url() . 'admins/unsubscribe" class="unsubscribe" ><font color="#ffffff">haz click aquí</font></a>                 &#13;
-              </td>&#13;
-            </tr><tr><td align="center" style="padding: 20px 0 0;">&#13;
-                <table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td width="37" style="text-align: center; padding: 0 10px;" align="center">&#13;
-                      <a href="http://www.facebook.com/">&#13;
-                        <img src="http://www.tugastocomun.cl/app/img/facebook.png" width="37" height="37" alt="Facebook" border="0" style="height: auto;" /></a>&#13;
-                    </td>&#13;
-                    <td width="37" style="text-align: center; padding: 0 10px;" align="center">&#13;
-                      <a href="http://www.twitter.com/">&#13;
-                        <img src="http://www.tugastocomun.cl/app/img/twitter.png" width="37" height="37" alt="Twitter" border="0" style="height: auto;" /></a>&#13;
-                    </td>&#13;
-                  </tr></tbody></table></td>&#13;
-            </tr></tbody></table></td>&#13;
-      </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
-          </td>
-        </tr>
-    </table>
-    <![endif]--></td>&#13;
-  </tr></tbody></table><!--analytics--><script type="text/javascript" async="" src="http://www.tugastocomun.cl/app/js/ga.js"></script><script src="http://www.tugastocomun.cl/app/js/jquery-1.10.1.min.js"></script><script src="http://www.tugastocomun.cl/app/js/ga-tracking.min.js"></script></body>
-</html>';
+	$txt_email = str_replace('{usuario}',$propiedad->responsable,$txt_email);
+	$txt_email = str_replace('{comunidad}',$comunidad->nombre,$txt_email);
+	$txt_email = str_replace('{propiedad}',$propiedad->numero,$txt_email);
+	$txt_email = str_replace('{periodo}',date2string($comunid->mes,$comunid->anno),$txt_email);
+	$txt_email = str_replace('{monto}','$ ' . number_format($propiedad->saldo,0,'.','.'),$txt_email);
+	$txt_email = str_replace('{vencimiento}',$comunid->fecha_vencimiento,$txt_email);
+	
 
 
-					//$lista_email = $this->admin->get_comunidad_adm_email_by_id($comunidadid);
-					
-					$array_email = array();
-					$array_email = array('rgonzalez@tugastocomun.cl');
-					/*foreach ($lista_email as $lista) {
-						array_push($array_email,$lista->email);
-					}*/
-					
-					/*array_push($array_email,'csandoval@aurbana.cl');
-					array_push($array_email,'adolfo@aurbana.cl');
-					array_push($array_email,'rgonzalez@tugastocomun.cl');
-					*/
-					//$array_email = array(); //Para pruebas y enviar sólo a mi
-
-					$fecaviso = date('Y-m-d H:i:s');
-					$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,$comunidad->nombre." - Propiedad " . $propiedad->numero ." - Aviso Vencimiento Pago ",$messageBody,'html');
+				if($txt_email != ''){
 
 
-				/*
-					$this->db->where('id',$comunidadid);
-					$this->db->update('gc_comunidad',array('fecaviso' => $fecaviso));
+						$messageBody = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+						<!-- saved from url=(0072)http://tutsplus.github.io/a-simple-responsive-html-email/HTML/index.html -->
+						<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
+						  <head>
+						    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+						    <title>A Simple Responsive HTML Email</title>
+						  </head>
+						  <body yahoo="" bgcolor="#f6f8f1" style="min-width: 100% !important; margin: 0; padding: 0;">&#13;
+						<table width="100%" bgcolor="#f6f8f1" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td>&#13;
+						    <!--[if (gte mso 9)|(IE)]>
+						      <table width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+						        <tr>
+						          <td>
+						    <![endif]-->     &#13;
+						    <table bgcolor="#ffffff" class="content" align="center" cellpadding="0" cellspacing="0" border="0" style="width: 100%; max-width: 600px;"><tbody><tr><td bgcolor="#605ca8" class="header" style="padding: 40px 30px 20px;">&#13;
+						          <table width="70" align="left" border="0" cellpadding="0" cellspacing="0"><tbody><tr><td height="70" style="padding: 0 20px 20px 0;">&#13;
+						                <!--img class="fix" src="./mail_completo_files/logo4_1.png" width="70" height="70" border="0" alt=""-->&#13;
+						              </td>&#13;
+						            </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
+						            <table width="425" align="left" cellpadding="0" cellspacing="0" border="0">
+						              <tr>
+						                <td>
+						          <![endif]--><table class="col425" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 425px;"><tbody><tr><td height="70">&#13;
+						                <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="subhead" style="font-size: 14px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px; padding: 0 0 0 3px;">&#13;
+						                      <center>Aviso de Vencimiento Pago</center>&#13;
+						                    </td>&#13;
+						                  </tr><tr><td class="h1" style="color: #153643; font-family: sans-serif; font-size: 33px; line-height: 38px; font-weight: bold; padding: 5px 0 0;">&#13;
+						                      <center><img class="fix" src="http://www.tugastocomun.cl/app/img/logo4_1.png" border="0" alt="" style="height: auto;" /></center>&#13;
+						                    </td>&#13;
+						                  </tr></tbody></table></td>&#13;
+						            </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
+						                </td>
+						              </tr>
+						          </table>
+						          <![endif]--></td>&#13;
+						      </tr><tr><td class="innerpadding borderbottom" style="border-bottom-width: 1px; border-bottom-color: #f2eeed; border-bottom-style: solid; padding: 30px;">&#13;
+						          <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td class="bodycopy" style="color: #153643; font-family: sans-serif; font-size: 13px; line-height: 22px;text-align: justify">&#13;
+						               ' . $txt_email . '
+						              </td>&#13;
+						            </tr>
+									<tr><td class="innerpadding bodycopy" style="color: #153643; font-family: sans-serif; font-size: 10px; line-height: 22px; padding: 30px;">&#13;
+									  Para m&aacute;s informaci&oacute;n vis&iacute;tenos en nuestro sitio web http://www.tugastocomun.cl
+						        </td>&#13;
+						      </tr>
+						            </tbody></table></td>&#13;
+						      			</tr>
+						          </table>
+						          <![endif]--></td>&#13;
+						      </tr><!--tr>
+						        <td class="innerpadding borderbottom">
+						          <img class="fix" src="./mail_completo_files/wide.png" width="100%" border="0" alt="">
+						        </td>
+						      </tr--><tr><td class="footer" bgcolor="#44525f" style="padding: 20px 30px 15px;">&#13;
+						          <table width="100%" border="0" cellspacing="0" cellpadding="0"><tbody><tr><td align="center" class="footercopy" style="font-family: sans-serif; font-size: 14px; color: #ffffff;">&#13;
+						                Copyright © ' . date('Y') . '-' . (date('Y') + 1) . ' Tu Gasto Común.<br />
+						                <span class="hide">Si no desea seguir recibiendo correos de Tu Gasto Comun, por favor </span>&#13;
+						                <a href="' . base_url() . 'admins/unsubscribe" class="unsubscribe" ><font color="#ffffff">haz click aquí</font></a>                 &#13;
+						              </td>&#13;
+						            </tr><tr><td align="center" style="padding: 20px 0 0;">&#13;
+						                <table border="0" cellspacing="0" cellpadding="0"><tbody><tr><td width="37" style="text-align: center; padding: 0 10px;" align="center">&#13;
+						                      <a href="http://www.facebook.com/">&#13;
+						                        <img src="http://www.tugastocomun.cl/app/img/facebook.png" width="37" height="37" alt="Facebook" border="0" style="height: auto;" /></a>&#13;
+						                    </td>&#13;
+						                    <td width="37" style="text-align: center; padding: 0 10px;" align="center">&#13;
+						                      <a href="http://www.twitter.com/">&#13;
+						                        <img src="http://www.tugastocomun.cl/app/img/twitter.png" width="37" height="37" alt="Twitter" border="0" style="height: auto;" /></a>&#13;
+						                    </td>&#13;
+						                  </tr></tbody></table></td>&#13;
+						            </tr></tbody></table></td>&#13;
+						      </tr></tbody></table><!--[if (gte mso 9)|(IE)]>
+						          </td>
+						        </tr>
+						    </table>';
 
-					$array_insert_log = array(
-										'idcomunidad' => $comunidadid,
-										'fecaviso' => $fecaviso
-										);
-					$this->db->insert('gc_log_avisos',$array_insert_log);
 
-				*/
+						    //var_dump($messageBody); exit;
+											$lista_email = $this->admin->get_comunidad_adm_email_by_id($comunidadid);
+											
+											$array_email = array();
+											$array_email = array('rodrigog.84@gmail.com');
+											foreach ($lista_email as $lista) {
+												array_push($array_email,$lista->email);
+											}
+											
+											//array_push($array_email,'csandoval@aurbana.cl');
+											/*array_push($array_email,'adolfo@aurbana.cl');
+											array_push($array_email,'rgonzalez@tugastocomun.cl');
+											*/
+											//$array_email = array(); //Para pruebas y enviar sólo a mi
+
+											$fecaviso = date('Y-m-d H:i:s');
+											$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,$comunidad->nombre." - Propiedad " . $propiedad->numero ." - Aviso Vencimiento Pago ",$messageBody,'html');
+
+
+										/*
+											$this->db->where('id',$comunidadid);
+											$this->db->update('gc_comunidad',array('fecaviso' => $fecaviso));
+
+											$array_insert_log = array(
+																'idcomunidad' => $comunidadid,
+																'fecaviso' => $fecaviso
+																);
+											$this->db->insert('gc_log_avisos',$array_insert_log);
+
+										*/
+
+
+
+
+
+				}
+
+
 
 
 			$this->db->trans_complete();
@@ -4099,7 +4253,6 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 			}
 
 			//var_dump($content); exit;
-
 			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
 									'margin-top' => 16,
 									'margin-bottom' => 16,
@@ -4577,9 +4730,12 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 
 
 
-			$this->db->select('valor',false)
+			/*$this->db->select('valor',false)
 							  ->from('gc_tabla_cobro')
-			                  ->where($cantidad_propiedades . ' between desde and hasta');
+			                  ->where($cantidad_propiedades . ' between desde and hasta');*/
+
+			$this->db->select('uf as valor',false)
+							  ->from('gc_parametros_generales');
 
 			$query = $this->db->get();
 			$monto_cobro = $query->row()->valor;
@@ -4590,6 +4746,127 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 
 
 	}
+
+
+	public function compara_pago_online($transaction){
+
+		
+		$this->load->model('admin');
+
+
+
+		$orden = $this->admin->get_pay_for_token($transaction->order);
+		if(is_null($orden)){
+			//echo 'Orden no esta en sistema';
+			$result = false;
+		}else{
+			if(isset($orden->aceptacionpago)){
+				if(is_null($orden->aceptacionpago)){
+						//echo 'Orden no completada en sistema';						
+					$result = false;
+				}else{
+						//echo 'Orden Correcta';
+					$result = true;
+				}
+
+			}else{
+
+				//echo 'Orden no completada en sistema';	
+				$result = false;
+			}
+		}
+
+		if(!$result){
+			var_dump($transaction);
+		}
+		return $result;
+		//echo '<br>';
+	}
+
+
+	public function revisa_pagos_online($comunidad,$fecproceso){
+
+		echo '<pre>';
+		$this->load->model('payment');
+		//$fecproceso = '2024-01-02'; //no hay registros
+		//$fecproceso = '2024-01-10'; //solo 1 registro
+		$fecprocesoinit = '2024-01-01'; //varios registros
+		$fecprocesoend = '2024-01-29'; //varios registros
+		$url_api = 'https://app.payku.cl/api/transaction?date_init=' . $fecprocesoinit . '&date_end=' . $fecprocesoend . '&success=true';
+
+		var_dump($url_api);
+		var_dump($comunidad->token_pagoonline);
+
+
+		$curl_pasarela = curl_init();
+
+		curl_setopt_array($curl_pasarela, array(
+		  CURLOPT_URL => $url_api,
+		  CURLOPT_RETURNTRANSFER => true,
+		  CURLOPT_ENCODING => '',
+		  CURLOPT_MAXREDIRS => 10,
+		  CURLOPT_TIMEOUT => 0,
+		  CURLOPT_FOLLOWLOCATION => true,
+		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		  CURLOPT_CUSTOMREQUEST => 'GET',
+		  CURLOPT_HTTPHEADER => array(
+		    'Authorization: Bearer ' . $comunidad->token_pagoonline,
+		    'Cookie: PHPSESSID=k246v5dfg0p0nlmkdqcj9replu; __cflb=0H28vpEYUuS7CwnZUxZguAZir9YPp4rcaVJ1peWMmEL'
+		  ),
+		));
+
+		$response_pasarela = curl_exec($curl_pasarela);
+
+
+
+	    if ($response_pasarela === false) {
+	    	var_dump(curl_error($curl_pasarela));
+	    	var_dump(curl_errno($curl_pasarela));
+	       // throw new Exception(curl_error($ch), curl_errno($ch));
+	    }
+
+
+
+		curl_close($curl_pasarela);
+    	
+    	$array_response_pasarela = json_decode($response_pasarela);	
+    	var_dump($array_response_pasarela);
+
+    	echo '############################################ INIT #########################################';
+    	if(isset($array_response_pasarela->status)){
+
+    		if($array_response_pasarela->status == 'failed'){
+
+    			echo 'No hay registros';
+    		}else{ // solo 1 registro
+
+    			$transaction = $array_response_pasarela;
+    			if($transaction->email != 'rodrigog.84@gmail.com'){
+    				$this->payment->compara_pago_online($transaction);    				
+    			}
+    			
+
+    		}
+
+    	}else{ // varios registros
+
+	    	foreach ($array_response_pasarela->transaction as $transaction) {
+	    		if($transaction->email != 'rodrigog.84@gmail.com'){
+    				$this->payment->compara_pago_online($transaction);    				
+    			}
+	    	}
+
+    	}
+
+    	echo '############################################# FIN ####################################';
+
+		//exit;
+
+
+
+
+	}	
+
 
 }
 

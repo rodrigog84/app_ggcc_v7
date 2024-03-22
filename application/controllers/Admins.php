@@ -674,10 +674,10 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idproveedor' => count($proveedor) == 0 ? 0 : $proveedor->id,
-                'nombre' => count($proveedor) == 0 ? '' : $proveedor->nombre,
-                'rut' => count($proveedor) == 0 ? '' : number_format(substr($proveedor->rut . $proveedor->dv, 0, -1), 0, "", ".") . '-' . substr($proveedor->rut . $proveedor->dv, strlen($proveedor->rut . $proveedor->dv) - 1, 1),
-                'direccion' => count($proveedor) == 0 ? '' : $proveedor->direccion,
+                'idproveedor' => is_null($proveedor) ? 0 : $proveedor->id,
+                'nombre' => is_null($proveedor) ? '' : $proveedor->nombre,
+                'rut' => is_null($proveedor) ? '' : number_format(substr($proveedor->rut . $proveedor->dv, 0, -1), 0, "", ".") . '-' . substr($proveedor->rut . $proveedor->dv, strlen($proveedor->rut . $proveedor->dv) - 1, 1),
+                'direccion' => is_null($proveedor) ? '' : $proveedor->direccion,
             );
 
             $vars['content_menu'] = $content;

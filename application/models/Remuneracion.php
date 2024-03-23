@@ -943,7 +943,7 @@ class Remuneracion extends CI_Model
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno
@@ -1020,7 +1020,7 @@ class Remuneracion extends CI_Model
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno
@@ -1096,7 +1096,7 @@ class Remuneracion extends CI_Model
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno
@@ -1178,7 +1178,7 @@ class Remuneracion extends CI_Model
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno
@@ -1267,7 +1267,7 @@ class Remuneracion extends CI_Model
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno
@@ -4624,7 +4624,7 @@ public function lre($datos_remuneracion,$periodo)
         $query = $this->db->get();
         $datos_periodo = $query->row();
         $idperiodo = 0;
-        if (count($datos_periodo) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo)) { // si no existe periodo, se crea
             $data = array(
                 'mes' => $mes,
                 'anno' =>  $anno

@@ -145,9 +145,20 @@ class Main extends CI_Controller
             $unidad_id = $unidad_id == '' && $this->session->userdata('comunidadid') ? $this->session->userdata('comunidadid') : $unidad_id;
 
             $comunidades_asignadas = $unidad_id != '' ? $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'), $unidad_id) : $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'));
-            $num_comunidades = count($this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level')));
 
-            if (is_array($comunidades_asignadas)) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
+            if(is_array($comunidades_asignadas)){
+
+                $num_comunidades = count($comunidades_asignadas);                
+            }else if(isset($comunidades_asignadas->id)){
+
+                $num_comunidades = 1;
+            }else{
+                $num_comunidades = 0;
+            }
+
+
+
+            if (is_array($comunidades_asignadas) && $num_comunidades > 0) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
                 $content = array(
                     'menu' => 'Selecci&oacute;n Comunidad',
                     'title' => 'Comunidades',
@@ -160,7 +171,7 @@ class Main extends CI_Controller
                 $template = "template_lock";
                 //$this->load->view('template_lock',$vars);
             //} else if (count(get_object_vars($comunidades_asignadas)) == 1) { // SE ASOCIA COMUNIDAD
-            } else if (isset($comunidades_asignadas->id)) { // SE ASOCIA COMUNIDAD
+            } else if (isset($comunidades_asignadas->id)  && $num_comunidades > 0) { // SE ASOCIA COMUNIDAD
                 $this->session->set_userdata('comunidadid', $comunidades_asignadas->id);
                 $this->session->set_userdata('comunidadnombre', $comunidades_asignadas->nombre);
                 $this->session->set_userdata('diasvencsuscripcion', $comunidades_asignadas->vencsuscripcion);

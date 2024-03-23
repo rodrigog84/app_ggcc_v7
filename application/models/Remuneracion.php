@@ -1365,7 +1365,7 @@ class Remuneracion extends CI_Model
             ->where('pr.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo = $query->row();
-        if (count($datos_periodo) == 0) {
+        if (is_null($datos_periodo)) {
             return 2;
         } else {
 

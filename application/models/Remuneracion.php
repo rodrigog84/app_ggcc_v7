@@ -962,7 +962,7 @@ class Remuneracion extends CI_Model
             ->where('r.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo_remuneracion = $query->row();
-        if (count($datos_periodo_remuneracion) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo_remuneracion)) { // si no existe periodo, se crea
             $data = array(
                 'idperiodo' => $idperiodo,
                 'idcomunidad' => $this->session->userdata('comunidadid')
@@ -981,7 +981,7 @@ class Remuneracion extends CI_Model
                 ->where('r.idperiodo', $idperiodo);
             $query = $this->db->get();
             $datos_remuneracion = $query->row();
-            if (count($datos_remuneracion) == 0) { // si no existe periodo, se crea
+            if (is_null($datos_remuneracion)) { // si no existe periodo, se crea
 
                 $data = array(
                     'idpersonal' => $idtrabajador,
@@ -1039,7 +1039,7 @@ class Remuneracion extends CI_Model
             ->where('r.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo_remuneracion = $query->row();
-        if (count($datos_periodo_remuneracion) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo_remuneracion)) { // si no existe periodo, se crea
             $data = array(
                 'idperiodo' => $idperiodo,
                 'idcomunidad' => $this->session->userdata('comunidadid')
@@ -1058,7 +1058,7 @@ class Remuneracion extends CI_Model
                 ->where('r.idperiodo', $idperiodo);
             $query = $this->db->get();
             $datos_remuneracion = $query->row();
-            if (count($datos_remuneracion) == 0) { // si no existe periodo, se crea
+            if (is_null($datos_remuneracion)) { // si no existe periodo, se crea
                 $data = array(
                     'idpersonal' => $idtrabajador,
                     'idperiodo' => $idperiodo,
@@ -1115,7 +1115,7 @@ class Remuneracion extends CI_Model
             ->where('r.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo_remuneracion = $query->row();
-        if (count($datos_periodo_remuneracion) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo_remuneracion)) { // si no existe periodo, se crea
             $data = array(
                 'idperiodo' => $idperiodo,
                 'idcomunidad' => $this->session->userdata('comunidadid')
@@ -1134,7 +1134,7 @@ class Remuneracion extends CI_Model
                 ->where('r.idperiodo', $idperiodo);
             $query = $this->db->get();
             $datos_remuneracion = $query->row();
-            if (count($datos_remuneracion) == 0) { // si no existe periodo, se crea
+            if (is_null($datos_remuneracion)) { // si no existe periodo, se crea
                 $data = array(
                     'idpersonal' => $idtrabajador,
                     'idperiodo' => $idperiodo,
@@ -1197,7 +1197,7 @@ class Remuneracion extends CI_Model
             ->where('r.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo_remuneracion = $query->row();
-        if (count($datos_periodo_remuneracion) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo_remuneracion)) { // si no existe periodo, se crea
             $data = array(
                 'idperiodo' => $idperiodo,
                 'idcomunidad' => $this->session->userdata('comunidadid')
@@ -1286,7 +1286,7 @@ class Remuneracion extends CI_Model
             ->where('r.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos_periodo_remuneracion = $query->row();
-        if (count($datos_periodo_remuneracion) == 0) { // si no existe periodo, se crea
+        if (is_null($datos_periodo_remuneracion)) { // si no existe periodo, se crea
             $data = array(
                 'idperiodo' => $idperiodo,
                 'idcomunidad' => $this->session->userdata('comunidadid')
@@ -1305,7 +1305,7 @@ class Remuneracion extends CI_Model
                 ->where('r.idperiodo', $idperiodo);
             $query = $this->db->get();
             $datos_remuneracion = $query->row();
-            if (count($datos_remuneracion) == 0) { // si no existe periodo, se crea
+            if (is_null($datos_remuneracion)) { // si no existe periodo, se crea
                 $data = array(
                     'idpersonal' => $idtrabajador,
                     'idperiodo' => $idperiodo,

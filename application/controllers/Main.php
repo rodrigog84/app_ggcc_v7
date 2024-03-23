@@ -145,16 +145,18 @@ class Main extends CI_Controller
             $unidad_id = $unidad_id == '' && $this->session->userdata('comunidadid') ? $this->session->userdata('comunidadid') : $unidad_id;
 
             $comunidades_asignadas = $unidad_id != '' ? $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'), $unidad_id) : $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'));
+            $comunidades_asociadas = $this->admin->comunidades_asignadas($this->session->userdata('user_id'), $this->session->userdata('level'));
 
-            if(is_array($comunidades_asignadas)){
+            if(is_array($comunidades_asociadas)){
 
-                $num_comunidades = count($comunidades_asignadas);                
-            }else if(isset($comunidades_asignadas->id)){
+                $num_comunidades = count($comunidades_asociadas);                
+            }else if(isset($comunidades_asociadas->id)){
 
                 $num_comunidades = 1;
             }else{
                 $num_comunidades = 0;
             }
+
 
 
 

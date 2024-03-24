@@ -61,23 +61,23 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcomunidad' => count($comunidad) == 0 ? 0 : $comunidad->id,
-                'nombre' => count($comunidad) == 0 ? '' : $comunidad->nombre,
-                'rut' => count($comunidad) == 0 ? '' : number_format(substr($comunidad->rut . $comunidad->dv, 0, -1), 0, "", ".") . '-' . substr($comunidad->rut . $comunidad->dv, strlen($comunidad->rut . $comunidad->dv) - 1, 1),
-                'direccion' => count($comunidad) == 0 ? '' : $comunidad->direccion,
-                'idregion' => count($comunidad) == 0 ? '' : $comunidad->idregion,
-                'idcomuna' => count($comunidad) == 0 ? '' : $comunidad->idcomuna,
-                'fono' => count($comunidad) == 0 ? '' : $comunidad->fono,
-                'fono2' => count($comunidad) == 0 ? '' : $comunidad->fono2,
-                'email' => count($comunidad) == 0 ? '' : $comunidad->email,
-                'saldo' => count($comunidad) == 0 ? '' : $comunidad->saldo,
-                'caja' => count($comunidad) == 0 ? '' : $comunidad->caja,
-                'cajainicial' => count($comunidad) == 0 ? '' : $comunidad->cajainicial,
-                'fondoreserva' => count($comunidad) == 0 ? '' : $comunidad->fondoreserva,
-                'fondoreservainicial' => count($comunidad) == 0 ? '' : $comunidad->fondoreservainicial,
-                'logo' => count($comunidad) == 0 ? '' : $comunidad->logo,
-                'firma' => count($comunidad) == 0 ? '' : $comunidad->firma,
-                'descripcion' => count($comunidad) == 0 ? '' : $comunidad->obscomprobante,
+                'idcomunidad' => is_null($comunidad) ? 0 : $comunidad->id,
+                'nombre' => is_null($comunidad) ? '' : $comunidad->nombre,
+                'rut' => is_null($comunidad) ? '' : number_format(substr($comunidad->rut . $comunidad->dv, 0, -1), 0, "", ".") . '-' . substr($comunidad->rut . $comunidad->dv, strlen($comunidad->rut . $comunidad->dv) - 1, 1),
+                'direccion' => is_null($comunidad) ? '' : $comunidad->direccion,
+                'idregion' => is_null($comunidad) ? '' : $comunidad->idregion,
+                'idcomuna' => is_null($comunidad) ? '' : $comunidad->idcomuna,
+                'fono' => is_null($comunidad) ? '' : $comunidad->fono,
+                'fono2' => is_null($comunidad) ? '' : $comunidad->fono2,
+                'email' => is_null($comunidad) ? '' : $comunidad->email,
+                'saldo' => is_null($comunidad) ? '' : $comunidad->saldo,
+                'caja' => is_null($comunidad) ? '' : $comunidad->caja,
+                'cajainicial' => is_null($comunidad) == 0 ? '' : $comunidad->cajainicial,
+                'fondoreserva' => is_null($comunidad) == 0 ? '' : $comunidad->fondoreserva,
+                'fondoreservainicial' => is_null($comunidad) == 0 ? '' : $comunidad->fondoreservainicial,
+                'logo' => is_null($comunidad) ? '' : $comunidad->logo,
+                'firma' => is_null($comunidad) ? '' : $comunidad->firma,
+                'descripcion' => is_null($comunidad) ? '' : $comunidad->obscomprobante,
             );
 
             $vars['content_menu'] = $content;
@@ -439,7 +439,7 @@ class Admins extends CI_Controller
             $this->load->model('admin');
             $periodo = $this->admin->get_periodo_by_id($idperiodo);
 
-            if (count($periodo) == 0) { // No se puede editar si le doy un periodo inexistente
+            if (is_null($periodo)) { // No se puede editar si le doy un periodo inexistente
                 $this->session->set_flashdata('periodo_result', 6);
                 redirect('admins/admin_periodo');
             } else {
@@ -459,10 +459,10 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idperiodo' => count($periodo) == 0 ? 0 : $periodo->id,
-                'mes' => count($periodo) == 0 ? '' : $periodo->mes,
-                'anno' => count($periodo) == 0 ? '' : $periodo->anno,
-                'fecvencimiento' => count($periodo) == 0 ? date('d/m/Y') : $periodo->fecha_vencimiento,
+                'idperiodo' => is_null($periodo) ? 0 : $periodo->id,
+                'mes' => is_null($periodo) ? '' : $periodo->mes,
+                'anno' => is_null($periodo) ? '' : $periodo->anno,
+                'fecvencimiento' => is_null($periodo) ? date('d/m/Y') : $periodo->fecha_vencimiento,
             );
 
 
@@ -874,10 +874,10 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idespaciocomun' => count($espacio_comun) == 0 ? 0 : $espacio_comun->id,
-                'nombre' => count($espacio_comun) == 0 ? '' : $espacio_comun->nombre,
-                'unidadmedida' => count($espacio_comun) == 0 ? '' : $espacio_comun->idumespcomun,
-                'monto' => count($espacio_comun) == 0 ? '' : $espacio_comun->monto
+                'idespaciocomun' => is_null($espacio_comun) ? 0 : $espacio_comun->id,
+                'nombre' => is_null($espacio_comun) ? '' : $espacio_comun->nombre,
+                'unidadmedida' => is_null($espacio_comun) ? '' : $espacio_comun->idumespcomun,
+                'monto' => is_null($espacio_comun) ? '' : $espacio_comun->monto
             );
 
 
@@ -1085,8 +1085,8 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idunidadmedida' => count($unidadmedida) == 0 ? 0 : $unidadmedida->id,
-                'nombre' => count($unidadmedida) == 0 ? '' : $unidadmedida->nombre,
+                'idunidadmedida' => is_null($unidadmedida) ? 0 : $unidadmedida->id,
+                'nombre' => is_null($unidadmedida) ? '' : $unidadmedida->nombre,
             );
 
             $vars['content_menu'] = $content;
@@ -1282,12 +1282,12 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idtipocuenta' => count($tipo_cuenta) == 0 ? 0 : $tipo_cuenta->id,
-                'nombre' => count($tipo_cuenta) == 0 ? '' : $tipo_cuenta->nombre,
-                'concepto' => count($tipo_cuenta) == 0 ? '' : $tipo_cuenta->idpadre,
-                'nombreconcepto' => count($tipo_cuenta) == 0 ? '' : $tipo_cuenta->nombrepadre,
-                'tipo_cuenta' => count($tipo_cuenta) == 0 ? '' : $tipo_cuenta->idclasifcuenta,
-                'idcomunidad' => count($tipo_cuenta) == 0 ? '' : $tipo_cuenta->idcomunidad
+                'idtipocuenta' => is_null($tipo_cuenta) ? 0 : $tipo_cuenta->id,
+                'nombre' => is_null($tipo_cuenta) ? '' : $tipo_cuenta->nombre,
+                'concepto' => is_null($tipo_cuenta) ? '' : $tipo_cuenta->idpadre,
+                'nombreconcepto' => is_null($tipo_cuenta) ? '' : $tipo_cuenta->nombrepadre,
+                'tipo_cuenta' => is_null($tipo_cuenta) ? '' : $tipo_cuenta->idclasifcuenta,
+                'idcomunidad' => is_null($tipo_cuenta) ? '' : $tipo_cuenta->idcomunidad
             );
 
             $vars['content_menu'] = $content;
@@ -1484,9 +1484,9 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcargo' => count($cargo) == 0 ? 0 : $cargo->id,
-                'nombre' => count($cargo) == 0 ? '' : $cargo->nombre,
-                'padre' => count($cargo) == 0 ? '' : $cargo->idpadre,
+                'idcargo' => is_null($cargo) ? 0 : $cargo->id,
+                'nombre' => is_null($cargo) ? '' : $cargo->nombre,
+                'padre' => is_null($cargo) ? '' : $cargo->idpadre,
             );
 
             $vars['content_menu'] = $content;
@@ -1757,19 +1757,19 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcomunidad' => count($comunidad) == 0 ? 0 : $comunidad->id,
-                'nombre' => count($comunidad) == 0 ? '' : $comunidad->nombre,
-                'rut' => count($comunidad) == 0 ? '' : number_format(substr($comunidad->rut . $comunidad->dv, 0, -1), 0, "", ".") . '-' . substr($comunidad->rut . $comunidad->dv, strlen($comunidad->rut . $comunidad->dv) - 1, 1),
-                'direccion' => count($comunidad) == 0 ? '' : $comunidad->direccion,
-                'idregion' => count($comunidad) == 0 ? '' : $comunidad->idregion,
-                'idcomuna' => count($comunidad) == 0 ? '' : $comunidad->idcomuna,
-                'fono' => count($comunidad) == 0 ? '' : $comunidad->fono,
-                'fono2' => count($comunidad) == 0 ? '' : $comunidad->fono2,
-                'email' => count($comunidad) == 0 ? '' : $comunidad->email,
-                'saldo' => count($comunidad) == 0 ? '' : $comunidad->saldo,
-                'caja' => count($comunidad) == 0 ? '' : $comunidad->caja,
-                'fondoreserva' => count($comunidad) == 0 ? '' : $comunidad->fondoreserva,
-                'fecinicio' => count($comunidad) == 0 ? date("d/m/Y") : $comunidad->fecinicio
+                'idcomunidad' => is_null($comunidad) ? 0 : $comunidad->id,
+                'nombre' => is_null($comunidad) ? '' : $comunidad->nombre,
+                'rut' => is_null($comunidad) ? '' : number_format(substr($comunidad->rut . $comunidad->dv, 0, -1), 0, "", ".") . '-' . substr($comunidad->rut . $comunidad->dv, strlen($comunidad->rut . $comunidad->dv) - 1, 1),
+                'direccion' => is_null($comunidad) ? '' : $comunidad->direccion,
+                'idregion' => is_null($comunidad) ? '' : $comunidad->idregion,
+                'idcomuna' => is_null($comunidad) ? '' : $comunidad->idcomuna,
+                'fono' => is_null($comunidad) ? '' : $comunidad->fono,
+                'fono2' => is_null($comunidad) ? '' : $comunidad->fono2,
+                'email' => is_null($comunidad) ? '' : $comunidad->email,
+                'saldo' => is_null($comunidad) ? '' : $comunidad->saldo,
+                'caja' => is_null($comunidad) ? '' : $comunidad->caja,
+                'fondoreserva' => is_null($comunidad) ? '' : $comunidad->fondoreserva,
+                'fecinicio' => is_null($comunidad) ? date("d/m/Y") : $comunidad->fecinicio
             );
 
             $vars['content_menu'] = $content;
@@ -2049,18 +2049,18 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idpropiedad' => count($propiedad) == 0 ? 0 : $propiedad->id,
-                'idcomunidad' => count($propiedad) == 0 ? '' : $propiedad->idcomunidad,
-                'numero' => count($propiedad) == 0 ? '' : $propiedad->numero,
-                'direccion' => count($propiedad) == 0 ? '' : $propiedad->direccion,
-                'responsable' => count($propiedad) == 0 ? '' : $propiedad->responsable,
-                'rutresponsable' => count($propiedad) == 0 ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
-                'mail' => count($propiedad) == 0 ? '' : $propiedad->mail,
-                'fono' => count($propiedad) == 0 ? '' : $propiedad->fono,
-                'suscrito' => count($propiedad) == 0 ? '' : $propiedad->suscrito,
-                'prorrateo' => count($propiedad) == 0 ? '' : $propiedad->prorrateo_propiedad,
-                'saldo' => count($propiedad) == 0 ? '' : $propiedad->saldo_publicado,
-                'saldoinicial' => count($propiedad) == 0 ? 0 : $propiedad->saldoinicial
+                'idpropiedad' => is_null($propiedad) ? 0 : $propiedad->id,
+                'idcomunidad' => is_null($propiedad) == 0 ? '' : $propiedad->idcomunidad,
+                'numero' => is_null($propiedad) == 0 ? '' : $propiedad->numero,
+                'direccion' => is_null($propiedad) == 0 ? '' : $propiedad->direccion,
+                'responsable' => is_null($propiedad) == 0 ? '' : $propiedad->responsable,
+                'rutresponsable' => is_null($propiedad) == 0 ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
+                'mail' => is_null($propiedad) ? '' : $propiedad->mail,
+                'fono' => is_null($propiedad) ? '' : $propiedad->fono,
+                'suscrito' => is_null($propiedad) ? '' : $propiedad->suscrito,
+                'prorrateo' => is_null($propiedad) ? '' : $propiedad->prorrateo_propiedad,
+                'saldo' => is_null($propiedad) ? '' : $propiedad->saldo_publicado,
+                'saldoinicial' => is_null($propiedad) ? 0 : $propiedad->saldoinicial
             );
 
             $vars['content_menu'] = $content;
@@ -2775,7 +2775,7 @@ class Admins extends CI_Controller
                                 $error_carga = true;
                                 $dato_error = "Prorrateo";
                                 $tipo_error = "es requerido";
-                            } else if (count($propiedad) == 0) {
+                            } else if (is_null($propiedad)) {
                                 $error_carga = true;
                                 $dato_error = "N&uacute;mero Propiedad";
                                 $tipo_error = "Propiedad No Existe";
@@ -3038,7 +3038,7 @@ class Admins extends CI_Controller
                                 $error_carga = true;
                                 $dato_error = "Prorrateo";
                                 $tipo_error = "es requerido";
-                            } else if (count($propiedad) == 0) {
+                            } else if (is_null($propiedad)) {
                                 $error_carga = true;
                                 $dato_error = "N&uacute;mero Propiedad";
                                 $tipo_error = "Propiedad No Existe";
@@ -3219,7 +3219,7 @@ class Admins extends CI_Controller
             $this->load->model('account');
             $movimiento = $tipo_movimiento == 'p' ? $this->account->get_mov_pago_by_id($idmovimiento) : $this->account->get_mov_abono_by_id($idmovimiento);
 
-            if (count($movimiento) == 0) {
+            if (is_null($movimiento)) {
                 redirect('main/dashboard');
             }
 
@@ -3581,11 +3581,11 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idbodega' => count($bodega) == 0 ? 0 : $bodega->id,
-                'nombre' => count($bodega) == 0 ? '' : $bodega->nombre,
-                'idpropiedad' => count($bodega) == 0 ? 0 : $bodega->idpropiedad,
-                'idcomunidad' => count($bodega) == 0 ? '' : $bodega->idcomunidad,
-                'prorrateo' => count($bodega) == 0 ? '' : $bodega->prorrateo,
+                'idbodega' => is_null($bodega) ? 0 : $bodega->id,
+                'nombre' => is_null($bodega) ? '' : $bodega->nombre,
+                'idpropiedad' => is_null($bodega) ? 0 : $bodega->idpropiedad,
+                'idcomunidad' => is_null($bodega) ? '' : $bodega->idcomunidad,
+                'prorrateo' => is_null($bodega) ? '' : $bodega->prorrateo,
             );
 
             $vars['content_menu'] = $content;
@@ -3777,11 +3777,11 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idestacionamiento' => count($estacionamiento) == 0 ? 0 : $estacionamiento->id,
-                'nombre' => count($estacionamiento) == 0 ? '' : $estacionamiento->nombre,
-                'idpropiedad' => count($estacionamiento) == 0 ? 0 : $estacionamiento->idpropiedad,
-                'idcomunidad' => count($estacionamiento) == 0 ? '' : $estacionamiento->idcomunidad,
-                'prorrateo' => count($estacionamiento) == 0 ? '' : $estacionamiento->prorrateo,
+                'idestacionamiento' => is_null($estacionamiento) ? 0 : $estacionamiento->id,
+                'nombre' => is_null($estacionamiento) ? '' : $estacionamiento->nombre,
+                'idpropiedad' => is_null($estacionamiento) ? 0 : $estacionamiento->idpropiedad,
+                'idcomunidad' => is_null($estacionamiento) ? '' : $estacionamiento->idcomunidad,
+                'prorrateo' => is_null($estacionamiento) ? '' : $estacionamiento->prorrateo,
             );
 
             $vars['content_menu'] = $content;
@@ -3975,9 +3975,9 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idestacionamiento' => count($estacionamiento) == 0 ? 0 : $estacionamiento->id,
-                'nombre' => count($estacionamiento) == 0 ? '' : $estacionamiento->nombre,
-                'idcomunidad' => count($estacionamiento) == 0 ? '' : $estacionamiento->idcomunidad,
+                'idestacionamiento' => is_null($estacionamiento) ? 0 : $estacionamiento->id,
+                'nombre' => is_null($estacionamiento) ? '' : $estacionamiento->nombre,
+                'idcomunidad' => is_null($estacionamiento) ? '' : $estacionamiento->idcomunidad,
             );
 
             $vars['content_menu'] = $content;
@@ -4168,7 +4168,7 @@ class Admins extends CI_Controller
 
             $idcomunidad = '';
             $array_comunidades = array();
-            if (count($user) > 0) {
+            if (!is_null($user)) {
                 if (isset($user->level)) {
                     if ($user->level == 1) {
                         $lista_comunidad = $this->admin->comunidades_asignadas($user->id, $user->level);
@@ -4187,7 +4187,7 @@ class Admins extends CI_Controller
 
             $idpropiedad = '';
             $array_propiedades = array();
-            if (count($user) > 0) {
+            if (!is_null($user)) {
                 if (isset($user->level)) {
                     if ($user->level == 3 || $user->level == 2) {
                         $propiedades = $this->admin->propiedades_asignadas($user->id);
@@ -4223,11 +4223,11 @@ class Admins extends CI_Controller
 
 
             $datos_form = array(
-                'iduser' => count($user) == 0 ? 0 : $user->id,
-                'nombre' => count($user) == 0 ? '' : $user->first_name,
-                'apellido' => count($user) == 0 ? '' : $user->last_name,
-                'email' => count($user) == 0 ? '' : $user->email,
-                'perfil' => count($user) == 0 ? '' : $user->level,
+                'iduser' => is_null($user) ? 0 : $user->id,
+                'nombre' => is_null($user) ? '' : $user->first_name,
+                'apellido' => is_null($user) ? '' : $user->last_name,
+                'email' => is_null($user) ? '' : $user->email,
+                'perfil' => is_null($user) ? '' : $user->level,
                 'idcomunidad' => $idcomunidad,
                 'idpropiedad' => $idpropiedad
             );
@@ -4656,7 +4656,7 @@ class Admins extends CI_Controller
 
             $idcomunidad = '';
             $array_comunidades = array();
-            if (count($user) > 0) {
+            if (!is_null($user)) {
                 if (isset($user->level)) {
                     if ($user->level == 1) {
                         $lista_comunidad = $this->admin->comunidades_asignadas($user->id, $user->level);
@@ -4673,7 +4673,7 @@ class Admins extends CI_Controller
 
             $idpropiedad = '';
             $array_propiedades = array();
-            if (count($user) > 0) {
+            if (!is_null($user)) {
                 if (isset($user->level)) {
                     if ($user->level == 3) {
                         $propiedades = $this->admin->propiedades_asignadas($user->id);
@@ -4703,11 +4703,11 @@ class Admins extends CI_Controller
 
 
             $datos_form = array(
-                'iduser' => count($user) == 0 ? 0 : $user->id,
-                'nombre' => count($user) == 0 ? '' : $user->first_name,
-                'apellido' => count($user) == 0 ? '' : $user->last_name,
-                'email' => count($user) == 0 ? '' : $user->email,
-                'perfil' => count($user) == 0 ? '' : $user->level,
+                'iduser' => is_null($user) ? 0 : $user->id,
+                'nombre' => is_null($user) ? '' : $user->first_name,
+                'apellido' => is_null($user) ? '' : $user->last_name,
+                'email' => is_null($user) ? '' : $user->email,
+                'perfil' => is_null($user) ? '' : $user->level,
                 'idcomunidad' => $idcomunidad,
                 'idpropiedad' => $idpropiedad
             );
@@ -4924,7 +4924,7 @@ class Admins extends CI_Controller
                 $this->load->model('admin');
                 $comunicados = $this->admin->get_comunicados($idcomunicado);
 
-                if (count($comunicados) == 0) {
+                if (is_null($comunicados)) {
                     $this->session->set_flashdata('add_comunicado_result', 2);
                     redirect('admins/comunicados');
                 }
@@ -5093,7 +5093,7 @@ class Admins extends CI_Controller
                 $this->load->model('admin');
                 $comunicados = $this->admin->get_comunicados($idcomunicado);
 
-                if (count($comunicados) == 0) {
+                if (is_null($comunicados)) {
                     $this->session->set_flashdata('add_comunicado_result', 10);
                     redirect('admins/comunicados');
                 }
@@ -5311,13 +5311,13 @@ class Admins extends CI_Controller
 
 
             $datos_form = array(
-                'mes_aldia' => count($comunidad) == 0 ? '-1' : $comunidad->mes_aldia,
-                'mes_moroso' => count($comunidad) == 0 ? '-1' : $comunidad->mes_moroso,
-                'mes_corteluz' => count($comunidad) == 0 ? '-1' : $comunidad->mes_corteluz,
-                'mes_prejudicial' => count($comunidad) == 0 ? '-1' : $comunidad->mes_prejudicial,
-                'mes_judicial' => count($comunidad) == 0 ? '-1' : $comunidad->mes_judicial,
-                'mail_morosidad_antes_vencimiento' => count($comunidad) == 0 ? '-1' : $comunidad->mail_morosidad_antes_vencimiento,
-                'mail_morosidad_despues_vencimiento' => count($comunidad) == 0 ? '-1' : $comunidad->mail_morosidad_despues_vencimiento,
+                'mes_aldia' => is_null($comunidad) ? '-1' : $comunidad->mes_aldia,
+                'mes_moroso' => is_null($comunidad) ? '-1' : $comunidad->mes_moroso,
+                'mes_corteluz' => is_null($comunidad) ? '-1' : $comunidad->mes_corteluz,
+                'mes_prejudicial' => is_null($comunidad) ? '-1' : $comunidad->mes_prejudicial,
+                'mes_judicial' => is_null($comunidad) ? '-1' : $comunidad->mes_judicial,
+                'mail_morosidad_antes_vencimiento' => is_null($comunidad) ? '-1' : $comunidad->mail_morosidad_antes_vencimiento,
+                'mail_morosidad_despues_vencimiento' => is_null($comunidad) ? '-1' : $comunidad->mail_morosidad_despues_vencimiento,
             );
 
 
@@ -5508,13 +5508,13 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcomunidad' => count($miembro) == 0 ? 0 : $miembro->idcomunidad,
-                'iduser' => count($miembro) == 0 ? 0 : $miembro->iduser,
-                'nombre' => count($miembro) == 0 ? '' : $miembro->first_name,
-                'apellido' => count($miembro) == 0 ? '' : $miembro->last_name,
-                'email' => count($miembro) == 0 ? '' : $miembro->email,
-                'idcargo' => count($miembro) == 0 ? 0 : $miembro->id,
-                'cargo' => count($miembro) == 0 ? 'Seleccione cargo' : $miembro->cargo
+                'idcomunidad' => is_null($miembro) ? 0 : $miembro->idcomunidad,
+                'iduser' => is_null($miembro) ? 0 : $miembro->iduser,
+                'nombre' => is_null($miembro) ? '' : $miembro->first_name,
+                'apellido' => is_null($miembro) ? '' : $miembro->last_name,
+                'email' => is_null($miembro) ? '' : $miembro->email,
+                'idcargo' => is_null($miembro) ? 0 : $miembro->id,
+                'cargo' => is_null($miembro) ? 'Seleccione cargo' : $miembro->cargo
             );
 
             $vars['cargos_comite'] = $cargos_comite;
@@ -5749,11 +5749,11 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcomunidad' => count($documento) == 0 ? 0 : $documento->idcomunidad,
-                'descripcion' => count($documento) == 0 ? '' : $documento->descripcion,
-                'path' => count($documento) == 0 ? '' : $documento->path,
-                'tipo' => count($documento) == 0 ? 'Seleccione tipo' : $documento->tipo,
-                'idtipodocumento' => count($documento) == 0 ? 0 : $documento->idtipodocumento
+                'idcomunidad' => is_null($documento) ? 0 : $documento->idcomunidad,
+                'descripcion' => is_null($documento) ? '' : $documento->descripcion,
+                'path' => is_null($documento) ? '' : $documento->path,
+                'tipo' => is_null($documento) ? 'Seleccione tipo' : $documento->tipo,
+                'idtipodocumento' => is_null($documento) ? 0 : $documento->idtipodocumento
             );
 
             $vars['tipos_documento'] = $tipos_documento;
@@ -5971,12 +5971,12 @@ class Admins extends CI_Controller
             );
 
             $datos_form = array(
-                'idcomunidad' => count($asamblea) == 0 ? 0 : $asamblea->idcomunidad,
-                'asunto' => count($asamblea) == 0 ? '' : $asamblea->asunto,
-                'fecha' => count($asamblea) == 0 ? '' : $asamblea->fecha,
-                'path' => count($asamblea) == 0 ? '' : $asamblea->path,
-                'tipo' => count($asamblea) == 0 ? 'Seleccione tipo' : $asamblea->tipo,
-                'idtipoasamblea' => count($asamblea) == 0 ? 0 : $asamblea->idtipoasamblea
+                'idcomunidad' => is_null($asamblea) ? 0 : $asamblea->idcomunidad,
+                'asunto' => is_null($asamblea) ? '' : $asamblea->asunto,
+                'fecha' => is_null($asamblea) ? '' : $asamblea->fecha,
+                'path' => is_null($asamblea) ? '' : $asamblea->path,
+                'tipo' => is_null($asamblea) ? 'Seleccione tipo' : $asamblea->tipo,
+                'idtipoasamblea' => is_null($asamblea) ? 0 : $asamblea->idtipoasamblea
             );
 
             $vars['tipos_asamblea'] = $tipos_asamblea;

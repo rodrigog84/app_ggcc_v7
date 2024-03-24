@@ -1016,7 +1016,7 @@ class Remuneraciones extends CI_Controller
             $personal = $this->remuneracion->get_personal();
             foreach ($personal as $trabajador) {
                 $datos_remuneracion = $this->remuneracion->get_datos_remuneracion($mes, $anno, $trabajador->id);
-                if (count($datos_remuneracion) == 0) {
+                if (is_null($datos_remuneracion)) {
                     $datos_pendientes = true;
                     break;
                 } else {
@@ -1604,7 +1604,7 @@ class Remuneraciones extends CI_Controller
                         }
 
                         $datos_remuneracion = $this->remuneracion->get_datos_remuneracion($periodos->mes, $periodos->anno, $trabajador->id);
-                        if (count($datos_remuneracion) == 0) {
+                        if (is_null($datos_remuneracion)) {
                             if (!in_array("Informaci&oacute;n Asistencia", $mensajes[$periodos->id])) {
                                 array_push($mensajes[$periodos->id], "Informaci&oacute;n Asistencia");
                             }
@@ -2030,7 +2030,7 @@ class Remuneraciones extends CI_Controller
                 redirect('main/dashboard/');
             } else {
                 $remuneraciones = $this->remuneracion->get_remuneraciones_by_periodo($idperiodo);
-                if (count($remuneraciones) == 0) { // SI NO ENCUENTRO NINGUNA REMUNERACION (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
+                if (is_null($remuneraciones)) { // SI NO ENCUENTRO NINGUNA REMUNERACION (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
                     redirect('main/dashboard/');
                 } else {
                     $datosdetalle = $this->remuneracion->liquidaciones($remuneraciones);
@@ -2069,7 +2069,7 @@ class Remuneraciones extends CI_Controller
                 redirect('main/dashboard/');
             } else {
                 $remuneraciones = $this->remuneracion->get_remuneraciones_by_periodo($idperiodo, true);
-                if (count($remuneraciones) == 0) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
+                if (is_null($remuneraciones)) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
                     redirect('main/dashboard/');
                 } else {
                     $datosdetalle = $this->remuneracion->previred($remuneraciones);
@@ -2108,7 +2108,7 @@ class Remuneraciones extends CI_Controller
                 redirect('main/dashboard/');
             } else {
                 $remuneraciones = $this->remuneracion->get_remuneraciones_by_periodo($idperiodo, true);
-                if (count($remuneraciones) == 0) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
+                if (is_null($remuneraciones)) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
                     redirect('main/dashboard/');
                 } else {
                     $datosdetalle = $this->remuneracion->libro($remuneraciones);
@@ -2146,7 +2146,7 @@ class Remuneraciones extends CI_Controller
                 redirect('main/dashboard/');
             } else {
                 $remuneraciones = $this->remuneracion->get_remuneraciones_by_periodo($idperiodo, true);
-                if (count($remuneraciones) == 0) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
+                if (is_null($remuneraciones)) { // SI NO ENCUENTRO NINGUNA REMUNERACION (QUIERE DECIR QUE NO EXISTIAN TRABAJADORES EN ESE PERIODO)
                     redirect('main/dashboard/');
                 } else {
                     $datosdetalle = $this->remuneracion->lre($remuneraciones,$periodo);
@@ -2615,10 +2615,10 @@ class Remuneraciones extends CI_Controller
             );
 
             $datos_form = array(
-                'idafp' => count($afp) == 0 ? 0 : $afp->id,
-                'nombre' => count($afp) == 0 ? '' : $afp->nombre,
-                'porc' => count($afp) == 0 ? '' : $afp->porc,
-                'exregimen' => count($afp) == 0 ? 0 : $afp->exregimen
+                'idafp' => is_null($afp) ? 0 : $afp->id,
+                'nombre' => is_null($afp) ? '' : $afp->nombre,
+                'porc' => is_null($afp) ? '' : $afp->porc,
+                'exregimen' => is_null($afp) ? 0 : $afp->exregimen
             );
 
             $vars['content_menu'] = $content;
@@ -2863,8 +2863,8 @@ class Remuneraciones extends CI_Controller
             );
 
             $datos_form = array(
-                'idferiado' => count($feriado) == 0 ? 0 : $feriado->id,
-                'fecha' => count($feriado) == 0 ? date("d/m/Y") : $feriado->fecha
+                'idferiado' => is_null($feriado) ? 0 : $feriado->id,
+                'fecha' => is_null($feriado) ? date("d/m/Y") : $feriado->fecha
             );
 
             $vars['content_menu'] = $content;
@@ -2972,8 +2972,8 @@ class Remuneraciones extends CI_Controller
             );
 
             $datos_form = array(
-                'idisapre' => count($isapre) == 0 ? 0 : $isapre->id,
-                'nombre' => count($isapre) == 0 ? '' : $isapre->nombre
+                'idisapre' => is_null($isapre) ? 0 : $isapre->id,
+                'nombre' => is_null($isapre) ? '' : $isapre->nombre
             );
 
             $vars['content_menu'] = $content;
@@ -3270,7 +3270,8 @@ class Remuneraciones extends CI_Controller
 
             $vars['content_menu'] = $content;
             $vars['content_view'] = 'remuneraciones/ver_descuento';
-            $vars['existe'] = count($descuento) > 0 ? true : false;
+            //$vars['existe'] = count($descuento) > 0 ? true : false;
+            $vars['existe'] = !is_null($descuento) ? true : false;
 
             if (!$vars['existe']) {
                 $vars['message'] = "Descuento no existe";
@@ -3327,7 +3328,7 @@ class Remuneraciones extends CI_Controller
 
             $vars['content_menu'] = $content;
             $vars['content_view'] = 'remuneraciones/edit_descuento';
-            if (count($descuento) == 0) {
+            if (is_null($descuento)) {
                 $this->session->set_flashdata('descuento_result', 3);
                 redirect('remuneraciones/descuentos');
             }
@@ -3423,7 +3424,7 @@ class Remuneraciones extends CI_Controller
                 redirect('remuneraciones/descuentos');
             }
 
-            if (count($descuento) == 0) {
+            if (is_null($descuento)) {
                 $this->session->set_flashdata('descuento_result', 3);
                 redirect('remuneraciones/descuentos');
             }
@@ -3755,7 +3756,7 @@ public function cartola_vacaciones_personal()
 
 
 
-            if(count($personal_trabajo) > 0){
+            if(!is_null($personal_trabajo)){
                 $trabajador = $personal_trabajo[0];
                 $idpersonal = $trabajador->id;
 
@@ -4733,7 +4734,7 @@ public function cartola_vacaciones_personal()
             //print_r($cartola); exit;
 
 
-            if (count($cartola) == 0) { // SI NO ENCUENTRO NINGUNA CARTOLA (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
+            if (is_null($cartola)) { // SI NO ENCUENTRO NINGUNA CARTOLA (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
                 redirect('main/dashboard/');
             } else {
                 $datosdetalle = $this->remuneracion->comprobante_solicitud($idpersonal, $idcartola);

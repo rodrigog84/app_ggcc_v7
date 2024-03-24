@@ -137,14 +137,16 @@ class Accounts extends CI_Controller {
 				}
 			}else if($origen == 'pagos_cuentas'){
 				$cuenta = $this->account->get_cuentas_impagas_by_id($idcuenta);		
-				if(count($cuenta) == 0){
+				if(is_null($cuenta)){
 					$cuenta = $this->account->get_notas_credito($idcuenta);		
 				}		
 			}
 
 			//$cuenta = $origen == 'ver_detalle_periodo' ? $this->account->get_cuentas_by_periodo($idperiodo,$idcuenta) : $this->account->get_cuentas_impagas_by_id($idcuenta);
 			//var_dump($cuentas); exit;
-			$vars['existe'] = count($cuenta) > 0 ? true : false;
+			//$vars['existe'] = count($cuenta) > 0 ? true : false;
+
+			$vars['existe'] = !is_null($cuenta) ? true : false;
 
 			if(!$vars['existe']){ //  no se consideran aun los cobros individuales
 				if($origen == 'ver_detalle_periodo'){
@@ -225,7 +227,8 @@ class Accounts extends CI_Controller {
 			$this->load->model('account');
 			$cuentas = $this->account->get_cuentas_by_id($idcuenta);
 
-			$vars['existe'] = count($cuentas) > 0 ? true : false;
+			//$vars['existe'] = count($cuentas) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuentas) ? true : false;
 
 			if(!$vars['existe'] || $cuentas->formapago == 'ci'){ //  no se consideran aun los cobros individuales
 				$this->session->set_flashdata('editar_cuenta_result', 4);
@@ -250,18 +253,18 @@ class Accounts extends CI_Controller {
 
 
 			$datos_form = array(
-							'formapago' => count($cuentas) == 0 ? 0 : $cuentas->formapago,
-							'proveedor' => count($cuentas) == 0 ? 0 : $cuentas->idproveedor,
-							'tipodoc' => count($cuentas) == 0 ? '' : $cuentas->idtipodoctotrib,
-							'documento' => count($cuentas) == 0 ? '' : $cuentas->nrodocumento,
-							'fecdocumento' => count($cuentas) == 0 ? '' : $cuentas->fecdocumento,
-							'concepto' => count($cuentas) == 0 ? '' : $cuentas->idconcepto,
-							'monto' => count($cuentas) == 0 ? '' : $cuentas->monto,
-							'abonado' => count($cuentas) == 0 ? '' : $cuentas->abonado,
-							'fecvencimiento' => count($cuentas) == 0 ? '' : $cuentas->fecvencimiento,
-							'descripcion' => count($cuentas) == 0 ? '' : $cuentas->descripcion,
-							'nombrearchivo' => count($cuentas) == 0 ? '' : $cuentas->nombrearchivo,
-							'idcuenta' => count($cuentas) == 0 ? '' : $cuentas->id,
+							'formapago' => is_null($cuentas) ? 0 : $cuentas->formapago,
+							'proveedor' => is_null($cuentas) ? 0 : $cuentas->idproveedor,
+							'tipodoc' => is_null($cuentas) ? '' : $cuentas->idtipodoctotrib,
+							'documento' => is_null($cuentas) ? '' : $cuentas->nrodocumento,
+							'fecdocumento' => is_null($cuentas) ? '' : $cuentas->fecdocumento,
+							'concepto' => is_null($cuentas) ? '' : $cuentas->idconcepto,
+							'monto' => is_null($cuentas) ? '' : $cuentas->monto,
+							'abonado' => is_null($cuentas) ? '' : $cuentas->abonado,
+							'fecvencimiento' => is_null($cuentas) ? '' : $cuentas->fecvencimiento,
+							'descripcion' => is_null($cuentas) ? '' : $cuentas->descripcion,
+							'nombrearchivo' => is_null($cuentas) ? '' : $cuentas->nombrearchivo,
+							'idcuenta' => is_null($cuentas) ? '' : $cuentas->id,
 							);
 
 			$this->load->model('admin');
@@ -1082,7 +1085,7 @@ class Accounts extends CI_Controller {
 				$datos_cuenta = $this->account->get_cuentas_by_id($idcuenta);
 
 				//$datos_cuenta = $this->session->flashdata('cuenta');
-				if(count($datos_cuenta) == 0){
+				if(is_null($datos_cuenta)){
 						$this->session->set_flashdata('editar_cuenta_result', 11);
 						redirect('accounts/editar_cuenta');	
 				}
@@ -1230,7 +1233,7 @@ class Accounts extends CI_Controller {
 				redirect('accounts/editar_cuenta');	
 			}
 
-			if(count($datos_cuenta) == 0){
+			if(is_null($datos_cuenta)){
 				$this->session->set_flashdata('editar_cuenta_result', 15);
 				redirect('accounts/editar_cuenta');		
 			}
@@ -1333,7 +1336,8 @@ class Accounts extends CI_Controller {
 			$this->load->model('account');
 			$cargos = $this->account->get_cargos_by_id($idcargo);
 
-			$vars['existe'] = count($cargos) > 0 ? true : false;
+			//$vars['existe'] = count($cargos) > 0 ? true : false;
+			$vars['existe'] = !is_null($cargos) ? true : false;
 
 			if(!$vars['existe']){
 				$vars['message'] = "Cargo no existe";
@@ -1342,13 +1346,13 @@ class Accounts extends CI_Controller {
 			}			
 
 			$datos_form = array(
-							'proveedor' => count($cargos) == 0 ? 0 : $cargos->nombreproveedor,
-							'fecpago' => count($cargos) == 0 ? '' : $cargos->fecpago,
-							'monto' => count($cargos) == 0 ? '' : $cargos->monto,
-							'abonado' => count($cargos) == 0 ? '' : $cargos->abonado,
-							'descripcion' => count($cargos) == 0 ? '' : $cargos->descripcion,
-							'nombrearchivo' => count($cargos) == 0 ? '' : $cargos->nombrearchivo,
-							'idcargo' => count($cargos) == 0 ? '' : $cargos->id,
+							'proveedor' => is_null($cargos) ? 0 : $cargos->nombreproveedor,
+							'fecpago' => is_null($cargos) ? '' : $cargos->fecpago,
+							'monto' => is_null($cargos) ? '' : $cargos->monto,
+							'abonado' => is_null($cargos) ? '' : $cargos->abonado,
+							'descripcion' => is_null($cargos) ? '' : $cargos->descripcion,
+							'nombrearchivo' => is_null($cargos) ? '' : $cargos->nombrearchivo,
+							'idcargo' => is_null($cargos) ? '' : $cargos->id,
 							);
 
 
@@ -1579,14 +1583,14 @@ class Accounts extends CI_Controller {
 
 
 			$datos_form = array(
-							'idcuenta' => count($cuentas) == 0 ? 0 : $cuentas->id,
-							'concepto' => count($cuentas) == 0 ? 0 : $cuentas->idconcepto,
-							'propiedad' => count($cuentas) == 0 ? 0 : $cuentas->idpropiedad,
-							'periodo' => count($cuentas) == 0 ? '' : $cuentas->idperiodo,
-							'fechadeuda' => count($cuentas) == 0 ? '' : $cuentas->fechadeuda,
-							'monto' => count($cuentas) == 0 ? '' : ($cuentas->idconcepto == 8 ? $cuentas->monto*(-1) : $cuentas->monto),
-							'descripcion' => count($cuentas) == 0 ? '' : $cuentas->descripcion,
-							'nombrearchivo' => count($cuentas) == 0 ? '' : $cuentas->nombrearchivo,
+							'idcuenta' => is_null($cuentas) ? 0 : $cuentas->id,
+							'concepto' => is_null($cuentas) ? 0 : $cuentas->idconcepto,
+							'propiedad' => is_null($cuentas) ? 0 : $cuentas->idpropiedad,
+							'periodo' => is_null($cuentas) ? '' : $cuentas->idperiodo,
+							'fechadeuda' => is_null($cuentas) ? '' : $cuentas->fechadeuda,
+							'monto' => is_null($cuentas) ? '' : ($cuentas->idconcepto == 8 ? $cuentas->monto*(-1) : $cuentas->monto),
+							'descripcion' => is_null($cuentas) ? '' : $cuentas->descripcion,
+							'nombrearchivo' => is_null($cuentas) ? '' : $cuentas->nombrearchivo,
 							);
 
 			$this->load->model('admin');
@@ -2613,7 +2617,8 @@ class Accounts extends CI_Controller {
 			$this->load->model('account');
 			$cuentas = $this->account->get_cuentas_by_id($idcuenta,true);
 
-			$vars['existe'] = count($cuentas) > 0 ? true : false;
+			//$vars['existe'] = count($cuentas) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuentas) ? true : false;
 
 			if(!$vars['existe']){ //  no se consideran aun los cobros individuales
 				$this->session->set_flashdata('editar_cuenta_honorarios_result', 4);
@@ -2634,21 +2639,21 @@ class Accounts extends CI_Controller {
 
 
 			$datos_form = array(
-							'formapago' => count($cuentas) == 0 ? 0 : $cuentas->formapago,
-							'proveedor' => count($cuentas) == 0 ? 0 : $cuentas->idproveedor,
-							'tipodoc' => count($cuentas) == 0 ? '' : $cuentas->idtipodoctotrib,
-							'documento' => count($cuentas) == 0 ? '' : $cuentas->nrodocumento,
-							'tiporetencion' => count($cuentas) == 0 ? '' : $cuentas->tiporetencion,
-							'fecdocumento' => count($cuentas) == 0 ? '' : $cuentas->fecdocumento,
-							'concepto' => count($cuentas) == 0 ? '' : $cuentas->idconcepto,
-							'monto' => count($cuentas) == 0 ? '' : $cuentas->monto,
-							'retencion' => count($cuentas) == 0 ? '' : $cuentas->retencion,
-							'abonado' => count($cuentas) == 0 ? '' : $cuentas->abonado,
-							'fecvencimiento' => count($cuentas) == 0 ? '' : $cuentas->fecvencimiento,
-							'descripcion' => count($cuentas) == 0 ? '' : $cuentas->descripcion,
-							'nombrearchivo' => count($cuentas) == 0 ? '' : $cuentas->nombrearchivo,
-							'idcuenta' => count($cuentas) == 0 ? '' : $cuentas->id,
-							'idretencion' => count($cuentas) == 0 ? '' : $cuentas->idretencion,
+							'formapago' => is_null($cuentas) ? 0 : $cuentas->formapago,
+							'proveedor' => is_null($cuentas) ? 0 : $cuentas->idproveedor,
+							'tipodoc' => is_null($cuentas) ? '' : $cuentas->idtipodoctotrib,
+							'documento' => is_null($cuentas) ? '' : $cuentas->nrodocumento,
+							'tiporetencion' => is_null($cuentas) ? '' : $cuentas->tiporetencion,
+							'fecdocumento' => is_null($cuentas) ? '' : $cuentas->fecdocumento,
+							'concepto' => is_null($cuentas) ? '' : $cuentas->idconcepto,
+							'monto' => is_null($cuentas) ? '' : $cuentas->monto,
+							'retencion' => is_null($cuentas) ? '' : $cuentas->retencion,
+							'abonado' => is_null($cuentas) ? '' : $cuentas->abonado,
+							'fecvencimiento' => is_null($cuentas) ? '' : $cuentas->fecvencimiento,
+							'descripcion' => is_null($cuentas) ? '' : $cuentas->descripcion,
+							'nombrearchivo' => is_null($cuentas) ? '' : $cuentas->nombrearchivo,
+							'idcuenta' => is_null($cuentas) ? '' : $cuentas->id,
+							'idretencion' => is_null($cuentas) ? '' : $cuentas->idretencion,
 							);
 
 			
@@ -2806,7 +2811,7 @@ class Accounts extends CI_Controller {
 			}			
 
 			$cuentacuotas = $this->account->get_cuentas_cuotas_by_id($idcuentacuotas);
-			if(count($cuentacuotas) == 0){
+			if(is_null($cuentacuotas)){
 				$this->session->set_flashdata('editar_cuenta_result', 4);
 				redirect('accounts/editar_cuenta');
 			}else{
@@ -2851,29 +2856,30 @@ class Accounts extends CI_Controller {
 
 			$cuentacuotas = $this->account->get_cuentas_cuotas_by_id($idcuentacuotas);
 			//var_dump($cuentacuotas); exit;
-			if(count($cuentacuotas) == 0){
+			if(is_null($cuentacuotas)){
 				$this->session->set_flashdata('editar_cuenta_result', 4);
 				redirect('accounts/editar_cuenta');
 			}
 
 			//$result = $this->account->delete_cuenta_cuotas($idcuentacuotas);
 
-			$vars['existe'] = count($cuentacuotas) > 0 ? true : false;
+			//$vars['existe'] = count($cuentacuotas) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuentacuotas) ? true : false;
 
 
 			$datos_form = array(
-						'formapago' => count($cuentacuotas) == 0 ? 0 : $cuentacuotas->formapago,
-						'proveedor' => count($cuentacuotas) == 0 ? 0 : $cuentacuotas->idproveedor,
-						'tipodoc' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->idtipodoctotrib,
-						'documento' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->nrodocumento,
-						'fecdocumento' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->fecdocumento,
-						'concepto' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->idconcepto,
-						'monto' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->monto,
-						'fecvencimiento' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->fecvencimiento,
-						'descripcion' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->descripcion,
-						'nombrearchivo' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->nombrearchivo,
-						'idcuenta' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->id,
-						'numcuotas' => count($cuentacuotas) == 0 ? '' : $cuentacuotas->numcuotas,
+						'formapago' => is_null($cuentacuotas) ? 0 : $cuentacuotas->formapago,
+						'proveedor' => is_null($cuentacuotas) ? 0 : $cuentacuotas->idproveedor,
+						'tipodoc' => is_null($cuentacuotas) ? '' : $cuentacuotas->idtipodoctotrib,
+						'documento' => is_null($cuentacuotas) ? '' : $cuentacuotas->nrodocumento,
+						'fecdocumento' => is_null($cuentacuotas) ? '' : $cuentacuotas->fecdocumento,
+						'concepto' => is_null($cuentacuotas) ? '' : $cuentacuotas->idconcepto,
+						'monto' => is_null($cuentacuotas) ? '' : $cuentacuotas->monto,
+						'fecvencimiento' => is_null($cuentacuotas) ? '' : $cuentacuotas->fecvencimiento,
+						'descripcion' => is_null($cuentacuotas) ? '' : $cuentacuotas->descripcion,
+						'nombrearchivo' => is_null($cuentacuotas) ? '' : $cuentacuotas->nombrearchivo,
+						'idcuenta' => is_null($cuentacuotas) ? '' : $cuentacuotas->id,
+						'numcuotas' => is_null($cuentacuotas) ? '' : $cuentacuotas->numcuotas,
 						);
 
 
@@ -2941,7 +2947,7 @@ class Accounts extends CI_Controller {
 			$cuentas = $tipocuenta == 'c' ? $this->account->get_cargos_by_id($idcuenta) : $this->account->get_cuentas_by_id($idcuenta);
 
 
-			if(count($cuentas) == 0 || !isset($cuentas->abonado)){
+			if(is_null($cuentas) || !isset($cuentas->abonado)){
 				$this->session->set_flashdata('editar_cuenta_result', 4);
 				redirect('accounts/editar_cuenta');
 			}
@@ -3014,7 +3020,7 @@ class Accounts extends CI_Controller {
 
 			$cuentas = $this->account->get_cuentas_by_id($idcuenta,true);
 
-			if(count($cuentas) == 0 || !isset($cuentas->abonado)){
+			if(is_null($cuentas) || !isset($cuentas->abonado)){
 				$this->session->set_flashdata('editar_cuenta_honorarios_result', 4);
 				redirect('accounts/honorarios_condominio');
 			}
@@ -3074,7 +3080,7 @@ class Accounts extends CI_Controller {
 
 			$this->load->model('account');
 			$ingresos = $this->account->get_ingresos_by_id($idingreso,null,null,true);
-			if(count($ingresos) == 0){
+			if(is_null($ingresos)){
 				$this->session->set_flashdata('editar_ingreso_result', 4);
 				redirect('accounts/editar_ingresos');
 			}
@@ -3193,7 +3199,8 @@ class Accounts extends CI_Controller {
 
 			$this->load->model('account');
 			$ingreso = $this->account->get_ingresos_by_id($idingreso);
-			$vars['existe'] = count($ingreso) > 0 ? true : false;
+			//$vars['existe'] = count($ingreso) > 0 ? true : false;
+			$vars['existe'] = !is_null($ingreso) ? true : false;
 
 			if(!$vars['existe']){ 
 				$this->session->set_flashdata('editar_ingreso_result', 4);
@@ -3201,18 +3208,18 @@ class Accounts extends CI_Controller {
 			}
 
 			$datos_form = array(
-							'proveedor' => count($ingreso) == 0 ? 0 : $ingreso->idproveedor,
-							'tipodoc' => count($ingreso) == 0 ? '' : $ingreso->idtipodoctotrib,
-							'documento' => count($ingreso) == 0 ? '' : $ingreso->nrodocumento,
-							'fecdocumento' => count($ingreso) == 0 ? '' : $ingreso->fecdocumento,
-							'concepto' => count($ingreso) == 0 ? '' : $ingreso->idconcepto,
-							'monto' => count($ingreso) == 0 ? '' : $ingreso->monto,
-							'fecvencimiento' => count($ingreso) == 0 ? '' : $ingreso->fecvencimiento,
-							'descripcion' => count($ingreso) == 0 ? '' : $ingreso->descripcion,
-							'nombrearchivo' => count($ingreso) == 0 ? '' : $ingreso->nombrearchivo,
-							'idingreso' => count($ingreso) == 0 ? '' : $ingreso->id,
-							'tipoingreso' => count($ingreso) == 0 ? '' : $ingreso->tipoingreso,
-							'habilitagasto' => count($ingreso) == 0 ? '' : $ingreso->habilitagasto,
+							'proveedor' => is_null($ingreso) ? 0 : $ingreso->idproveedor,
+							'tipodoc' => is_null($ingreso) ? '' : $ingreso->idtipodoctotrib,
+							'documento' => is_null($ingreso) ? '' : $ingreso->nrodocumento,
+							'fecdocumento' => is_null($ingreso) ? '' : $ingreso->fecdocumento,
+							'concepto' => is_null($ingreso) ? '' : $ingreso->idconcepto,
+							'monto' => is_null($ingreso) ? '' : $ingreso->monto,
+							'fecvencimiento' => is_null($ingreso) ? '' : $ingreso->fecvencimiento,
+							'descripcion' => is_null($ingreso) ? '' : $ingreso->descripcion,
+							'nombrearchivo' => is_null($ingreso) ? '' : $ingreso->nombrearchivo,
+							'idingreso' => is_null($ingreso) ? '' : $ingreso->id,
+							'tipoingreso' => is_null($ingreso) ? '' : $ingreso->tipoingreso,
+							'habilitagasto' => is_null($ingreso) ? '' : $ingreso->habilitagasto,
 							);
 
 			$this->load->model('admin');
@@ -3639,7 +3646,7 @@ class Accounts extends CI_Controller {
 			$datosegreso = $this->account->get_datos_egreso($idegreso);		
 			
 
-			if(count($datosegreso) > 0){
+			if(!is_null($datosegreso)){
 				$datosdetalle = $this->account->generar_egreso($idegreso);						
 			}else{
 				redirect('main/dashboard');	 

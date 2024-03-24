@@ -59,7 +59,8 @@ class Comunity extends CI_Controller
             $datospublicacion = $this->payment->get_ggcc_publicacion_by_comunidad($this->session->userdata('comunidadid'));
 
 
-            $pendiente_publicacion = count($datospublicacion) > 0 ? true : false;
+            //$pendiente_publicacion = count($datospublicacion) > 0 ? true : false;
+            $pendiente_publicacion = !is_null($datospublicacion) ? true : false;
 
             $content = array(
                 'menu' => 'Gasto Com&uacute;n',
@@ -76,7 +77,7 @@ class Comunity extends CI_Controller
             $vars['pendiente_publicacion'] = $pendiente_publicacion;
 
 
-            if ($pendiente_publicacion && $resultid == '' && count($datosdeuda) > 0) {
+            if ($pendiente_publicacion && $resultid == '' && !is_null($datosdeuda)) {
                 $vars['message'] = "No es posible prorratear.  Existe Gasto Com&uacute;n pendiente de publicar";
                 $vars['classmessage'] = 'danger';
                 $vars['icon'] = 'fa-ban';
@@ -174,7 +175,7 @@ class Comunity extends CI_Controller
             $this->load->model('payment');
             $datosdeuda = $this->payment->get_ggcc_prorrateo_by_comunidad($this->session->userdata('comunidadid'), $idperiodo);
 
-            if (count($datosdeuda) == 0) { // en caso de querer prorratear un período inválido
+            if (is_null($datosdeuda)) { // en caso de querer prorratear un período inválido
                 $resultid = $this->session->set_flashdata('calculo_ggcc_result', 2);
                 redirect('comunity/calculo_ggcc');
             }
@@ -681,17 +682,17 @@ class Comunity extends CI_Controller
             );
 
             $datos_form = array(
-                'idregistro' => count($registro) == 0 ? 0 : $registro->id,
-                'idcomunidad' => count($registro) == 0 ? $this->session->userdata('comunidadid') : $registro->idcomunidad,
-                'idpropiedad' => count($registro) == 0 ? '' : $registro->idpropiedad,
-                'idestacionamiento' => count($registro) == 0 ? '' : $registro->idestacionamiento,
-                'nombre' => count($registro) == 0 ? '' : $registro->nombre,
-                'apellidos' => count($registro) == 0 ? '' : $registro->apellidos,
-                'rut' => count($registro) == 0 ? '' : number_format($registro->rut, 0, ".", ".") . "-" . $registro->dv,
-                'propiedad' => count($registro) == 0 ? '' : $registro->propiedad,
-                'responsable' => count($registro) == 0 ? '' : $registro->responsable,
-                'estacionamiento' => count($registro) == 0 ? '' : $registro->estacionamiento,
-                'patente' => count($registro) == 0 ? '' : $registro->patente,
+                'idregistro' => is_null($registro) ? 0 : $registro->id,
+                'idcomunidad' => is_null($registro) ? $this->session->userdata('comunidadid') : $registro->idcomunidad,
+                'idpropiedad' => is_null($registro) ? '' : $registro->idpropiedad,
+                'idestacionamiento' => is_null($registro) ? '' : $registro->idestacionamiento,
+                'nombre' => is_null($registro) ? '' : $registro->nombre,
+                'apellidos' => is_null($registro) ? '' : $registro->apellidos,
+                'rut' => is_null($registro) ? '' : number_format($registro->rut, 0, ".", ".") . "-" . $registro->dv,
+                'propiedad' => is_null($registro) ? '' : $registro->propiedad,
+                'responsable' => is_null($registro) ? '' : $registro->responsable,
+                'estacionamiento' => is_null($registro) ? '' : $registro->estacionamiento,
+                'patente' => is_null($registro) ? '' : $registro->patente,
             );
 
             $vars['content_menu'] = $content;
@@ -736,11 +737,11 @@ class Comunity extends CI_Controller
             );
 
             $datos_form = array(
-                'idbitacora' => count($bitacora) == 0 ? 0 : $idbitacora,
-                'idcomunidad' => count($bitacora) == 0 ? $this->session->userdata('comunidadid') : $bitacora->idcomunidad,
-                'iduser' => count($bitacora) == 0 ? $this->session->userdata('user_id') : $bitacora->iduser,
-                'accion' => count($bitacora) == 0 ? '' : $bitacora->accion,
-                'descripcion' => count($bitacora) == 0 ? '' : $bitacora->descripcion,
+                'idbitacora' => is_null($bitacora) ? 0 : $idbitacora,
+                'idcomunidad' => is_null($bitacora) ? $this->session->userdata('comunidadid') : $bitacora->idcomunidad,
+                'iduser' => is_null($bitacora) ? $this->session->userdata('user_id') : $bitacora->iduser,
+                'accion' => is_null($bitacora) ? '' : $bitacora->accion,
+                'descripcion' => is_null($bitacora) ? '' : $bitacora->descripcion,
             );
 
             $vars['content_menu'] = $content;

@@ -357,7 +357,8 @@ class Reports extends CI_Controller {
 
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/ver_cuenta_individual';
-			$vars['existe'] = count($cuenta) > 0 ? true : false;
+			//$vars['existe'] = count($cuenta) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuenta) ? true : false;
 
 			if(!$vars['existe']){
 				$vars['message'] = "Cuenta Individual no existe";
@@ -406,7 +407,7 @@ class Reports extends CI_Controller {
 
 
 
-			if(count($cuenta) <= 0){
+			if(is_null($cuenta)){
 				$this->session->set_flashdata('ver_detalle_lectura_result', 1);
 				redirect('reports/ver_detalle_lectura/'.$idcuenta);
 
@@ -465,7 +466,8 @@ class Reports extends CI_Controller {
 
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/ver_cuenta_esp_comunes';
-			$vars['existe'] = count($cuenta) > 0 ? true : false;
+			//$vars['existe'] = count($cuenta) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuenta) ? true : false;
 
 			if(!$vars['existe']){
 				$vars['message'] = "Cuenta de Espacios Comunes no existe";
@@ -517,7 +519,8 @@ class Reports extends CI_Controller {
 
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/ver_cuenta';
-			$vars['existe'] = count($cuenta) > 0 ? true : false;
+			//$vars['existe'] = count($cuenta) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuenta) ? true : false;
 			$vars['mensual_data'] = $this->session->flashdata('mes_mensualdata') != '' ? true : false;
 
 			if(!$vars['existe']){
@@ -568,7 +571,7 @@ class Reports extends CI_Controller {
 			$this->load->model('account');
 			$detalle_lectura = $this->account->get_detalle_lectura_by_cuenta($idcuenta);
 
-			if(count($detalle_lectura) <= 0){
+			if(is_null($detalle_lectura)){
 				$this->session->set_flashdata('editar_cuenta_result', 11);
 				redirect('accounts/editar_cuenta');
 
@@ -626,7 +629,8 @@ class Reports extends CI_Controller {
 
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/ver_ingreso';
-			$vars['existe'] = count($ingreso) > 0 ? true : false;
+			//$vars['existe'] = count($ingreso) > 0 ? true : false;
+			$vars['existe'] = !is_null($ingreso) ? true : false;
 
 			if(!$vars['existe']){
 				$vars['message'] = "Ingreso no existe";
@@ -670,7 +674,8 @@ class Reports extends CI_Controller {
 
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/ver_cargo';
-			$vars['existe'] = count($cuenta) > 0 ? true : false;
+			//$vars['existe'] = count($cuenta) > 0 ? true : false;
+			$vars['existe'] = !is_null($cuenta) ? true : false;
 
 			if(!$vars['existe']){
 				$vars['message'] = "Cargo no existe";
@@ -2845,7 +2850,7 @@ class Reports extends CI_Controller {
 			$this->load->model('account');
 			$movimiento = $this->account->get_movimiento_by_id($idmovimiento);
 			$op = "Movimiento";
-			if(count($movimiento) > 0){
+			if(!is_null($movimiento)){
 
 				if(is_null($movimiento->idpago)){
 					if(is_null($movimiento->idabono)){

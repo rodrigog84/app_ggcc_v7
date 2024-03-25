@@ -524,7 +524,7 @@ class Account extends CI_Model
 			$this->db->trans_start();
 			$datos_ingreso = $this->get_ingresos_by_id($idingreso); 
 
-			if(count($datos_ingreso) > 0){
+			if(!is_null($datos_ingreso)){
 				$this->load->model('admin');
 				$datoscomunidad = $this->admin->get_comunidad_by_id($this->session->userdata('comunidadid'));
 				$saldo_caja_actual = $datoscomunidad->caja;
@@ -896,7 +896,7 @@ class Account extends CI_Model
 			$this->db->trans_start();
 
 				$cuentas = $this->get_cuentas_by_id($idcuenta);
-				if(count($cuentas) > 0){
+				if(!is_null($cuentas)){
 
 					//BORRAMOS LAS CUENTAS INDIVIDUALES EXISTENTES
 					$this->db->where('idcuenta',$idcuenta);
@@ -940,7 +940,7 @@ class Account extends CI_Model
 	public function delete_cuenta_individual($idcuenta){
 
 			$datos_cuenta = $this->get_cuentas_individuales_by_id($idcuenta);
-			if(count($datos_cuenta) > 0){
+			if(!is_null($datos_cuenta)){
 
 				$this->load->model('admin');
 				$datos_propiedad = $this->admin->get_propiedad_by_id($datos_cuenta->idpropiedad);
@@ -959,7 +959,7 @@ class Account extends CI_Model
 
 				$datos_cuenta_esp_comunes = $this->get_cuentas_espacios_comunes_by_id($idcuenta);
 
-				if(count($datos_cuenta_esp_comunes) > 0){
+				if(!is_null($datos_cuenta_esp_comunes)){
 
 					$this->load->model('admin');
 					$datos_propiedad = $this->admin->get_propiedad_by_id($datos_cuenta_esp_comunes->idpropiedad);
@@ -1796,7 +1796,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 
 
 		$cuenta = $this->account->get_cuentas_by_ggcc($idggcc,$idcuenta);
-		if(count($cuenta) > 0){
+		if(!is_null($cuenta)){
 			$monto = $cuenta->idtipodoctrib == 4 ? $cuenta->monto*(-1) : $cuenta->monto;
 			// ACTUALIZA MONTO DEUDA
 			$this->db->query("update gc_ggcc_comunidad set 
@@ -1840,7 +1840,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 
 
 		$ingreso = $this->account->get_ingresos_by_ggcc($idggcc,$idingreso);
-		if(count($ingreso) > 0){
+		if(!is_null($ingreso)){
 			// ACTUALIZA MONTO DEUDA
 			$this->db->query("update gc_ggcc_comunidad set 
 														monto = monto + " . $ingreso->monto . ",
@@ -1893,7 +1893,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 			$query = $this->db->get();
 			$datos = $query->row();
 
-			if(count($datos) == 0){ // no existe autorizacion
+			if(is_null($datos)){ // no existe autorizacion
 				$data = array(
 			      	'tipo' => 'D',
 			      	'idcomunidad' =>  $this->session->userdata('comunidadid'),
@@ -2906,7 +2906,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 	public function put_vida_util($idcuenta,$vidautil){		
 
 				$cuentas = $this->get_activo_fijo_impago_by_id($idcuenta);
-				$monto = count($cuentas) > 0 ? $cuentas->monto : 0;
+				$monto = !is_null($cuentas) ? $cuentas->monto : 0;
 				$depreciacion = (int)$monto/$vidautil;
 
 				$this->db->where('id',$idcuenta);
@@ -2922,7 +2922,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 	public function desactiva_cuenta($idcuenta){				
 
 			$datos_cuenta = $this->get_cuentas_impagas_by_id($idcuenta);
-			if(count($datos_cuenta) > 0){
+			if(!is_null($datos_cuenta)){
 				$active = $datos_cuenta->active == 1 ? 0 : 1;
 				$fecdesactiva = $datos_cuenta->active == 1 ? date("Y-m-d H:i:s") : null;
 				$this->db->where('id',$idcuenta);

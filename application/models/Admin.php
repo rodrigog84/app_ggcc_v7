@@ -1422,7 +1422,7 @@ class Admin extends CI_Model
         $query = $this->db->get();
         $datos = $query->row();
 
-        if (count($datos) == 0) { // nadie a agregado periodo, no hay nada más que validar.  Se crea
+        if (is_null($datos)) { // nadie a agregado periodo, no hay nada más que validar.  Se crea
 
             if ($array_datos['idperiodo'] == 0) { // es agregar
                 $data = array(
@@ -1453,7 +1453,7 @@ class Admin extends CI_Model
                     ->where('pe.idcomunidad', $this->session->userdata('comunidadid'));
                 $query = $this->db->get();
                 $datos = $query->row();
-                if (count($datos) == 0) { //periodo ya existe, pero no asociado a la comunidad
+                if (is_null($datos)) { //periodo ya existe, pero no asociado a la comunidad
 
                     $data = array(
                         'idperiodo' => $idperiodo,
@@ -1936,7 +1936,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('p.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nuevo proveedor no existe
+        if (is_null($datos)) { // nuevo proveedor no existe
             if ($array_datos['idproveedor'] == 0) {
                 $data = array(
                     'idcomunidad' => $this->session->userdata('comunidadid'),
@@ -2078,7 +2078,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('td.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nuevo proveedor no existe
+        if (is_null($datos)) { // nuevo proveedor no existe
             if ($array_datos['idespaciocomun'] == 0) {
                 $data = array(
                     'idtipodeuda' => 10,
@@ -2146,7 +2146,7 @@ public function accept_payprop($token = null,$tokentgc = null)
         $query = $this->db->get();
         $datos = $query->row();
 
-        if (count($datos) == 0) { // nuevo proveedor no existe
+        if (is_null($datos)) { // nuevo proveedor no existe
             if ($array_datos['idtipocuenta'] == 0) {
                 $data = array(
                     'idtipodeuda' => 1,
@@ -2288,7 +2288,7 @@ public function accept_payprop($token = null,$tokentgc = null)
         $query = $this->db->get();
         $datos = $query->row();
 
-        if (count($datos) == 0) { // nuevo proveedor no existe
+        if (is_null($datos)) { // nuevo proveedor no existe
 
             if ($array_datos['idunidadmedida'] == 0) {
                 $data = array(
@@ -2459,7 +2459,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('c.active = 1');
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nueva comunidad no existe
+        if (is_null($datos)) { // nueva comunidad no existe
             if ($array_datos['idcomunidad'] == 0) {
                 $data = array(
                     'nombre' => $array_datos['comunidad'],
@@ -2628,7 +2628,7 @@ public function accept_payprop($token = null,$tokentgc = null)
         $datos = $query->row();
         //echo "<pre>";
         //print_r($array_datos); exit;
-        if (count($datos) == 0) { // propiedad no existe
+        if (is_null($datos)) { // propiedad no existe
             if ($array_datos['idpropiedad'] == 0) {
                 $data = array(
                     'idcomunidad' => $array_datos['comunidad'],
@@ -2898,7 +2898,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('p.idcomunidad', strtoupper($array_datos['idcomunidad']));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // propiedad no existe
+        if (is_null($datos)) { // propiedad no existe
             if ($array_datos['idbodega'] == 0) {
                 $data = array(
                     'idpropiedad' => $array_datos['idpropiedad'],
@@ -3007,7 +3007,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('p.idcomunidad', strtoupper($array_datos['idcomunidad']));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // propiedad no existe
+        if (is_null($datos)) { // propiedad no existe
             if ($array_datos['idestacionamiento'] == 0) {
                 $data = array(
                     'idpropiedad' => $array_datos['idpropiedad'],
@@ -3099,7 +3099,7 @@ public function accept_payprop($token = null,$tokentgc = null)
             ->where('e.idcomunidad', strtoupper($array_datos['idcomunidad']));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // propiedad no existe
+        if (is_null($datos)) { // propiedad no existe
             if ($array_datos['idestacionamiento'] == 0) {
                 $data = array(
                     'idcomunidad' => $array_datos['idcomunidad'],

@@ -251,7 +251,7 @@ class Remuneracion extends CI_Model
             ->where('(idcomunidad = ' . $this->session->userdata('comunidadid') . ' or idcomunidad is null)');
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nuevo proveedor no existe
+        if (is_null($datos)) { // nuevo proveedor no existe
             if ($array_datos['idcargo'] == 0) {
                 $data = array(
                     'nombre' => $array_datos['cargo'],
@@ -742,7 +742,7 @@ class Remuneracion extends CI_Model
             ->where('p.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nuevo trabajador no existe
+        if (is_null($datos)) { // nuevo trabajador no existe
             if ($idtrabajador == 0) {
                 $array_datos['created_at'] = date('Y-m-d H:i:s');
                 $this->db->insert('gc_personal', $array_datos);
@@ -4421,7 +4421,7 @@ public function lre($datos_remuneracion,$periodo)
 
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nueva afp  no existe
+        if (is_null($datos)) { // nueva afp  no existe
             if ($array_datos['idafp'] == 0) {
                 $data = array(
                     'nombre' => $array_datos['nombre'],
@@ -4492,7 +4492,7 @@ public function lre($datos_remuneracion,$periodo)
 
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nueva afp  no existe
+        if (is_null($datos)) { // nueva afp  no existe
             if ($array_datos['idisapre'] == 0) {
                 $data = array(
                     'nombre' => $array_datos['nombre']
@@ -4541,7 +4541,7 @@ public function lre($datos_remuneracion,$periodo)
 
         $query = $this->db->get();
         $datos = $query->row();
-        if (count($datos) == 0) { // nueva afp  no existe
+        if (is_null($datos)) { // nueva afp  no existe
             if ($array_datos['idferiado'] == 0) {
                 $data = array(
                     'fecha' => $array_datos['fecha']

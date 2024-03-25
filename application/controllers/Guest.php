@@ -354,7 +354,7 @@ class Guest extends CI_Controller {
 
 
 			$datos_propiedad = $this->admin->get_prop_comunidad_guest($idpropiedad,$idcomunidad);
-			if(count($datos_propiedad) == 0){
+			if(is_null($datos_propiedad)){
 				redirect('main/dashboard/');
 			}
 

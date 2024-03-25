@@ -1000,7 +1000,7 @@ class Contabilidad_model extends CI_Model
 		#obtengo balance del periodo para la comunidad (me aseguro que sea un periodo ya calculado y no aprobado)
 		$balance = $this->get_balances_pendientes($idperiodo);
 
-		if(count($balance) > 0){ // SÓLO REALIZA REVERSA EN CASO DE QUE EL PERÍODO CORRESPONDA
+		if(!is_null($balance)){ // SÓLO REALIZA REVERSA EN CASO DE QUE EL PERÍODO CORRESPONDA
 
 			#BORRAMOS EL DETALLE POR CUENTA
 			$this->db->where('idcomunidad',$this->session->userdata('comunidadid'));
@@ -1229,7 +1229,7 @@ class Contabilidad_model extends CI_Model
 				$this->load->model('payment');
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
 
-				if(count($ultimo_balance) > 0){
+				if(!is_null($ultimo_balance)){
 					$fec_corte_anterior = $ultimo_balance->corte_sgte;
 				}else{
 					$fec_corte_anterior = '2010-01-01';
@@ -1356,7 +1356,7 @@ class Contabilidad_model extends CI_Model
 				$data[0] = $this->account->get_activo_fijo_impago_by_id();
 
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				$data[1] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,9) : $this->get_saldos_cuentas_inic(9);
+				$data[1] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,9) : $this->get_saldos_cuentas_inic(9);
 
 
 				break;	
@@ -1391,15 +1391,15 @@ class Contabilidad_model extends CI_Model
 				break;										
 			case 24: #INGRESOS NO IDENTIFICADOS
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				if(count($ultimo_balance) > 0){
+				if(!is_null($ultimo_balance)){
 					$data[0] = $this->get_ingresos_no_contabilizados_by_periodo($idperiodo); //INGRESADOS
 					$data[1] = $this->get_ingresos_no_contabilizados_by_periodo($idperiodo,true); //ELIMINADOS
-					$data[2] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,24) : $this->get_saldos_cuentas_inic(24);				
+					$data[2] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,24) : $this->get_saldos_cuentas_inic(24);				
 				}else{
 					$data[0] = $this->get_ingresos_no_contabilizados_by_periodo(); //INGRESADOS
 					$data[1] = $this->get_ingresos_no_contabilizados_by_periodo(null,true); //ELIMINADOS
 					//$data[1] = array();
-					$data[2] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,24) : $this->get_saldos_cuentas_inic(24);				
+					$data[2] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,24) : $this->get_saldos_cuentas_inic(24);				
 				}
 				break;	
 			case 14: #FONDO DE RESERVA
@@ -1408,7 +1408,7 @@ class Contabilidad_model extends CI_Model
 				$this->load->model('payment');
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
 
-				if(count($ultimo_balance) > 0){
+				if(!is_null($ultimo_balance)){
 					$fec_corte_anterior = $ultimo_balance->corte;
 				}else{
 					$fec_corte_anterior = '2010-01-01';
@@ -1431,7 +1431,7 @@ class Contabilidad_model extends CI_Model
 
 				$data[0] = $query->result();
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				$data[1] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,16) : $this->get_saldos_cuentas_inic(16);				
+				$data[1] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,16) : $this->get_saldos_cuentas_inic(16);				
 				break;					
 			case 21: #FONDO DE RESERVA - INTERESES
 
@@ -1449,7 +1449,7 @@ class Contabilidad_model extends CI_Model
 				$data[0] = $query->result();
 
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				$data[1] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,21) : $this->get_saldos_cuentas_inic(21);
+				$data[1] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,21) : $this->get_saldos_cuentas_inic(21);
 				break;	
 			case 22: #FONDO DE RESERVA - OTROS COBROS
 				$query = $this->db->query('select p.numero, p.responsable, p.prorrateo,
@@ -1461,7 +1461,7 @@ class Contabilidad_model extends CI_Model
 										where p.idcomunidad = ' . $this->session->userdata('comunidadid'));
 				$data[0] = $query->result();
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				$data[1] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,22) : $this->get_saldos_cuentas_inic(22);				
+				$data[1] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,22) : $this->get_saldos_cuentas_inic(22);				
 				break;								
 			case 17: #EXCEDENTES ACUMULADOS
 
@@ -1481,7 +1481,7 @@ class Contabilidad_model extends CI_Model
 				$data[1] = array('deuda' => $this->payment->get_ggcc_by_periodo($idperiodo,'D'),
 								 'fr' => $this->payment->get_ggcc_by_periodo($idperiodo,'FR'));
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
-				$data[2] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,17) : $this->get_saldos_cuentas_inic(17);								
+				$data[2] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,17) : $this->get_saldos_cuentas_inic(17);								
 				break;	
 			case 23: #DEPRECIACIÓN ACTIVO FIJO
 				$this->load->model('account');
@@ -1489,7 +1489,7 @@ class Contabilidad_model extends CI_Model
 
 				$ultimo_balance = $this->get_ultimo_balance($idperiodo);
 				#SE TOMA EL SALDO ANTERIOR DE LA DEPRECIACIÓN ACUMULADA, YA QUE TIENEN EL MISMO VALOR 
-				$data[1] = count($ultimo_balance) > 0 ? $this->get_cuentas_balance($ultimo_balance->idperiodo,9) : $this->get_saldos_cuentas_inic(9);				
+				$data[1] = !is_null($ultimo_balance) ? $this->get_cuentas_balance($ultimo_balance->idperiodo,9) : $this->get_saldos_cuentas_inic(9);				
 				break;								
 			default:
 				break;

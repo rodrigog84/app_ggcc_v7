@@ -298,7 +298,7 @@ class Comunity_model extends CI_Model
             $query = $this->db->get();
             $registros = $query->num_rows() == 1 ? $query->row() : $query->result();
 
-            if (count($registros) > 0) {
+            if (!is_null($registros)) {
                 $this->db->where('idcomunidad', $idcomunidad)
                     ->where('active', 0)
                     ->delete('gc_libro_visitas');
@@ -324,7 +324,7 @@ class Comunity_model extends CI_Model
             $query = $this->db->get();
             $bitacoras = $query->num_rows() == 1 ? $query->row() : $query->result();
 
-            if (count($bitacoras) > 0) {
+            if (!is_null($bitacoras)) {
                 $this->db->where('idcomunidad', $idcomunidad)
                     ->where('active', 0)
                     ->delete('gc_libro_novedades');

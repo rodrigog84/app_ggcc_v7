@@ -371,6 +371,7 @@ class Accounts extends CI_Controller {
 			$this->load->model('account');
 
 			$existe = $tipodoc == 13 ? false : $this->account->valida_existe_cuenta_cuotas($proveedor,$tipodoc,$documento,$idcuenta);
+			$data = array();
 			if($existe){
 				$data['result'] = "error";
 				$data['fields']['documento'] = "Ya existe el documento indicado para el proveedor";	
@@ -407,6 +408,7 @@ class Accounts extends CI_Controller {
 
 			$this->load->model('account');
 			$existe = $this->account->valida_existe_ingreso($proveedor,$tipodoc,$documento,$idingreso);
+			$data = array();
 			if($existe){
 				$data['result'] = "error";
 				$data['fields']['documento'] = "Ya existe el documento indicado para el proveedor";	

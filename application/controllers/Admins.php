@@ -4440,6 +4440,7 @@ class Admins extends CI_Controller
 
             $this->load->model('admin');
             $existe = $this->admin->valida_existe_mail($email, $iduser);
+            $data = array();
             if ($existe) {
                 $data['result'] = "error";
                 $data['fields']['email'] = "Email ya est&aacute; asociado a otro usuario.    Favor contactar con el administrador";
@@ -4470,7 +4471,7 @@ class Admins extends CI_Controller
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
             $result = $this->ion_auth->hash_password_db($this->session->userdata('user_id'), $this->input->post('password_actual'));
-
+            $data = array();
             if (!$result) {
                 $data['result'] = "error";
                 $data['fields']['password_actual'] = "Clave actual es incorrecta";
@@ -4506,6 +4507,7 @@ class Admins extends CI_Controller
 
             $this->load->model('admin');
             $existe = $this->admin->valida_existe_propiedad($comunidadid, $numpropiedad, $idpropiedad);
+            $data = array();
             if ($existe) {
                 $data['result'] = "error";
                 $data['fields']['numpropiedad'] = "Propiedad ya existe en la comunidad";

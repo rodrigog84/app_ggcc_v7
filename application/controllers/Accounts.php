@@ -1999,7 +1999,7 @@ class Accounts extends CI_Controller {
 			}
 
 
-
+			$data = array();
 			if(count($array_cuentas_autorizadas) == 0 && count($array_ingresos_autorizados) == 0){
 				$data['result'] = "error";
 				$data['fields']['periodo'] = "Debe autorizar al menos una cuenta y/o ingreso";	

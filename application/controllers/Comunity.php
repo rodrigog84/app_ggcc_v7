@@ -59,8 +59,9 @@ class Comunity extends CI_Controller
             $datospublicacion = $this->payment->get_ggcc_publicacion_by_comunidad($this->session->userdata('comunidadid'));
 
 
-            //$pendiente_publicacion = count($datospublicacion) > 0 ? true : false;
-            $pendiente_publicacion = !is_null($datospublicacion) ? true : false;
+            $pendiente_publicacion = count($datospublicacion) > 0 ? true : false;
+            //$pendiente_publicacion = !is_null($datospublicacion) ? true : false;
+            //var_dump($pendiente_publicacion); exit;
 
             $content = array(
                 'menu' => 'Gasto Com&uacute;n',

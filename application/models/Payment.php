@@ -449,7 +449,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 				$query = $this->db->get();
 				$ggcc_propiedad = $query->row();
 
-				$monto = count($ggcc_propiedad) == 0 ? 0 : $monto;
+				$monto = is_null($ggcc_propiedad) ? 0 : $monto;
 
 			}else{ // abona a periodo
 
@@ -620,7 +620,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 						                  ->limit(1);
 						$query = $this->db->get();
 						$ggcc_propiedad = $query->row();
-						if(count($ggcc_propiedad) == 0 && $monto > 0){  //QUEDA UN SALDO POSITIVO (SE GENERA UN ABONO SIN PERIODO)
+						if(is_null($ggcc_propiedad) && $monto > 0){  //QUEDA UN SALDO POSITIVO (SE GENERA UN ABONO SIN PERIODO)
 
 
 							$data = array(
@@ -669,7 +669,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 
 						}
 
-						$monto = count($ggcc_propiedad) == 0 ? 0 : $monto;
+						$monto = is_null($ggcc_propiedad) ? 0 : $monto;
 					}
 
 
@@ -955,7 +955,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		$query = $this->db->get();
 		$datos = $query->row();
 
-		return count($query->row()) == 0 ? 0 : $datos->monto;
+		return is_null($query->row()) ? 0 : $datos->monto;
 
 	}		
 
@@ -1152,7 +1152,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		                  ->where('pe.publica is not null');		
 		$query = $this->db->get();
 		$datos = $query->row();
-		if(count($datos) == 0){ //se valida de que gasto comun no se ha prorrateado
+		if(is_null($datos)){ //se valida de que gasto comun no se ha prorrateado
 
 
 			$this->db->where('idcomunidad', $this->session->userdata('comunidadid'));	
@@ -1213,7 +1213,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 			$datos_fr = $query->row();
 
 
-			if(count($datos_fr) > 0){ // SI TIENE FONDO DE RESERVA, DEBEN ELIMINARSE LOS DATOS
+			if(!is_null($datos_fr)){ // SI TIENE FONDO DE RESERVA, DEBEN ELIMINARSE LOS DATOS
 				$monto_fr = $datos_fr->monto;
 				$idggcc_fr = $datos_fr->id;
 
@@ -1422,7 +1422,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		                  ->where('pe.genera is not null');		
 		$query = $this->db->get();
 		$datos = $query->row();
-		if(count($datos) == 0){ //se valida de que gasto comun no se ha prorrateado
+		if(is_null($datos)){ //se valida de que gasto comun no se ha prorrateado
 
 			$monto = $ggcc_comunidad->monto;
 
@@ -1514,7 +1514,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 
 					#LA IDEA ES CALCULAR EL INTERÉS SOBRE LA DEUDA EXISTENTE AL VENCIMIENTO DEL GASTO COMUN ANTERIOR
 
-					if(count($ultimo_periodo) > 0){ // sólo si existen periodos previos se calcula
+					if(!is_null($ultimo_periodo)){ // sólo si existen periodos previos se calcula
 							$id_periodo_int = $ultimo_periodo->idperiodo;
 							$monto_int = $ultimo_periodo->monto;
 							$saldo_int = $ultimo_periodo->saldo;

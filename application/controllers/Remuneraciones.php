@@ -727,6 +727,7 @@ class Remuneraciones extends CI_Controller
             $valor_hora = $parametros_generales->sueldominimo / 45;
             $sueldominimo_proporcional = (int)($valor_hora * $horassemanales);
 
+            $data = array();
             if ($parttime == 'on') {
                 $data['result'] = "ok";
             } else {

@@ -313,7 +313,7 @@ class Payments extends CI_Controller {
 			$this->load->model('account');
 			$abono_data = $this->account->get_listado_abono_by_id($idingreso);
 
-			if(count($abono_data) > 0){
+			if(!is_null($abono_data)){
 				$this->load->model('payment');
 				$datosdetalle = $this->payment->generar_ingreso($idpropiedad,$idingreso);						
 			}else{
@@ -462,7 +462,7 @@ class Payments extends CI_Controller {
 
 				$this->load->model('payment');
 				$propiedades = $this->payment->get_propiedad_by_periodo($idperiodo);
-				if(count($propiedades) == 0){ // SI NO ENCUENTRO NINGUNA PROPIEDAD (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
+				if(is_null($propiedades)){ // SI NO ENCUENTRO NINGUNA PROPIEDAD (CORRESPONDE A OTRA COMUNIDAD POR EJEMPLO)
 					redirect('main/dashboard/');
 				}else{
 					$datosdetalle = $this->payment->comprobantes($propiedades,$idperiodo);

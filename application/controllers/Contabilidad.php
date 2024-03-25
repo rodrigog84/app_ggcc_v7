@@ -56,8 +56,8 @@ class Contabilidad extends CI_Controller {
 
 
 			$balances = $this->contabilidad->get_balances();
-			//$tiene_balance = count($balances) > 0 ? true : false;
-			$tiene_balance = !is_null($balances) ? true : false;
+			$tiene_balance = count($balances) > 0 ? true : false;
+			//$tiene_balance = !is_null($balances) ? true : false;
 
 
 			$content = array(
@@ -111,8 +111,8 @@ class Contabilidad extends CI_Controller {
 
 
 			$balances = $this->contabilidad->get_balances();
-			//$tiene_balance = count($balances) > 0 ? true : false;
-			$tiene_balance = !is_null($balances) ? true : false;
+			$tiene_balance = count($balances) > 0 ? true : false;
+			//$tiene_balance = !is_null($balances) ? true : false;
 
 
 			$content = array(

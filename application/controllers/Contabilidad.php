@@ -56,7 +56,8 @@ class Contabilidad extends CI_Controller {
 
 
 			$balances = $this->contabilidad->get_balances();
-			$tiene_balance = count($balances) > 0 ? true : false;
+			//$tiene_balance = count($balances) > 0 ? true : false;
+			$tiene_balance = !is_null($balances) ? true : false;
 
 
 			$content = array(
@@ -110,7 +111,8 @@ class Contabilidad extends CI_Controller {
 
 
 			$balances = $this->contabilidad->get_balances();
-			$tiene_balance = count($balances) > 0 ? true : false;
+			//$tiene_balance = count($balances) > 0 ? true : false;
+			$tiene_balance = !is_null($balances) ? true : false;
 
 
 			$content = array(
@@ -279,7 +281,7 @@ class Contabilidad extends CI_Controller {
 
 			
 			$balances = $this->contabilidad->get_balances_pendientes(); 
-			if(count($balances) > 0){
+			if(!is_null($balances)){
 				$this->session->set_flashdata('balance_result', 3);
 				redirect('contabilidad/generar_balance');				
 			}
@@ -334,7 +336,7 @@ class Contabilidad extends CI_Controller {
 			$this->load->model('contabilidad_model','contabilidad');
 
 			$balance = $this->contabilidad->get_balances($idperiodo);
-			if(count($balance) == 0){
+			if(is_null($balance)){
 				$this->session->set_flashdata('balance_result', 5);
 				redirect('contabilidad/generar_balance/');							
 			}
@@ -990,7 +992,7 @@ class Contabilidad extends CI_Controller {
 
 			}else{
 				$ingreso = $this->contabilidad->get_ingresos_no_contabilizados($idingreso);
-				if(count($ingreso) == 0){
+				if(is_null($ingreso)){
 					$this->session->set_flashdata('ingresos_no_contabilizados_result', 4);
 					redirect('contabilidad/ingresos_no_contabilizados');		
 				}else{

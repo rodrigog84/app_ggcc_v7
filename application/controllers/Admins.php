@@ -2028,6 +2028,7 @@ class Admins extends CI_Controller
 
             $this->load->model('admin');
             $propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
+
             $lista_email = $this->admin->get_propiedad_email_by_id($idpropiedad);
 
             $array_email = array();
@@ -2048,13 +2049,14 @@ class Admins extends CI_Controller
                 'subtitle' => 'Administraci&oacute;n de Propiedades'
             );
 
+
             $datos_form = array(
                 'idpropiedad' => is_null($propiedad) ? 0 : $propiedad->id,
-                'idcomunidad' => is_null($propiedad) == 0 ? '' : $propiedad->idcomunidad,
-                'numero' => is_null($propiedad) == 0 ? '' : $propiedad->numero,
-                'direccion' => is_null($propiedad) == 0 ? '' : $propiedad->direccion,
-                'responsable' => is_null($propiedad) == 0 ? '' : $propiedad->responsable,
-                'rutresponsable' => is_null($propiedad) == 0 ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
+                'idcomunidad' => is_null($propiedad) ? '' : $propiedad->idcomunidad,
+                'numero' => is_null($propiedad)  ? '' : $propiedad->numero,
+                'direccion' => is_null($propiedad) ? '' : $propiedad->direccion,
+                'responsable' => is_null($propiedad) ? '' : $propiedad->responsable,
+                'rutresponsable' => is_null($propiedad) ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
                 'mail' => is_null($propiedad) ? '' : $propiedad->mail,
                 'fono' => is_null($propiedad) ? '' : $propiedad->fono,
                 'suscrito' => is_null($propiedad) ? '' : $propiedad->suscrito,
@@ -2062,6 +2064,8 @@ class Admins extends CI_Controller
                 'saldo' => is_null($propiedad) ? '' : $propiedad->saldo_publicado,
                 'saldoinicial' => is_null($propiedad) ? 0 : $propiedad->saldoinicial
             );
+
+
 
             $vars['content_menu'] = $content;
             $vars['propiedad'] = $propiedad;

@@ -4176,7 +4176,7 @@ class Admins extends CI_Controller
                 if (isset($user->level)) {
                     if ($user->level == 1) {
                         $lista_comunidad = $this->admin->comunidades_asignadas($user->id, $user->level);
-                        if (count($lista_comunidad) == 1) {
+                        if (isset($lista_comunidad->id)) {
                             array_push($array_comunidades, $lista_comunidad->id);
                         } else if (count($lista_comunidad) > 1) {
                             foreach ($lista_comunidad as $comunidad) {
@@ -4195,7 +4195,7 @@ class Admins extends CI_Controller
                 if (isset($user->level)) {
                     if ($user->level == 3 || $user->level == 2) {
                         $propiedades = $this->admin->propiedades_asignadas($user->id);
-                        if (count($propiedades) == 1) {
+                        if (isset($propiedades->id)) {
                             array_push($array_propiedades, array(
                                 'idcomunidad' => $propiedades->idcomunidad,
                                 'idpropiedad' => $propiedades->id

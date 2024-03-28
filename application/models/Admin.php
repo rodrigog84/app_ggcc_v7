@@ -3692,7 +3692,7 @@ public function accept_payprop($token = null,$tokentgc = null)
         $query = $this->db->get();
         $usuario = $query->row();
 
-        return count($usuario) > 0 ? $usuario : false;
+        return !is_null($usuario) ? $usuario : false;
     }
 
     public function valida_existe_mail_personal($email)
@@ -3954,6 +3954,8 @@ public function envia_mail($from, $toList, $subject, $content, $type, $alias = "
                              'to' => [['email' => $destiny]],
                              'htmlContent' => $content
                         ]);                     
+
+                         
 
                         $array_attachments = array();
                         if(!is_null($attachments)){

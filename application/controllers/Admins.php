@@ -2029,6 +2029,8 @@ class Admins extends CI_Controller
             $this->load->model('admin');
             $propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
 
+           // var_dump(count($propiedad)); //exit;
+
             $lista_email = $this->admin->get_propiedad_email_by_id($idpropiedad);
 
             $array_email = array();
@@ -2051,18 +2053,18 @@ class Admins extends CI_Controller
 
 
             $datos_form = array(
-                'idpropiedad' => is_null($propiedad) ? 0 : $propiedad->id,
-                'idcomunidad' => is_null($propiedad) ? '' : $propiedad->idcomunidad,
-                'numero' => is_null($propiedad)  ? '' : $propiedad->numero,
-                'direccion' => is_null($propiedad) ? '' : $propiedad->direccion,
-                'responsable' => is_null($propiedad) ? '' : $propiedad->responsable,
-                'rutresponsable' => is_null($propiedad) ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
-                'mail' => is_null($propiedad) ? '' : $propiedad->mail,
-                'fono' => is_null($propiedad) ? '' : $propiedad->fono,
-                'suscrito' => is_null($propiedad) ? '' : $propiedad->suscrito,
-                'prorrateo' => is_null($propiedad) ? '' : $propiedad->prorrateo_propiedad,
-                'saldo' => is_null($propiedad) ? '' : $propiedad->saldo_publicado,
-                'saldoinicial' => is_null($propiedad) ? 0 : $propiedad->saldoinicial
+                'idpropiedad' => count($propiedad) == 0 ? 0 : $propiedad->id,
+                'idcomunidad' => count($propiedad) == 0 ? '' : $propiedad->idcomunidad,
+                'numero' => count($propiedad) == 0  ? '' : $propiedad->numero,
+                'direccion' => count($propiedad) == 0 ? '' : $propiedad->direccion,
+                'responsable' => count($propiedad) == 0 ? '' : $propiedad->responsable,
+                'rutresponsable' => count($propiedad) == 0 ? "" : number_format($propiedad->rutresponsable, 0, ".", ".") . "-" . $propiedad->dvresponsable,
+                'mail' => count($propiedad) == 0 ? '' : $propiedad->mail,
+                'fono' => count($propiedad) == 0 ? '' : $propiedad->fono,
+                'suscrito' => count($propiedad) == 0 ? '' : $propiedad->suscrito,
+                'prorrateo' => count($propiedad) == 0 ? '' : $propiedad->prorrateo_propiedad,
+                'saldo' => count($propiedad) == 0 ? '' : $propiedad->saldo_publicado,
+                'saldoinicial' => count($propiedad) == 0 ? 0 : $propiedad->saldoinicial
             );
 
 

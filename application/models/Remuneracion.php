@@ -5107,6 +5107,7 @@ public function lre($datos_remuneracion,$periodo)
             ->join('gc_periodo pe', 'r.idperiodo = pe.id')
             ->where('p.idcomunidad', $this->session->userdata('comunidadid'))
             ->where('pe.anno', $anno)
+            ->where('r.active', 1)
             ->group_by('p.id')
             ->order_by('p.nombre');
 

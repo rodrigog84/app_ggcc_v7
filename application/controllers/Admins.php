@@ -2338,9 +2338,9 @@ class Admins extends CI_Controller
                     $error_carga = false;
 
 
-                    if ($extension != '.xls') {
+                    if ($extension != '.csv') {
                         $error_carga = true;
-                        $msg = "Archivo debe tener formato xls";
+                        $msg = "Archivo debe tener formato csv";
 
                         $vars['message'] = $msg;
                         $vars['classmessage'] = 'danger';
@@ -2352,118 +2352,111 @@ class Admins extends CI_Controller
 
                         /******* LECTURA DE EXCEL ********/
 
-                        $this->load->library('PHPExcel');
-                        //read file from path
-                        $objPHPExcel = PHPExcel_IOFactory::load($config['upload_path'] . $dataupload['orig_name']);
-                        //get only the Cell Collection
-                        $cell_collection = $objPHPExcel->getActiveSheet()->getCellCollection();
+                          $fila = 1;
+                          $encabezado = true;
+                          if (($gestor = fopen($config['upload_path'] . $dataupload['orig_name'], "r")) !== FALSE) {
+                              while (($datos = fgetcsv($gestor, 0, ";")) !== FALSE) {
 
-                        //extract to a PHP readable array format
-                        foreach ($cell_collection as $cell) {
-                            $column = $objPHPExcel->getActiveSheet()->getCell($cell)->getColumn();
-                            $row = $objPHPExcel->getActiveSheet()->getCell($cell)->getRow();
-                            $data_value = $objPHPExcel->getActiveSheet()->getCell($cell)->getValue();
-                            //header will/should be in row 1 only. of course this can be modified to suit your need.
-                            if ($row == 1) {
-                                $header[$row][$column] = $data_value;
-                            } else {
-                                $arr_data[$row][$column] = $data_value;
-                            }
-                        }
-                        $fila = 2;
+                                $numero = count($datos);
 
+                                if(!$encabezado){
 
-                        $dato_error = "";
-                        $tipo_error = "";
-                        foreach ($arr_data as $propiedad) {
-                            //print_r($propiedad);
-                            $numpropiedad = isset($propiedad['A']) ? $propiedad['A'] : "";
-                            $direccion = isset($propiedad['B']) ? $propiedad['B'] : "";
-                            $nombre_responsable =  isset($propiedad['C']) ? $propiedad['C'] : "";
-                            $apellido_responsable = isset($propiedad['D']) ? $propiedad['D'] : "";
-                            $email = isset($propiedad['E']) ? trim($propiedad['E']) : "";
-                            $fono = isset($propiedad['F']) ? $propiedad['F'] : 0;
+                                    $numpropiedad = isset($datos[0]) ? $datos[0] : "";
+                                    $direccion = isset($datos[1]) ? $datos[1] : "";
+                                    $nombre_responsable =  isset($datos[2]) ? $datos[2] : "";
+                                    $apellido_responsable = isset($datos[3]) ? $datos[3] : "";
+                                    $email = isset($datos[4]) ? trim($datos[4]) : "";
+                                    $fono = isset($datos[5]) ? $datos[5] : 0;
 
-                            //var_dump(is_numeric($propiedad['G']));
-                            //echo "<br>";
-
-                            $prorrateo = isset($propiedad['G']) ? (float)$propiedad['G'] : "";
-                            $saldo_inicial = isset($propiedad['H']) ? (int)$propiedad['H'] : "";
-                            if (isset($propiedad['I'])) {
-                                $suscrito = strtoupper($propiedad['I']) == 'SI' ? 'SI' : 'NO';
-                            }
+                                    $prorrateo = isset($datos[6]) ? (float)str_replace(',', '.',$datos[6]) : "";
+                                    $saldo_inicial = isset($datos[7]) ? (int)$datos[7] : "";
+                                    if (isset($datos[8])) {
+                                        $suscrito = strtoupper($datos[8]) == 'SI' ? 'SI' : 'NO';
+                                    }
 
 
-                            $email = $email == '' ? 'sincorreo@notiene.cl' : $email;
-                            $ingresa = 1;
-                            //echo $fila . " : " ;
 
-                            if ($numpropiedad == '') {
-                                $error_carga = true;
-                                $dato_error = "N&uacute;mero Propiedad";
-                                $tipo_error = "es requerido";
-                            } else if ($nombre_responsable == '') {
-                                $error_carga = true;
-                                $dato_error = "Nombre Responsable";
-                                $tipo_error = "es requerido";
-                            } else if ($email == '') {
-                                $error_carga = true;
-                                $dato_error = "Email";
-                                $tipo_error = "es requerido";
-                            } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { // se valida q sea email
-                                $error_carga = true;
-                                $dato_error = "Email";
-                                $tipo_error = "no es un email v&aacute;lido";
-                            } else if (!is_numeric($propiedad['G'])) {
-                                $error_carga = true;
-                                $dato_error = "Prorrateo";
-                                $tipo_error = "debe ser num&eacute;rico";
-                            } else if ($prorrateo == '' && $prorrateo != '0') {
+                                    $email = $email == '' ? 'sincorreo@notiene.cl' : $email;
+                                    $ingresa = 1;
 
-                                $error_carga = true;
-                                $dato_error = "Prorrateo";
-                                $tipo_error = "es requerido";
-                            } else if (!is_numeric($propiedad['H'])) {
-                                $error_carga = true;
-                                $dato_error = "Saldo Inicial";
-                                $tipo_error = "debe ser num&eacute;rico";
-                            } else if ($saldo_inicial === '') {
-                                $error_carga = true;
-                                $dato_error = "Saldo Inicial";
-                                $tipo_error = "es requerido";
-                            } else if (strtoupper($propiedad['I']) != 'SI' && strtoupper($propiedad['I']) != 'NO') {
-                                $error_carga = true;
-                                $dato_error = "Suscrito";
-                                $tipo_error = "debe indicar SI o NO";
-                            } else if ($suscrito == '') {
-                                $error_carga = true;
-                                $dato_error = "Suscrito";
-                                $tipo_error = "es requerido";
-                            }
-     
-                            if ($error_carga) {
-                                $msg = "Error en fila " . $fila . ": Campo '" . $dato_error . "' " . $tipo_error;
+                                    if ($numpropiedad == '') {
+                                        $error_carga = true;
+                                        $dato_error = "N&uacute;mero Propiedad";
+                                        $tipo_error = "es requerido";
+                                    } else if ($nombre_responsable == '') {
+                                        $error_carga = true;
+                                        $dato_error = "Nombre Responsable";
+                                        $tipo_error = "es requerido";
+                                    } else if ($email == '') {
+                                        $error_carga = true;
+                                        $dato_error = "Email";
+                                        $tipo_error = "es requerido";
+                                    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) { 
+                                        $error_carga = true;
+                                        $dato_error = "Email";
+                                        $tipo_error = "no es un email v&aacute;lido";
 
-                                $vars['message'] = $msg;
-                                $vars['classmessage'] = 'danger';
-                                $vars['icon'] = 'fa-ban';
-                                break;
-                            } else {
-                                $array_datos = array(
-                                    'propiedad' => $numpropiedad,
-                                    'direccion' => $direccion,
-                                    'nombre_responsable' => $nombre_responsable,
-                                    'apellido_responsable' => $apellido_responsable,
-                                    'email' => $email,
-                                    'fono' => $fono,
-                                    'prorrateo' => $prorrateo,
-                                    'saldo' => $saldo_inicial,
-                                    'suscrito' => $suscrito
-                                );
-                                array_push($lista_prop_sin_confirmar, $array_datos);
-                                $fila++;
-                            }
-                        }
+                                        
+                                    } else if (!is_numeric($prorrateo)) {
+                                        $error_carga = true;
+                                        $dato_error = "Prorrateo";
+                                        $tipo_error = "debe ser num&eacute;rico";
+
+                                    } else if ($prorrateo == '' && $prorrateo != '0') {
+
+                                        $error_carga = true;
+                                        $dato_error = "Prorrateo";
+                                        $tipo_error = "es requerido";
+                                    } else if (!is_numeric($datos[7])) {
+                                        $error_carga = true;
+                                        $dato_error = "Saldo Inicial";
+                                        $tipo_error = "debe ser num&eacute;rico";
+                                    } else if ($saldo_inicial === '') {
+                                        $error_carga = true;
+                                        $dato_error = "Saldo Inicial";
+                                        $tipo_error = "es requerido";
+                                    } else if (strtoupper($datos[8]) != 'SI' && strtoupper($datos[8]) != 'NO') {
+                                        $error_carga = true;
+                                        $dato_error = "Suscrito";
+                                        $tipo_error = "debe indicar SI o NO";
+                                    } else if ($suscrito == '') {
+                                        $error_carga = true;
+                                        $dato_error = "Suscrito";
+                                        $tipo_error = "es requerido";
+                                    }
+
+
+                                    if ($error_carga) {
+                                        $msg = "Error en fila " . $fila . ": Campo '" . $dato_error . "' " . $tipo_error;
+
+                                        $vars['message'] = $msg;
+                                        $vars['classmessage'] = 'danger';
+                                        $vars['icon'] = 'fa-ban';
+                                        break;
+                                    } else {
+                                        $array_datos = array(
+                                            'propiedad' => $numpropiedad,
+                                            'direccion' => $direccion,
+                                            'nombre_responsable' => $nombre_responsable,
+                                            'apellido_responsable' => $apellido_responsable,
+                                            'email' => $email,
+                                            'fono' => $fono,
+                                            'prorrateo' => $prorrateo,
+                                            'saldo' => $saldo_inicial,
+                                            'suscrito' => $suscrito
+                                        );
+                                        array_push($lista_prop_sin_confirmar, $array_datos);
+                                        $fila++;
+                                    }                                    
+
+                                    
+                                }else{
+                                    $encabezado = false;
+                                }
+
+                              }
+                          }
+
                     }
 
                     $lista_prop_sin_confirmar = $error_carga ? array() : $lista_prop_sin_confirmar;
@@ -2532,10 +2525,14 @@ class Admins extends CI_Controller
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
             $arr_data = $this->session->flashdata('lista_prop_sin_confirmar');
+
             $lista_propiedades = array();
             $lista_usuarios = array();
             /******** ANALISIS DE DATOS************/
             foreach ($arr_data as $propiedad) {
+
+
+
                 $array_email = array();
                 $numpropiedad = $propiedad['propiedad'];
                 $direccion = $propiedad['direccion'];
@@ -2557,7 +2554,9 @@ class Admins extends CI_Controller
                     'prorrateo' => $prorrateo,
                     'saldo' => $saldo_inicial,
                     'suscrito' => $suscrito,
-                    'idpropiedad' => 0
+                    'idpropiedad' => 0,
+                    'rutresponsable' => 0,
+                    'dvresponsable' => ''
                 );
 
                 $this->load->model('admin');

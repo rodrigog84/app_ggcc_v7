@@ -2485,7 +2485,7 @@ class Admins extends CI_Controller
                 $lista_propiedades = $this->session->flashdata('lista_propiedades');
                 $lista_usuarios = $this->session->flashdata('lista_usuarios');
                 $comunidad_defecto = $this->session->userdata('comunidadid') != '' ? $this->session->userdata('comunidadid') : 0;
-                if (count($lista_propiedades) > 0) {
+                if (!is_null($lista_propiedades)) {
 
                     $msg = "Propiedades creadas correctamente";
 

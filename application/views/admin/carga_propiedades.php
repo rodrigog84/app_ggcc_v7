@@ -122,7 +122,8 @@
           </div>
           <?php } ?>
 
-          <?php if(count($lista_propiedades) > 0 ){ ?>
+
+          <?php if(!is_null($lista_propiedades)){ ?>
           <br>
           <div class="row">
             
@@ -169,7 +170,7 @@
           <?php } ?>
          
 
-          <?php if(count($lista_usuarios) > 0 ){ ?>
+          <?php if(!is_null($lista_usuarios)){ ?>
           <br>
           <div class="row">
             

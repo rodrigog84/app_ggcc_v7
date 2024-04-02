@@ -3986,7 +3986,7 @@ public function envia_mail($from, $toList, $subject, $content, $type, $alias = "
 
 
                         } catch (Exception $e) {
-                            echo $e->getMessage(),PHP_EOL;
+                            //echo $e->getMessage(),PHP_EOL;
                         }
 
                     }
@@ -4030,7 +4030,7 @@ public function envia_mail($from, $toList, $subject, $content, $type, $alias = "
                             $this->db->insert('gc_log_envio_mail', $data_envio);    
 
                         } catch (Exception $e) {
-                            echo $e->getMessage(),PHP_EOL;
+                            //echo $e->getMessage(),PHP_EOL;
                         }
 
 

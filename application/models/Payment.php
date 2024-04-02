@@ -2285,6 +2285,8 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 
 	private function genera_grafico($ultimos_periodos,$comunidadid,$idpropiedad,$idperiodo){
 
+
+
 		$this->load->library('JpGraph/Graph');
         require_once (APPPATH.'/libraries/JpGraph/jpgraph_bar.php');
         require_once (APPPATH.'/libraries/JpGraph/jpgraph_line.php');
@@ -2416,7 +2418,7 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 					unlink('graph/ggcc/'.$idpropiedad.'/graph_'.$idperiodo.'.png');
 				}
 
-					$this->genera_grafico($ultimos_periodos,$comunidadid,$idpropiedad,$idperiodo);
+					//$this->genera_grafico($ultimos_periodos,$comunidadid,$idpropiedad,$idperiodo);
 				//}			
 			}
 
@@ -4243,6 +4245,7 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 	public function generar_ingreso($idpropiedad,$listado_abonos_id){
 
 
+
 			$this->load->model('admin');
 			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
 
@@ -4294,7 +4297,7 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 
 
 			// SE ALMACENA EL ARCHIVO
-			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_Ingreso_".$idegreso.".pdf";
+			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_Ingreso_".$listado_abonos_id.".pdf";
 			$mpdf->Output($nombre_archivo, "I");
 			
 	}

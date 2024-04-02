@@ -1264,21 +1264,29 @@ class Admin extends CI_Model
             $query = $this->db->get();
             $abonado_saldo_inicial = $query->row();
 
-            if ($abonado_saldo_inicial->abonado > 0) {
-                return 0;
-            } else {
-                $this->db->select('count(*) as cantidad', false)
-                    ->from('gc_ggcc_propiedad as p')
-                    ->where('p.idpropiedad', $idpropiedad)
-                    ->where('p.idperiodo <> 8');
-                $query = $this->db->get();
-                $cant_ggcc = $query->row();
-                if ($cant_ggcc->cantidad > 0) {
+            if(!is_null($abonado_saldo_inicial)){
+                if ($abonado_saldo_inicial->abonado > 0) {
                     return 0;
                 } else {
-                    return 1;
-                }
+                    $this->db->select('count(*) as cantidad', false)
+                        ->from('gc_ggcc_propiedad as p')
+                        ->where('p.idpropiedad', $idpropiedad)
+                        ->where('p.idperiodo <> 8');
+                    $query = $this->db->get();
+                    $cant_ggcc = $query->row();
+                    if ($cant_ggcc->cantidad > 0) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                }    
+            }else{
+
+                return 1;
+                
             }
+
+
         }
     }
 

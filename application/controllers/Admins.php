@@ -72,13 +72,15 @@ class Admins extends CI_Controller
                 'email' => is_null($comunidad) ? '' : $comunidad->email,
                 'saldo' => is_null($comunidad) ? '' : $comunidad->saldo,
                 'caja' => is_null($comunidad) ? '' : $comunidad->caja,
-                'cajainicial' => is_null($comunidad) == 0 ? '' : $comunidad->cajainicial,
-                'fondoreserva' => is_null($comunidad) == 0 ? '' : $comunidad->fondoreserva,
-                'fondoreservainicial' => is_null($comunidad) == 0 ? '' : $comunidad->fondoreservainicial,
+                'cajainicial' => is_null($comunidad) ? '' : $comunidad->cajainicial,
+                'fondoreserva' => is_null($comunidad) ? '' : $comunidad->fondoreserva,
+                'fondoreservainicial' => is_null($comunidad) ? '' : $comunidad->fondoreservainicial,
                 'logo' => is_null($comunidad) ? '' : $comunidad->logo,
                 'firma' => is_null($comunidad) ? '' : $comunidad->firma,
                 'descripcion' => is_null($comunidad) ? '' : $comunidad->obscomprobante,
             );
+
+
 
             $vars['content_menu'] = $content;
             $vars['regiones'] = $regiones;

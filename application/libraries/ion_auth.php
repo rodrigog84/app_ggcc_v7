@@ -127,6 +127,53 @@ class Ion_auth
 	}
 
 
+public function envia_mail($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común", $attachments = null)
+    {
+
+
+                // Configure API key authorization: api-key
+                $credentials = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', 'xkeysib-'.API_KEY_MAIL);
+
+                $apiInstance = new SendinBlue\Client\Api\TransactionalEmailsApi(new GuzzleHttp\Client(),$credentials);
+
+
+                $sendSmtpEmail = new SendinBlue\Client\Model\SendSmtpEmail([
+                     'subject' => $subject,
+                     'sender' => ['name' => $alias, 'email' => $from],
+                     'replyTo' => ['name' => $alias, 'email' => $from],
+                     'to' => [['email' => $toList]],
+                     'htmlContent' => $content
+                ]);
+
+
+                $array_attachments = array();
+                if(!is_null($attachments)){
+                    foreach ($attachments as $attachment) {
+                        $array_archivo = explode('/',$attachment);
+                        $array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment))),'name' => $array_archivo[count($array_archivo)-1]);
+                        array_push($array_attachments,$array_fila);
+                    }
+                        
+                }     
+
+                if(count($array_attachments) > 0){
+                    $sendSmtpEmail['attachment'] = $array_attachments;  
+                }
+                
+                
+
+
+            try {
+                    $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
+
+                } catch (Exception $e) {
+                    //echo $e->getMessage(),PHP_EOL;
+                }
+
+    }
+
+
+
 	/**
 	 * forgotten password feature
 	 *
@@ -136,6 +183,8 @@ class Ion_auth
 	 */
 	public function forgotten_password($identity)    //changed $email to $identity
 	{
+
+		$this->load->model('admin');
 		if ( $this->ion_auth_model->forgotten_password($identity) )   //changed
 		{
 			// Get user information
@@ -163,7 +212,11 @@ class Ion_auth
 					$this->email->subject($this->config->item('site_title', 'ion_auth') . ' - ' . $this->lang->line('email_forgotten_password_subject'));
 					$this->email->message($message);
 
-					if ($this->email->send())
+					$this->envia_mail('robot@tugastocomun.cl', $user->email, 'Reestablecer Contraseña', $message, 'html');
+
+					return TRUE;
+
+					/*if ($this->email->send())
 					{
 						$this->set_message('forgot_password_successful');
 						return TRUE;
@@ -172,7 +225,7 @@ class Ion_auth
 					{
 						$this->set_error('forgot_password_unsuccessful');
 						return FALSE;
-					}
+					}*/
 				}
 			}
 			else

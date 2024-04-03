@@ -69,9 +69,9 @@ $lang['email_activate_subheading'] = 'Please click this link to %s.';
 $lang['email_activate_link']       = 'Activate Your Account';
 // Forgot Password Email
 $lang['email_forgotten_password_subject']    = 'Verificación de contraseña olvidada';
-$lang['email_forgot_password_heading']    = 'Reset Password for %s';
-$lang['email_forgot_password_subheading'] = 'Please click this link to %s.';
-$lang['email_forgot_password_link']       = 'Reset Your Password';
+$lang['email_forgot_password_heading']    = 'Reestablecer contraseña para %s';
+$lang['email_forgot_password_subheading'] = 'Presiona el siguiente link %s.';
+$lang['email_forgot_password_link']       = 'Reestablecer Contraseña';
 // New Password Email
 $lang['email_new_password_subject']          = 'Nueva Contraseña';
 $lang['email_new_password_heading']    = 'New Password for %s';

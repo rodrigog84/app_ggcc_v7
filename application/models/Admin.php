@@ -4144,12 +4144,16 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
                             $result = $apiInstance->sendTransacEmail($sendSmtpEmail);
 
                           $data_envio = array(
-                                'email' => $destiny,
+                                'email' => $toList,
                                 'messageid' => $result['messageId'],
                                 'idcomunidad' => $this->session->userdata('comunidadid')
                             );
 
-                            $this->db->insert('gc_log_envio_mail', $data_envio);    
+                            $this->db->insert('gc_log_envio_mail', $data_envio);   
+
+
+
+
 
                         } catch (Exception $e) {
                             echo $e->getMessage(),PHP_EOL;

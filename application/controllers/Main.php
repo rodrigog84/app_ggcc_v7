@@ -252,7 +252,16 @@ class Main extends CI_Controller
 
 
             $propiedades_asignadas = $unidad_id != '' ? $this->admin->propiedades_asignadas($this->session->userdata('user_id'), $unidad_id) : $this->admin->propiedades_asignadas($this->session->userdata('user_id'));
-            $num_propiedades = count($this->admin->propiedades_asignadas($this->session->userdata('user_id')));
+
+            $propiedades_asignadas2 = $this->admin->propiedades_asignadas($this->session->userdata('user_id'));
+            
+          //  var_dump($propiedades_asignadas2); exit;
+            if(is_array($propiedades_asignadas2)){
+                $num_propiedades = count($propiedades_asignadas2);
+            }else{
+                $num_propiedades = 1;
+            }
+            //$num_propiedades = count($this->admin->propiedades_asignadas($this->session->userdata('user_id')));
            // if (count($propiedades_asignadas) > 1) { // EN CASO DE TENER MÁS DE UNA COMUNIDAD LO ENVÍA A LA PÁGINA DE SELECCIÓN
              if (is_array($propiedades_asignadas)) {
                 $content = array(

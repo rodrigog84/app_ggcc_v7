@@ -3152,7 +3152,7 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 
 
 			// SE ALMACENA EL ARCHIVO
-			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$datos_propiedad->numero.".pdf";
+			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$this->session->userdata('comunidadid').".pdf";
 
 
 

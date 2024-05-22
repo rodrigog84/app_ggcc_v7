@@ -10,7 +10,7 @@
                             <h3 class="box-title"><?php echo $datos_comunicado['txt_encabeza']; ?></h3>
                         </div><!-- /.box-header -->
                         <!-- form start -->
-                        <form id="basicBootstrapForm" action="<?php echo base_url(); ?>admins/submit_comunicados" method="post">
+                        <form id="basicBootstrapForm" action="<?php echo base_url(); ?>admins/submit_comunicados" method="post" enctype="multipart/form-data">
                             <div class="box-body">
                                 <div class="row">
                                     <div class='col-md-12'>
@@ -35,6 +35,48 @@
                                     </div>
 
                                 </div>
+
+
+
+                                <div class="row">
+                                    <div class='col-md-6'>
+                                        <div class="form-group">
+                                                <div class="form-group">
+                                                  <label for="exampleInputFile">Adjuntar Archivos Comunicado</label>
+                                                  <input type="file" id="userfile" name="userfile[]" accept=".pdf, image/*" multiple>
+                                                </div>
+                                        </div> 
+                                    </div>
+
+                                </div>
+
+                                 <div class="row">
+                                    <div class='col-md-6'>
+                                <?php if(count($archivos_comunicados) > 0){ ?>
+
+                                  <table class="table table-bordered table-striped dt-responsive">
+                                  <thead>
+                                    <tr>
+                                      <th>Archivo</th>
+                                      <th>&nbsp;</th>
+                                    </tr>
+                                  </thead>
+
+                                  <tbody>
+                                    <?php foreach ($archivos_comunicados as $archivo) { ?>
+                                            <tr >
+                                                    <td><a href='<?php echo base_url(); ?>uploads/comunicados/<?php echo $this->session->userdata('comunidadid'); ?>/<?php echo $archivo->nomtemparchivo;?>' target='_blank'><?php echo $archivo->nomarchivo;?></a></td>
+                                                    <td><button data-idfile='<?php echo $archivo->id;?>' data-idcomunicado='<?php echo $archivo->idcomunicado;?>' class="btn btn-danger deleteRow" >Eliminar</button></td>
+                                            </tr>
+                                    
+
+                                    <?php } ?>
+                                  </tbody>
+                              </table>
+                                <?php } ?>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="box-footer">
@@ -53,6 +95,35 @@
             </div>
         </section><!-- /.content -->
 
+
+<script>
+    $(document).ready(function(){
+        // Manejar el evento de clic en los botones "Borrar"
+        $('.deleteRow').on('click', function(){
+            // Encontrar la fila (<tr>) que contiene el botón clicado y eliminarla
+            $(this).closest('tr').remove();
+            //console.log($(this).data('idfile'))
+
+             var idfile = $(this).data('idfile');
+             var idcomunicado = $(this).data('idcomunicado');
+
+              $.ajax({
+                  type: "POST",
+                  url: '<?php echo base_url();?>admins/deletefile_comunicado/',
+                  dataType: 'json',
+                  data : {
+                          "idfile": idfile,
+                          "idcomunicado" : idcomunicado
+                        },
+                  async: false,
+              }).success(function(data) {
+
+
+              });             
+
+        });
+    });
+</script>
 
         <script type="text/javascript">
             $(function() {

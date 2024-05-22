@@ -1487,6 +1487,24 @@ class Admin extends CI_Model
     }
 
 
+
+    public function deletefile_comunicado($idcomunicado,$idfile)
+    {
+
+
+        $this->db->where('idcomunicado', $idcomunicado);
+        $this->db->where('id', $idfile);
+        $this->db->delete('gc_archivos_comunicado');
+
+
+        if ($this->db->affected_rows() > 0) { // se eliminó el archivo correctamente
+            return 1;
+        } else { // no hubo eliminación de archivo
+            return -1;
+        }
+    }
+
+
     public function delete_periodo($idperiodo)
     {
 
@@ -3939,7 +3957,6 @@ public function accept_payprop($token = null,$tokentgc = null)
 public function envia_mail($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común", $attachments = null)
     {
 
-
         if (ENVIO_MAIL) {
 
                 // Configure API key authorization: api-key
@@ -3968,8 +3985,9 @@ public function envia_mail($from, $toList, $subject, $content, $type, $alias = "
                         $array_attachments = array();
                         if(!is_null($attachments)){
                             foreach ($attachments as $attachment) {
-                                $array_archivo = explode('/',$attachment);
-                                $array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment))),'name' => $array_archivo[count($array_archivo)-1]);
+                                $array_archivo = explode('/',$attachment['archivo']);
+                                //$array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment))),'name' => $array_archivo[count($array_archivo)-1]);
+                                $array_fila = array('content' => chunk_split(base64_encode(file_get_contents($attachment['archivo']))),'name' => $attachment['name']);
                                 array_push($array_attachments,$array_fila);
                             }
                                 
@@ -4920,11 +4938,30 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
         return $datos;
     }
 
+
+
+    public function get_archivos_comunicados($idcomunicado = null)
+    {
+
+        $comunicados_data = $this->db->select("c.id, c.idcomunicado, c.nomarchivo , c.nomtemparchivo
+                     ", false)
+            ->from('gc_archivos_comunicado c')
+            ->where('c.idcomunicado', $idcomunicado)
+            ->order_by('id', 'desc');
+
+        $query = $this->db->get();
+        $datos = $query->result();
+        return $datos;
+    }
+
+
     public function save_comunicado($datos_comunicado)
     {
 
 
         $this->db->trans_start();
+
+        $idcomunicado = 0;
 
         if ($datos_comunicado['idcomunicado'] == 0) {
 
@@ -4936,6 +4973,9 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
             );
 
             $this->db->insert('gc_comunicados', $array_datos);
+
+
+            $idcomunicado = $this->db->insert_id();
         } else {
 
             $array_datos = array(
@@ -4946,7 +4986,28 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
             $this->db->where('id', $datos_comunicado['idcomunicado']);
             $this->db->where('idcomunidad', $this->session->userdata('comunidadid'));
             $this->db->update('gc_comunicados', $array_datos);
+
+
+            $idcomunicado = $datos_comunicado['idcomunicado'];
         }
+
+
+        $array_archivos = $datos_comunicado['archivos'];
+        foreach($array_archivos as $archivo){
+
+            $array_archivos_table = array(
+                'idcomunicado' => $idcomunicado,
+                'nomarchivo' => $archivo['name'],
+                'nomtemparchivo' => $archivo['tmp_name']
+            );
+
+            $this->db->insert('gc_archivos_comunicado', $array_archivos_table);
+
+
+        }
+
+
+
 
         $this->db->trans_complete();
         return 1;
@@ -5193,6 +5254,8 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
         $this->load->library('email');
 
 
+
+
         $messageBody = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 		<!-- saved from url=(0072)http://tutsplus.github.io/a-simple-responsive-html-email/HTML/index.html -->
 		<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
@@ -5277,6 +5340,19 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
         }
 
 
+        $files = $this->admin->get_archivos_comunicados($comunicado->id);       
+        $attachments = array();        
+        foreach($files as $file){
+                $archivo = './uploads/comunicados/' . $comunidadid .'/'.$file->nomtemparchivo;
+                $array_archivo = array('archivo' => $archivo,
+                                       'name' => $file->nomarchivo);
+                array_push($attachments,$array_archivo);
+
+        }
+
+
+       // echo '<pre>';
+       // var_dump($attachments); exit;
         //$array_email = array('rodrigog.84@gmail.com');
 
 
@@ -5284,8 +5360,13 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
             array_push($array_email, $lista->email);
         }
 
+
+        //$array_email = array('rodrigog.84@gmail.com');
+        //echo '<pre>';
+        //var_dump($array_email); exit;
+
         // echo $messageBody; exit;
-        $this->admin->envia_mail('robot@tugastocomun.cl', $array_email, $comunidad->nombre . " - " . $comunicado->titulo, $messageBody, 'html', 'Comunicado Condominio');
+        $this->admin->envia_mail('robot@tugastocomun.cl', $array_email, $comunidad->nombre . " - " . $comunicado->titulo, $messageBody, 'html', 'Comunicado Condominio',$attachments);
     }
 
     public function enviar_comunicados_pendientes()
@@ -5300,11 +5381,15 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
 
             $idcomunidad = $comunicado->idcomunidad;
             $propiedades = $this->get_propiedades($idcomunidad);
+            //echo '<pre>';
+            //var_dump($propiedades); exit;
             foreach ($propiedades as $propiedad) {
                 if ($propiedad->suscrito == 1) {
                     $this->generar_mail_comunicado($idcomunidad, $comunicado, $propiedad);
+
                 }
             }
+
 
             $this->generar_mail_comunicado($idcomunidad, $comunicado, false);
 

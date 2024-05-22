@@ -4957,6 +4957,9 @@ class Admins extends CI_Controller
             if (!is_null($idcomunicado)) {
                 $this->load->model('admin');
                 $comunicados = $this->admin->get_comunicados($idcomunicado);
+                $array_archivoscomunicados = $this->admin->get_archivos_comunicados($idcomunicado);
+
+                //var_dump($archivoscomunicados); exit;
 
                 if (is_null($comunicados)) {
                     $this->session->set_flashdata('add_comunicado_result', 2);
@@ -4972,6 +4975,9 @@ class Admins extends CI_Controller
                     'txt_button' => 'Editar'
                 );
             } else {
+
+                $array_archivoscomunicados = array();
+
                 $array_datos = array(
                     'id' => 0,
                     'titulo' => '',
@@ -4995,6 +5001,7 @@ class Admins extends CI_Controller
             $vars['content_menu'] = $content;
             $vars['agrega'] = $agrega;
             $vars['datos_comunicado'] = $array_datos;
+            $vars['archivos_comunicados'] = $array_archivoscomunicados;
             $vars['content_view'] = 'admin/add_comunicado';
             $vars['permite'] = true;
 
@@ -5017,6 +5024,35 @@ class Admins extends CI_Controller
         }
     }
 
+
+
+public function deletefile_comunicado($data = '')
+    {
+
+        if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
+            $idfile = $this->input->post('idfile');
+            $idcomunicado = $this->input->post('idcomunicado');
+            $this->load->model('admin');
+            $this->admin->deletefile_comunicado($idcomunicado,$idfile);
+
+            $data = "ok";
+
+            echo json_encode($data);
+
+        }else{
+            $content = array(
+                        'menu' => 'Error 403',
+                        'title' => 'Error 403',
+                        'subtitle' => '403 error');
+
+
+            $vars['content_menu'] = $content;               
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template',$vars);
+
+        }
+
+    }
 
 
  public function editar_mail_vencimiento($tipo = 1)
@@ -5188,6 +5224,60 @@ class Admins extends CI_Controller
 
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
+  
+
+            $files = $_FILES;
+
+            $this->load->library('upload');
+            $config['upload_path'] = "./uploads/comunicados/" . $this->session->userdata('comunidadid') . "/"; //una carpeta por comunicado
+            $config['allowed_types'] = "*";
+            $config['max_size'] = "10240";
+
+            if (!file_exists($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, true);
+            }
+
+
+            $number_of_files = count($_FILES['userfile']['name']);
+            $array_archivos = array();
+
+            for ($i = 0; $i < $number_of_files; $i++) {
+                $_FILES['userfile']['name'] = $files['userfile']['name'][$i];
+                $_FILES['userfile']['type'] = $files['userfile']['type'][$i];
+                $_FILES['userfile']['tmp_name'] = $files['userfile']['tmp_name'][$i];
+                $_FILES['userfile']['error'] = $files['userfile']['error'][$i];
+                $_FILES['userfile']['size'] = $files['userfile']['size'][$i];
+
+
+                $filename = date("Ymd") . "_" . date("His") . "_" . randomstring(5) . "_" . $this->session->userdata('comunidadid');
+                $array_filename = explode('.',$_FILES['userfile']['name']);
+                $extension_filename = $array_filename[count($array_filename) - 1];
+                $config['file_name'] = $filename; 
+
+                //poner nombre unico para no topar con otros archivos
+
+                $this->upload->initialize($config);
+
+                if ($this->upload->do_upload('userfile')) {
+                    $data = $this->upload->data();
+                    //echo "El archivo " . htmlspecialchars($data['file_name']) . " se ha subido correctamente.<br>";
+                    $array_archivo = array(
+                                                    'name' => $_FILES['userfile']['name'],
+                                                    'tmp_name' => $filename.'.'.$extension_filename
+                                        );
+                    array_push($array_archivos,$array_archivo);
+                } else {
+                    $errors[] = $this->upload->display_errors();
+
+                }
+            }
+
+
+         // echo '<pre>';
+           // var_dump($_FILES); exit;
+            //exit;
+
+
             $txt_comunicado = $this->input->post('txt_comunicado');
             $idcomunicado = $this->input->post('idcomunicado');
             $titulo = $this->input->post('titulo');
@@ -5195,7 +5285,8 @@ class Admins extends CI_Controller
             $datos_comunicado = array(
                 'txt_comunicado' => $txt_comunicado,
                 'idcomunicado' => $idcomunicado,
-                'titulo' => $titulo
+                'titulo' => $titulo,
+                'archivos' => $array_archivos
             );
 
             $this->load->model('admin');

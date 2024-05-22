@@ -3645,3 +3645,22 @@ ENGINE=InnoDB
 ;
 
 
+
+
+/***************************************************************************************/
+
+CREATE TABLE `gc_archivos_comunicado` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`idcomunicado` INT(11) NOT NULL DEFAULT '0',
+	`nomarchivo` VARCHAR(250) NOT NULL DEFAULT '' COLLATE 'utf8mb4_general_ci',
+	`nomtemparchivo` VARCHAR(250) NOT NULL DEFAULT '' COLLATE 'utf8mb4_general_ci',
+	`created_at` DATETIME NOT NULL DEFAULT current_timestamp(),
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+;
+
+INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/deletefile_comunicado', 10, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (315, 1);
+

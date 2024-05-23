@@ -5238,7 +5238,7 @@ public function deletefile_comunicado($data = '')
             }
 
 
-            $number_of_files = count($_FILES['userfile']['name']);
+            $number_of_files = isset($_FILES['userfile']['name']) ? count($_FILES['userfile']['name']) : 0;
             $array_archivos = array();
 
             for ($i = 0; $i < $number_of_files; $i++) {

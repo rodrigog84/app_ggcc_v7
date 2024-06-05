@@ -4954,6 +4954,7 @@ class Admins extends CI_Controller
 
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
+            $array_archivoscomunicados = array();
             if (!is_null($idcomunicado)) {
                 $this->load->model('admin');
                 $comunicados = $this->admin->get_comunicados($idcomunicado);
@@ -5159,9 +5160,13 @@ public function deletefile_comunicado($data = '')
 
         if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
+            $array_archivoscomunicados = array();
             if (!is_null($idcomunicado)) {
                 $this->load->model('admin');
                 $comunicados = $this->admin->get_comunicados($idcomunicado);
+                $array_archivoscomunicados = $this->admin->get_archivos_comunicados($idcomunicado);
+
+
 
                 if (is_null($comunicados)) {
                     $this->session->set_flashdata('add_comunicado_result', 10);
@@ -5195,6 +5200,7 @@ public function deletefile_comunicado($data = '')
             $vars['formValidation'] = true;
             $vars['content_menu'] = $content;
             $vars['datos_comunicado'] = $array_datos;
+            $vars['archivos_comunicados'] = $array_archivoscomunicados;
             $vars['agrega'] = $agrega;
             $vars['content_view'] = 'admin/add_comunicado';
             $vars['permite'] = false;

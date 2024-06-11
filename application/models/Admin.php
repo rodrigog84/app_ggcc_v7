@@ -695,6 +695,36 @@ class Admin extends CI_Model
     }
 
 
+    public function get_fondos($idcomunidad = null)
+    {
+
+        $fondos_data = $this->db->select('e.id, e.nombre, c.nombre as comunidad')
+            ->from('gc_fondos as e')
+            ->join('gc_comunidad as c', 'e.idcomunidad = c.id')
+            ->where('e.active = 1')
+            ->where('c.active = 1')
+            ->order_by('c.nombre asc, e.nombre asc');
+
+        $fondos_data = is_null($idcomunidad) ? $fondos_data : $fondos_data->where('c.id', $idcomunidad);
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+
+public function get_fondo_by_id($fondoid)
+    {
+
+        $this->db->select('e.id, e.nombre, e.idcomunidad')
+            ->from('gc_fondos as e')
+            ->where('e.id', $fondoid);
+        $query = $this->db->get();
+        $datos = $query->result();
+
+        return $datos;
+    }
+
+
+
     public function get_estacionamientos_by_propiedad($idpropiedad)
     {
 
@@ -3116,6 +3146,76 @@ public function accept_payprop($token = null,$tokentgc = null)
         }
     }
 
+
+
+
+
+    public function add_fondo($array_datos)
+    {
+
+        $this->db->select('e.id, e.active')
+            ->from('gc_fondos as e')
+            ->where('upper(e.nombre)', strtoupper($array_datos['nombre']))
+            ->where('e.idcomunidad', strtoupper($array_datos['idcomunidad']));
+        $query = $this->db->get();
+        $datos = $query->row();
+        if (is_null($datos)) { // propiedad no existe
+            if ($array_datos['idfondo'] == 0) {
+                $data = array(
+                    'idcomunidad' => $array_datos['idcomunidad'],
+                    'nombre' => $array_datos['nombre'],
+                    'active' => 1
+                );
+
+                $this->db->insert('gc_fondos', $data);
+                $idfondo = $this->db->insert_id();
+
+                return $idfondo;
+            } else {
+
+                $data = array(
+                    'idcomunidad' => $array_datos['idcomunidad'],
+                    'nombre' => $array_datos['nombre'],
+                    'active' => 1
+                );
+
+                $this->db->where('id', $array_datos['idfondo']);
+                $this->db->update('gc_fondos', $data);
+
+                return $array_datos['idfondo'];
+            }
+        } else { // ya existe fondo
+
+            if ($array_datos['idfondo'] != 0) {
+
+                $data = array(
+                    'idcomunidad' => $array_datos['idcomunidad'],
+                    'nombre' => $array_datos['nombre'],
+                    'active' => 1
+                );
+
+                $this->db->where('id', $array_datos['idfondo']);
+                $this->db->update('gc_fondos', $data);
+
+
+                return $array_datos['idestacionamiento'];
+            } else if ($datos->active == 0) {
+                $data = array(
+                    'idcomunidad' => $array_datos['idcomunidad'],
+                    'nombre' => $array_datos['nombre'],
+                    'active' => 1
+                );
+
+                $this->db->where('id', $datos->id);
+                $this->db->update('gc_fondos', $data);
+
+                return -2;
+            } else {
+                return -1;
+            }
+        }
+    }    
+
     public function add_estacionamiento_visita($array_datos)
     {
 
@@ -3204,6 +3304,25 @@ public function accept_payprop($token = null,$tokentgc = null)
 
             $this->db->query("update gc_propiedad set prorrateo = prorrateo - " . $datos->prorrateo . " where id = " . $datos->idpropiedad);
 
+
+            return 1;
+        } else { // no hubo eliminación de proveedor
+            return -1;
+        }
+    }
+
+
+
+    public function delete_fondo($idfondo)
+    {
+
+
+        $this->db->where('id', $idfondo);
+        $this->db->where('idcomunidad', $this->session->userdata('comunidadid'));
+        $this->db->update('gc_fondos', array('active' => '0'));
+
+
+        if ($this->db->affected_rows() > 0) { // se eliminó proveedor correctamente
 
             return 1;
         } else { // no hubo eliminación de proveedor

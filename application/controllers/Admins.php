@@ -3793,6 +3793,176 @@ class Admins extends CI_Controller
 
 
 
+    public function admin_fondos($resultid = '')
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            if ($resultid == 1) {
+                $vars['message'] = "Fondo Agregado correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 2) {
+                $vars['message'] = "Error al agregar Fondo. Fondo ya existe";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            } elseif ($resultid == 3) {
+                $vars['message'] = "Fondo Editado correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 4) {
+                $vars['message'] = "Error al eliminar Fondo. Fondo no existe";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
+            } elseif ($resultid == 5) {
+                $vars['message'] = "Fondo Eliminado correctamente";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 6) {
+                $vars['message'] = "Fondo se encontraba desactivado. Ha sido activado";
+                $vars['classmessage'] = 'success';
+                $vars['icon'] = 'fa-check';
+            }
+
+
+            $this->load->model('admin');
+            $idcomunidad = $this->session->userdata('level') == 1 || $this->session->userdata('level') == 5 ? $this->session->userdata('comunidadid') : null;
+            $fondos = $this->admin->get_fondos($idcomunidad);
+
+            $content = array(
+                'menu' => 'Administraci&oacute;n',
+                'title' => 'Administraci&oacute;n',
+                'subtitle' => 'Administraci&oacute;n de Fondos'
+            );
+
+            $vars['permite_editar'] = $this->session->userdata('level') === '1' || $this->session->userdata('level') == '4' ? true : false;
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'admin/admin_fondos';
+            $vars['fondos'] = $fondos;
+            $vars['dataTables'] = true;
+
+            $template = "template";
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+
+    public function add_fondo($idfondo = 0)
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $this->load->model('admin');
+            $fondo = $this->admin->get_fondo_by_id($idfondo);
+
+            if(count($fondo) > 0){
+
+                $fondo = $fondo[0];
+            }
+
+            //var_dump($fondo); exit;
+
+            $comunidades = $this->admin->get_comunidades();
+
+            $content = array(
+                'menu' => 'Administraci&oacute;n',
+                'title' => 'Administraci&oacute;n',
+                'subtitle' => 'Administraci&oacute;n de Fondos'
+            );
+
+            $datos_form = array(
+                'idfondo' => isset($fondo->id) == 0 ? 0 : $fondo->id,
+                'nombre' => isset($fondo->id) == 0 ? '' : $fondo->nombre,
+                'idcomunidad' => isset($fondo->id) == 0 ? '' : $fondo->idcomunidad
+            );
+
+            $vars['content_menu'] = $content;
+            $vars['fondo'] = $fondo;
+            $vars['comunidades'] = $comunidades;
+            $vars['content_view'] = 'admin/add_fondo';
+            $vars['titulo'] = $idfondo == '' ? "Agregar Fondo" : "Editar Fondo";
+            $vars['datos_form'] = $datos_form;
+            $vars['permite_editar'] = $this->session->userdata('level') == 4 ? true : false;
+            $vars['formValidation'] = true;
+
+
+            $template = "template";
+
+
+            $this->load->view($template, $vars);
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
+public function submit_fondo()
+    {
+
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+            //$nuevo_proveedor = $this->input->post('proveedor');
+            $idfondo = $this->input->post('idfondo');
+            $comunidad = $this->input->post('comunidad');
+            $nombre = $this->input->post('nombre');
+
+            $array_datos = array(
+                'idfondo' => $idfondo,
+                'idcomunidad' => $comunidad,
+                'nombre' => $nombre,
+            );
+
+            $this->load->model('admin');
+            $result = $this->admin->add_fondo($array_datos);
+
+            if ($result == -1) {
+                redirect('admins/admin_fondos/2');
+            } elseif ($result == -2) {
+                redirect('admins/admin_fondos/6');
+            } else {
+                if ($idfondo == 0) {
+                    redirect('admins/admin_fondos/1');
+                } else {
+                    redirect('admins/admin_fondos/3');
+                }
+            }
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
+
+
     public function add_estacionamiento($idestacionamiento = 0)
     {
 
@@ -3894,6 +4064,32 @@ class Admins extends CI_Controller
         }
     }
 
+
+public function delete_fondo($idfondo = 0)
+    {
+
+        if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
+            $this->load->model('admin');
+            $result = $this->admin->delete_fondo($idfondo);
+            if ($result == -1) {
+                redirect('admins/admin_fondos/4');
+            } else {
+                redirect('admins/admin_fondos/5');
+            }
+        } else {
+            $content = array(
+                'menu' => 'Error 403',
+                'title' => 'Error 403',
+                'subtitle' => '403 error'
+            );
+
+
+            $vars['content_menu'] = $content;
+            $vars['content_view'] = 'forbidden';
+            $this->load->view('template', $vars);
+        }
+    }
 
     public function delete_estacionamiento($idestacionamiento = 0)
     {

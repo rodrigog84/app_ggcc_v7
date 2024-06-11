@@ -3664,3 +3664,32 @@ ENGINE=InnoDB
 INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/deletefile_comunicado', 10, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
 INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (315, 1);
 
+/*******************************************************************************************/
+
+CREATE TABLE `gc_fondos` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`idcomunidad` INT(11) NOT NULL DEFAULT '0',
+	`nombre` VARCHAR(250) NOT NULL DEFAULT '' COLLATE 'utf8mb4_general_ci',
+	`active` TINYINT(4) NOT NULL DEFAULT '1',
+	`created_at` TIMESTAMP NOT NULL DEFAULT current_timestamp(),
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB
+;
+
+
+
+INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, orden, `created_at`, `updated_at`) VALUES ('admins/admin_fondos', 11, 1, 1,13, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (316, 1);
+UPDATE `gasto_ggcc`.`gc_app` SET `name`='Fondos' WHERE  `id`=316;
+
+INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/add_fondo', 11, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (317, 1);
+
+INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/submit_fondo', 11, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (318, 1);
+
+
+INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/delete_fondo', 11, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (319, 1);

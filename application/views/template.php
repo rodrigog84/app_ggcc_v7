@@ -312,7 +312,15 @@
                                     <ul class="treeview-menu">
                                         <?php foreach ($menu->app as $app) : ?>
                                             <?php if ($app->appvisible == 1) : ?>
+                                                <?php if($app->appname == 'Fondos' && $this->session->userdata('identity') != 'admin@admin.com' && $this->session->userdata('identity') != 'csandoval@aurbana.cl'){ 
+                                                            $show_submenu = false;
+                                                        }else{
+                                                            $show_submenu = true;
+                                                        } ?>
+
+                                                <?php if($show_submenu){ ?>
                                                 <li><a href="<?php echo base_url() . $app->appfunction; ?>"><i class="fa fa-circle-o"></i><?php echo $app->appname; ?></a></li>
+                                                <?php } ?>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                     </ul>

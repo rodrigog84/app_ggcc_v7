@@ -46,12 +46,12 @@
                                                 <td><?php echo $i; ?></td>
                                                 <td><?php echo $fondo->nombre; ?></td>
                                                 <td><?php echo $fondo->comunidad; ?></td>
-                                                <?php if ($permite_editar){ ?>
+                                                <?php if ($permite_editar && $fondo->idcomunidad != 0){ ?>
                                                     <td>
                                                         <a href="<?php echo base_url(); ?>admins/add_fondo/<?php echo $fondo->id; ?>" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
                                                         &nbsp;
                                                         &nbsp;
-                                                        <a href="<?php echo base_url(); ?>admins/delete_fondo/<?php echo $fondo->id; ?>" data-toggle="tooltip" title="Eliminar"><span class="glyphicon glyphicon-trash"></span></a>
+                                                        <!--a href="<?php echo base_url(); ?>admins/delete_fondo/<?php echo $fondo->id; ?>" data-toggle="tooltip" title="Eliminar"><span class="glyphicon glyphicon-trash"></span></a-->
                                                     </td>
                                                 <?php }else{ ?>
                                                     <td>&nbsp;</td>

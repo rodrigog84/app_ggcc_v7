@@ -3822,6 +3822,10 @@ class Admins extends CI_Controller
                 $vars['message'] = "Fondo se encontraba desactivado. Ha sido activado";
                 $vars['classmessage'] = 'success';
                 $vars['icon'] = 'fa-check';
+            } elseif ($resultid == 7) {
+                $vars['message'] = "Error al editar Fondo. Fondo no existe";
+                $vars['classmessage'] = 'danger';
+                $vars['icon'] = 'fa-ban';
             }
 
 
@@ -3871,6 +3875,11 @@ class Admins extends CI_Controller
             if(count($fondo) > 0){
 
                 $fondo = $fondo[0];
+            }else{
+                if($idfondo != 0){//venia un id fondo pero no lo encontro, quiere decir que no existe
+                    redirect('admins/admin_fondos/7');
+                }
+
             }
 
             //var_dump($fondo); exit;

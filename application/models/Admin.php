@@ -698,15 +698,16 @@ class Admin extends CI_Model
     public function get_fondos($idcomunidad = null)
     {
 
-        $fondos_data = $this->db->select('e.id, e.nombre, c.nombre as comunidad')
+        $fondos_data = $this->db->select('e.id, e.idcomunidad, e.nombre, c.nombre as comunidad')
             ->from('gc_fondos as e')
-            ->join('gc_comunidad as c', 'e.idcomunidad = c.id')
+            ->join('gc_comunidad as c', 'e.idcomunidad = c.id','LEFT')
             ->where('e.active = 1')
-            ->where('c.active = 1')
+            //->where('c.active = 1')
             ->order_by('c.nombre asc, e.nombre asc');
 
-        $fondos_data = is_null($idcomunidad) ? $fondos_data : $fondos_data->where('c.id', $idcomunidad);
+        $fondos_data = is_null($idcomunidad) ? $fondos_data : $fondos_data->where('(c.id = ' . $idcomunidad . ' or e.idcomunidad = 0)');
         $query = $this->db->get();
+        //echo $this->db->last_query(); exit;
         return $query->result();
     }
 
@@ -716,7 +717,8 @@ public function get_fondo_by_id($fondoid)
 
         $this->db->select('e.id, e.nombre, e.idcomunidad')
             ->from('gc_fondos as e')
-            ->where('e.id', $fondoid);
+            ->where('e.id', $fondoid)
+            ->where('e.idcomunidad', $this->session->userdata('comunidadid'));
         $query = $this->db->get();
         $datos = $query->result();
 

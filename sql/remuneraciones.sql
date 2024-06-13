@@ -3693,3 +3693,11 @@ INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (318, 1);
 
 INSERT INTO `gasto_ggcc`.`gc_app` (`function`, `menuid`, `visible`, `valid`, `created_at`, `updated_at`) VALUES ('admins/delete_fondo', 11, 0, 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00');
 INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (319, 1);
+
+
+
+/*******************************************************************************************/
+
+INSERT INTO `gasto_ggcc`.`gc_fondos` (`nombre`) VALUES ('Fondo Multas');
+INSERT INTO `gasto_ggcc`.`gc_fondos` (`nombre`) VALUES ('Fondo Intereses');
+

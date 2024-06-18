@@ -139,15 +139,27 @@
                                 $fr_selected = '';
                                 $sc_selected = '';
                                 $af_selected = 'selected';
-
+                                }else if($datos_form['formapago'] == 'f'){
+                                $gc_selected = '';
+                                $fr_selected = '';
+                                $sc_selected = '';
+                                $af_selected = '';
                                 } ?>
                               <label for="formapago">Forma de Cobro</label>    
                               <select name="formapago" id="formapago"  class="form-control" >
                                   <option value="">Seleccione una Forma de Pago</option>
+                                  <optgroup label='Asignaci&oacute;n Tradicional'>
                                   <option value="gc" <?php echo $gc_selected;?>>Gasto Com&uacute;n</option>
-                                  <option value="fr" <?php echo $fr_selected;?>>Fondo de Reserva</option>
                                   <option value="sc" <?php echo $sc_selected;?>>Sin Cobro</option>
                                   <option value="af" <?php echo $af_selected;?>>Activo Fijo</option>
+                                  </optgroup>
+                                  <optgroup label='Fondos'>
+                                      <option value="fr" <?php echo $fr_selected;?>>Fondo de Reserva</option>
+                                      <?php foreach($fondos as $fondo){ ?>
+                                          <?php $f_selected = $datos_form['formapago'] == 'f' && $fondo->id == $datos_form['idfondo'] ? 'selected' : ''; ?>
+                                            <option value="<?php echo 'f-'.$fondo->id;?>" <?php echo $f_selected;?>><?php echo $fondo->nombre;?></option>
+                                      <?php } ?>
+                                  </optgroup>
                               </select>
                         </div>
                       </div>                        

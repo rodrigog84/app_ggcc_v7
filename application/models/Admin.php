@@ -1038,13 +1038,37 @@ public function get_fondo_by_id($fondoid)
     public function get_cuentas_individuales_by_id($idconcepto = null)
     {
 
-        $concepto_data = $this->db->select('id , nombre ')
+        $concepto_data = $this->db->select('id , "td" as tipo_concepto,  nombre ',false)
             ->from('gc_tipo_deuda_detalle')
             ->where('idtipodeuda = 11')
+            ->where('activo = 1')
             ->order_by('nombre asc');
         $concepto_data = is_null($idconcepto) ? $concepto_data : $concepto_data->where('id', $idconcepto);
         $query = $this->db->get();
-        return $query->result();
+
+        $data_conceptos1 = $query->result();
+
+        //echo '<pre>';
+        
+        $data_conceptos2 = $this->get_fondos();
+
+
+        foreach ($data_conceptos2 as $obj) {
+
+            $obj->tipo_concepto = "f";
+            unset($obj->idcomunidad);
+            unset($obj->comunidad);
+        }
+
+        $data_conceptos = array_merge($data_conceptos1,$data_conceptos2);
+        //echo '<pre>';
+        //var_dump($data_conceptos);
+        return $data_conceptos;
+
+
+
+
+        //return $query->result();
         //return json_encode($query->result());
         //return is_null($idproveedor) ? json_encode($query->result()) : json_encode($query->row());
 

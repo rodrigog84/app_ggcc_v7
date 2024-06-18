@@ -1,3 +1,5 @@
+
+
         <!-- Main content -->
         <section class="content" >
         <?php if(isset($message)): ?>
@@ -167,11 +169,18 @@
                               <label for="formapago">Forma de Cobro</label>    
                               <select name="formapago" id="formapago"  class="form-control" >
                                   <option value="">Seleccione una Forma de Pago</option>
-                                  <option value="gc">Gasto Com&uacute;n</option>
-                                  <option value="fr">Fondo de Reserva</option>
-                                  <option value="ci">Cobro por Lectura Individual</option>
-                                  <option value="sc">Sin Cobro</option>
-                                  <option value="af">Activo Fijo</option>
+                                  <optgroup label='Asignaci&oacute;n Tradicional'>
+                                      <option value="gc">Gasto Com&uacute;n</option>
+                                      <option value="ci">Cobro por Lectura Individual</option>
+                                      <option value="sc">Sin Cobro</option>
+                                      <option value="af">Activo Fijo</option>
+                                  </optgroup>
+                                  <optgroup label='Fondos'>
+                                      <option value="fr">Fondo de Reserva</option>
+                                      <?php foreach($fondos as $fondo){ ?>
+                                            <option value="<?php echo 'f-'.$fondo->id;?>"><?php echo $fondo->nombre;?></option>
+                                      <?php } ?>
+                                  </optgroup>
                               </select>
                         </div>
                       </div>                       

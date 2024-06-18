@@ -134,11 +134,23 @@ class Account extends CI_Model
 
 	public function add_cuenta($parametros){
 			$this->db->trans_start();
+
+			$this->load->model('admin');
 			$fecdocumento = substr($parametros['fecdocumento'],6,4)."-".substr($parametros['fecdocumento'],3,2)."-".substr($parametros['fecdocumento'],0,2);
 			$fecvencimiento = substr($parametros['fecvencimiento'],6,4)."-".substr($parametros['fecvencimiento'],3,2)."-".substr($parametros['fecvencimiento'],0,2);
+
+			$array_forma_pago = explode('-',$parametros['formapago']);
+			$idfondo = 0;
+			if(isset($array_forma_pago[1])){
+				$parametros['formapago'] = 'f'; // cuando la cuenta va asociada a un fondo
+				$idfondo = $array_forma_pago[1];
+			}
+
+
 			$data = array(
 				'idcomunidad' => $this->session->userdata('comunidadid'),
 				'formapago' => $parametros['formapago'],
+				'idfondo' => $idfondo,
 				'idperiodo' => isset($parametros['idperiodo']) ? $parametros['idperiodo'] : null,
 		      	'idproveedor' => $parametros['idproveedor'],
 		      	'unidadmedida' => isset($parametros['unidadmedida']) ? $parametros['unidadmedida'] : null,
@@ -181,6 +193,27 @@ class Account extends CI_Model
 
 				$this->db->insert('gc_cuenta', $data);
 				$idcuenta = $this->db->insert_id();
+
+
+
+				if($parametros['formapago'] == 'f'){
+
+					$proveedor = $this->admin->get_proveedor_by_id($parametros['idproveedor']);
+
+
+					$data_cartola_fondos = array(
+				      	'idcomunidad' => $this->session->userdata('comunidadid'),
+				      	'idcuenta' =>  $idcuenta,
+				      	'idfondo' => $idfondo,
+				      	'glosa' =>  'Pagos de cuentas de Condominio. ' . $proveedor->nombre. '.',
+				      	'monto' =>  $parametros['monto']*(-1),
+					);
+
+					$this->db->insert('gc_cartola_otros_fondos', $data_cartola_fondos);
+
+				}
+
+
 
 
 			}else{
@@ -275,6 +308,31 @@ class Account extends CI_Model
 
 
 				$idcuenta = $parametros['idcuenta'];
+
+
+
+				// eliminamos todo el detalle de la lectura
+				$this->db->where('idcuenta',$idcuenta);
+				$this->db->delete('gc_cartola_otros_fondos');	
+
+
+				if($parametros['formapago'] == 'f'){
+
+					$proveedor = $this->admin->get_proveedor_by_id($parametros['idproveedor']);
+
+
+					$data_cartola_fondos = array(
+				      	'idcomunidad' => $this->session->userdata('comunidadid'),
+				      	'idcuenta' =>  $idcuenta,
+				      	'idfondo' => $idfondo,
+				      	'glosa' =>  'Pagos de cuentas de Condominio. ' . $proveedor->nombre. '.',
+				      	'monto' =>  $parametros['monto']*(-1),
+					);
+
+					$this->db->insert('gc_cartola_otros_fondos', $data_cartola_fondos);
+
+				}
+
 
 			}
 
@@ -696,7 +754,10 @@ class Account extends CI_Model
 				$this->db->delete('gc_cartola_fondo_reserva');
 
 
+				$this->db->where('idcuenta',$idcuenta);
+				$this->db->delete('gc_cartola_otros_fondos');
 
+					
 				$this->db->where('idcomunidad',$this->session->userdata('comunidadid'));
 				$this->db->where('id',$idcuenta);
 				$this->db->delete('gc_cuenta');
@@ -946,6 +1007,13 @@ class Account extends CI_Model
 				$datos_propiedad = $this->admin->get_propiedad_by_id($datos_cuenta->idpropiedad);
 
 				if($datos_propiedad->idcomunidad == $this->session->userdata('comunidadid')){
+
+
+					// eliminamos todo el detalle de la lectura
+					$this->db->where('idcuentaindividual',$idcuenta);
+					$this->db->delete('gc_cartola_otros_fondos');	
+
+
 					$this->db->where('id',$idcuenta);
 					$this->db->delete('gc_deuda_propiedad');
 					return true;
@@ -964,6 +1032,12 @@ class Account extends CI_Model
 					$this->load->model('admin');
 					$datos_propiedad = $this->admin->get_propiedad_by_id($datos_cuenta_esp_comunes->idpropiedad);
 					if($datos_propiedad->idcomunidad == $this->session->userdata('comunidadid')){
+
+						// eliminamos todo el detalle de la lectura
+						$this->db->where('idcuentaindividual',$idcuenta);
+						$this->db->delete('gc_cartola_otros_fondos');	
+
+												
 						$this->db->where('id',$idcuenta);
 						$this->db->delete('gc_deuda_propiedad');
 						return true;
@@ -1040,12 +1114,30 @@ class Account extends CI_Model
 
 
 	public function add_cuenta_individual($parametros){
-			$monto = $parametros['concepto'] == 8 ? $parametros['monto']*(-1) : $parametros['monto'];  //SI SON AJUSTES, ES UN MONTO NEGATIVO
+
+			//echo '<pre>';
+			//var_dump($parametros); exit;
+			$this->load->model('admin');
+			$propiedad = $this->admin->get_propiedad_by_id($parametros['idpropiedad']);
+
+
+
+			$monto = $parametros['concepto'] == 8 && $parametros['tipo_concepto'] == 'td' ? $parametros['monto']*(-1) : $parametros['monto'];  //SI SON AJUSTES, ES UN MONTO NEGATIVO
 
 			$fecuso = substr($parametros['fecuso'],6,4)."-".substr($parametros['fecuso'],3,2)."-".substr($parametros['fecuso'],0,2);
+
+			if($parametros['tipo_concepto'] == 'td'){
+				$concepto = $parametros['concepto'];
+				$fondo = 0;
+			}else if($parametros['tipo_concepto'] == 'f'){
+				$concepto = 0;
+				$fondo = $parametros['concepto'];
+			}
+
 			$data = array(
 		      	'idpropiedad' => $parametros['idpropiedad'],
-		      	'idtipodeudadetalle' =>  $parametros['concepto'],
+		      	'idtipodeudadetalle' =>  $concepto,
+		      	'idfondo' =>  $fondo,
 		      	'fechadeuda' =>  $fecuso,
 		      	'idperiodo' =>  $parametros['idperiodo'],
 		      	'idcuenta' =>  isset($parametros['idcuenta']) ? $parametros['idcuenta'] : null,
@@ -1065,12 +1157,47 @@ class Account extends CI_Model
 				// guarda cartola
 				$this->db->insert('gc_deuda_propiedad', $data);
 				$idcuenta =  $this->db->insert_id();
-				if($parametros['concepto'] == 7){
+				if($parametros['concepto'] == 7 && $parametros['tipo_concepto'] == 'td'){
 					$this->load->model('payment');
 					$this->payment->generar_mail_multa($this->session->userdata('comunidadid'),$parametros['idpropiedad'],$idcuenta);					
 				}
 
+
+				if($parametros['tipo_concepto'] == 'f'){
+
+						
+						$data_cartola_fondos = array(
+					      	'idcomunidad' => $this->session->userdata('comunidadid'),
+					      	'idcuentaindividual' =>  $idcuenta,
+					      	'idfondo' => $parametros['concepto'],
+					      	'glosa' =>  'Abono a Fondo por cobro individual. Propiedad ' . $propiedad->numero. '.',
+					      	'monto' =>  $monto,
+						);
+
+						$this->db->insert('gc_cartola_otros_fondos', $data_cartola_fondos);
+
+				}
+
 			}else{
+				// eliminamos todo el detalle de la lectura
+				$this->db->where('idcuentaindividual',$parametros['idcuentaindividual']);
+				$this->db->delete('gc_cartola_otros_fondos');	
+
+				if($parametros['tipo_concepto'] == 'f'){
+
+						
+						$data_cartola_fondos = array(
+					      	'idcomunidad' => $this->session->userdata('comunidadid'),
+					      	'idcuentaindividual' =>  $parametros['idcuentaindividual'],
+					      	'idfondo' => $parametros['concepto'],
+					      	'glosa' =>  'Abono a Fondo por cobro individual. Propiedad ' . $propiedad->numero. '.',
+					      	'monto' =>  $monto,
+						);
+
+						$this->db->insert('gc_cartola_otros_fondos', $data_cartola_fondos);
+
+				}
+
 
 				$this->db->where('id',$parametros['idcuentaindividual']);
 				$this->db->update('gc_deuda_propiedad', $data);
@@ -1106,7 +1233,7 @@ class Account extends CI_Model
 
 	public function get_cuentas_by_id($idcuenta = null,$honorarios = false){
 
-		$cuentas_data = $this->db->select('c.id , c.idperiodo, c.formapago, p.id as idproveedor, p.nombre as proveedor, tdt.id as idtipodoctotrib, tdt.nombre as tipodocumentotributario, c.nrodocumento, date_format(c.fecdocumento,"%d/%m/%Y") as fecdocumento, d.id as idconcepto, d.nombre as concepto, c.monto, c.abonado, date_format(c.fecvencimiento,"%d/%m/%Y") as fecvencimiento, c.nombrearchivo, c.nombrerealarchivo, c.updated_at, c.descripcion, c.abonado, c.active, c.unidadmedida, c.retencion as tiporetencion, c2.id as idretencion,  c2.monto as retencion, c2.abonado as abonado_retencion ')
+		$cuentas_data = $this->db->select('c.id , c.idperiodo, c.formapago, c.idfondo, p.id as idproveedor, p.nombre as proveedor, tdt.id as idtipodoctotrib, tdt.nombre as tipodocumentotributario, c.nrodocumento, date_format(c.fecdocumento,"%d/%m/%Y") as fecdocumento, d.id as idconcepto, d.nombre as concepto, c.monto, c.abonado, date_format(c.fecvencimiento,"%d/%m/%Y") as fecvencimiento, c.nombrearchivo, c.nombrerealarchivo, c.updated_at, c.descripcion, c.abonado, c.active, c.unidadmedida, c.retencion as tiporetencion, c2.id as idretencion,  c2.monto as retencion, c2.abonado as abonado_retencion ')
 						  ->from('gc_cuenta c')
 						  ->join('gc_proveedor p','c.idproveedor = p.id')
 						  ->join('gc_tipo_deuda_detalle d','c.idtipodeudadetalle = d.id')
@@ -1139,7 +1266,7 @@ class Account extends CI_Model
 						  ->join('gc_cuenta c2','c2.retencionidctaasoc = c.id','left')
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('c.idggcc is null')
-						  ->where("c.formapago in ('gc','fr','sc','af')")
+						  ->where("c.formapago in ('gc','fr','sc','af','f')")
 						  ->where('c.saldo > 0')
 						  ->where('c.abonado = 0')
 						  ->where('c.active = 1')
@@ -1724,15 +1851,16 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 
 	public function get_cuentas_individuales_by_id($idcuenta = null){
 
-		$cuentas_data = $this->db->select('dp.id, p.numero , tdd.id as idconcepto, tdd.nombre as concepto, date_format(dp.fechadeuda,"%d/%m/%Y") as fechadeuda, pe.mes, pe.anno, dp.monto, dp.nombrearchivo, dp.descripcion, pes.idperiodo, dp.idpropiedad ')
+		$cuentas_data = $this->db->select("dp.id, p.numero , case when dp.idfondo = 0 then 'td' else 'f' end as tipo_concepto, ifnull(tdd.id,f.id) as idconcepto, ifnull(tdd.nombre,f.nombre) as concepto, date_format(dp.fechadeuda,'%d/%m/%Y') as fechadeuda, pe.mes, pe.anno, dp.monto, dp.nombrearchivo, dp.descripcion, pes.idperiodo, dp.idpropiedad ", false )
 						  ->from('gc_deuda_propiedad dp')
 						  ->join('gc_propiedad p','dp.idpropiedad = p.id')
 						  ->join('gc_periodo pe','dp.idperiodo = pe.id')
-						  ->join('gc_tipo_deuda_detalle tdd','dp.idtipodeudadetalle = tdd.id')
+						  ->join('gc_tipo_deuda_detalle tdd','dp.idtipodeudadetalle = tdd.id AND tdd.idtipodeuda in (1,11)','LEFT')
+						  ->join('gc_fondos f','dp.idfondo = f.id','LEFT')
 						  ->join('gc_periodo_estado pes','pe.id = pes.idperiodo and pes.idcomunidad = '.$this->session->userdata('comunidadid'))
 						  ->where('p.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('pes.genera is null')
-						  ->where('tdd.idtipodeuda in (1,11)')
+						  //->where('tdd.idtipodeuda in (1,11)')
 						  ->where('dp.idcuenta is null')
 		                  ->order_by('dp.updated_at desc');
 		$cuentas_data = is_null($idcuenta) ? $cuentas_data : $cuentas_data->where('dp.id',$idcuenta);  

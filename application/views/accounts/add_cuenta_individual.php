@@ -28,7 +28,7 @@
                               <select name="concepto" id="concepto"  class="form-control"  >
                                   <option value="">Seleccione un concepto</option>
                                   <?php foreach ($conceptos as $concepto) { ?>
-                                      <option value="<?php echo $concepto->id;?>" ><?php echo $concepto->nombre;?></option>
+                                      <option value="<?php echo $concepto->tipo_concepto.'-'.$concepto->id;?>" ><?php echo $concepto->nombre;?></option>
                                   <?php } ?>                                
                               </select>
                             </div>

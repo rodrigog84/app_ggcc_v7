@@ -3701,3 +3701,52 @@ INSERT INTO `gasto_ggcc`.`gc_role` (`appid`, `levelid`) VALUES (319, 1);
 INSERT INTO `gasto_ggcc`.`gc_fondos` (`nombre`) VALUES ('Fondo Multas');
 INSERT INTO `gasto_ggcc`.`gc_fondos` (`nombre`) VALUES ('Fondo Intereses');
 
+/**********************************************************************************************/
+
+UPDATE `gasto_ggcc`.`gc_tipo_deuda_detalle` SET `activo`=0 WHERE  `id`=7;
+UPDATE `gasto_ggcc`.`gc_tipo_deuda_detalle` SET `activo`=0 WHERE  `id`=9;
+
+ALTER TABLE `gc_deuda_propiedad`
+	ADD COLUMN `idfondo` INT(11) UNSIGNED NOT NULL AFTER `idtipodeudadetalle`;
+
+ALTER TABLE `gc_deuda_propiedad`
+	CHANGE COLUMN `idfondo` `idfondo` INT(11) UNSIGNED NULL AFTER `idtipodeudadetalle`;
+
+ALTER TABLE `gc_deuda_propiedad`
+	CHANGE COLUMN `idtipodeudadetalle` `idtipodeudadetalle` INT(11) UNSIGNED NULL AFTER `idpropiedad`;
+
+ALTER TABLE `gc_deuda_propiedad`
+	DROP FOREIGN KEY `fk_deuda_propiedad_idtipodeudadetalle_tipo_deuda_detalle_id`;
+
+CREATE TABLE `gc_cartola_otros_fondos` (
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`idcomunidad` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+	`idcuentaindividual` INT(11) UNSIGNED NULL DEFAULT NULL,
+	`idfondo` INT(11) UNSIGNED NULL DEFAULT '0',
+	`glosa` TEXT NOT NULL COLLATE 'latin1_swedish_ci',
+	`monto` INT(11) NOT NULL DEFAULT '0',
+	`activo` TINYINT(4) NOT NULL DEFAULT '1',
+	`created_at` DATETIME NOT NULL DEFAULT current_timestamp(),
+	`updated_at` TIMESTAMP NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+	PRIMARY KEY (`id`) USING BTREE,
+	INDEX `fk_cartola_caja_idcomunidad_comunidad_id` (`idcomunidad`) USING BTREE,
+	INDEX `gc_cartola_fondo_reserva_cuenta_id` (`idcuentaindividual`) USING BTREE,
+	CONSTRAINT `gc_cartola_otros_fondos_ibfk_2` FOREIGN KEY (`idcomunidad`) REFERENCES `gc_comunidad` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT
+)
+COLLATE='latin1_swedish_ci'
+ENGINE=InnoDB
+ROW_FORMAT=COMPACT
+;
+
+
+
+
+ALTER TABLE `gc_cuenta`
+	CHANGE COLUMN `formapago` `formapago` ENUM('gc','fr','ci','sc','af','f') NOT NULL DEFAULT 'gc' COMMENT 'gc: gasto comun, fr: fondo reserva, ci: cobro individual, sc: sin cobro, af: activo fijo, f: fondo' COLLATE 'latin1_swedish_ci' AFTER `fecautoriza`,
+	ADD COLUMN `idfondo` INT NOT NULL DEFAULT 0 AFTER `formapago`;
+
+
+ALTER TABLE `gc_cartola_otros_fondos`
+	ADD COLUMN `idcuenta` INT(11) UNSIGNED NULL DEFAULT NULL AFTER `idcuentaindividual`;
+
+	

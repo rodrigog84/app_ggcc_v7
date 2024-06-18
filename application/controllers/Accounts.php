@@ -62,8 +62,9 @@ class Accounts extends CI_Controller {
 			$tipodoc = $this->admin->get_tipodoc_tributario_by_id();
 			$conceptos = $this->admin->get_tipos_cuentas_comunidad_by_id();
 
-
 			$this->load->model('account');
+			$this->load->model('admin');
+			$data_fondos = $this->admin->get_fondos();
 
 			$content = array(
 						'menu' => 'Cuentas',
@@ -76,6 +77,7 @@ class Accounts extends CI_Controller {
 			$vars['proveedores'] = $proveedores;
 			$vars['tipodoc'] = $tipodoc;
 			$vars['conceptos'] = $conceptos;
+			$vars['fondos'] = $data_fondos;
 
 			$vars['datetimepicker'] = true;
 			$vars['dataTables'] = true;
@@ -254,6 +256,7 @@ class Accounts extends CI_Controller {
 
 			$datos_form = array(
 							'formapago' => is_null($cuentas) ? 0 : $cuentas->formapago,
+							'idfondo' => is_null($cuentas) ? 0 : $cuentas->idfondo,
 							'proveedor' => is_null($cuentas) ? 0 : $cuentas->idproveedor,
 							'tipodoc' => is_null($cuentas) ? '' : $cuentas->idtipodoctotrib,
 							'documento' => is_null($cuentas) ? '' : $cuentas->nrodocumento,
@@ -272,6 +275,7 @@ class Accounts extends CI_Controller {
 			$proveedores = $this->admin->get_proveedor_comunidad_by_id();
 			$tipodoc = $this->admin->get_tipodoc_tributario_by_id();
 			$conceptos = $this->admin->get_tipos_cuentas_comunidad_by_id();
+			$data_fondos = $this->admin->get_fondos();
 
 			$this->load->model('account');
 
@@ -286,6 +290,7 @@ class Accounts extends CI_Controller {
 			$vars['proveedores'] = $proveedores;
 			$vars['tipodoc'] = $tipodoc;
 			$vars['conceptos'] = $conceptos;
+			$vars['fondos'] = $data_fondos;
 			$vars['datos_form'] = $datos_form;
 
 
@@ -1576,6 +1581,7 @@ class Accounts extends CI_Controller {
 			$this->load->model('account');
 			$cuentas = $this->account->get_cuentas_individuales_by_id($idcuenta);
 
+			//var_dump($cuentas); exit;
 
 			if(is_null($cuentas)){
 				$this->session->set_flashdata('editar_individual_result', 10);
@@ -1586,7 +1592,7 @@ class Accounts extends CI_Controller {
 
 			$datos_form = array(
 							'idcuenta' => is_null($cuentas) ? 0 : $cuentas->id,
-							'concepto' => is_null($cuentas) ? 0 : $cuentas->idconcepto,
+							'concepto' => is_null($cuentas) ? 0 : $cuentas->tipo_concepto.'-'.$cuentas->idconcepto,
 							'propiedad' => is_null($cuentas) ? 0 : $cuentas->idpropiedad,
 							'periodo' => is_null($cuentas) ? '' : $cuentas->idperiodo,
 							'fechadeuda' => is_null($cuentas) ? '' : $cuentas->fechadeuda,
@@ -1704,11 +1710,14 @@ class Accounts extends CI_Controller {
 
        				if($propiedad != ''){
 
+       					$array_concepto = explode('-',$this->input->post("concepto"));
+
 			       		$parametros = array(
 			       						'idcuentaindividual' => $this->input->post("idcuenta"),
 			       						'idpropiedad' => $propiedad,
 			       						'idperiodo' => $this->input->post("periodo"),
-			       						'concepto' => $this->input->post("concepto"),
+			       						'tipo_concepto' => $array_concepto[0],
+			       						'concepto' => $array_concepto[1],
 			       						'fecuso' => $this->input->post("fecha"),
 			       						'monto' => str_replace(".","",$this->input->post("monto")),
 			       						'descripcion' => $this->input->post("descripcion"),

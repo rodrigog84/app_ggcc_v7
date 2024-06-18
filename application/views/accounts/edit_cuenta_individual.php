@@ -28,8 +28,8 @@
                               <select name="concepto" id="concepto"  class="form-control"  >
                                   <option value="">Seleccione un concepto</option>
                                   <?php foreach ($conceptos as $concepto) { ?>
-                                  		<?php $conceptoselected = $concepto->id == $datos_form['concepto'] ? "selected" : ""; ?>
-                                      <option value="<?php echo $concepto->id;?>" <?php echo $conceptoselected;?> ><?php echo $concepto->nombre;?></option>
+                                  		<?php $conceptoselected = $concepto->tipo_concepto.'-'.$concepto->id == $datos_form['concepto'] ? "selected" : ""; ?>
+                                      <option value="<?php echo $concepto->tipo_concepto.'-'.$concepto->id;?>" <?php echo $conceptoselected;?> ><?php echo $concepto->nombre;?></option>
                                   <?php } ?>                                
                               </select>
                             </div>

@@ -92,7 +92,7 @@
                         <td class="text-right">$&nbsp;<?php echo number_format($saldo,0,".",".");?></td>
                         <td class="text-right">
                           <center>
-                          <?php if(!is_null($movimiento->nombrearchivo)){ ?>
+                          <?php if(!is_null($movimiento->nombrearchivo) && $tiporeporte == 'fr'){ ?>
                           <a href="<?php echo base_url(); ?>uploads/cuentas/<?php echo $this->session->userdata('comunidadid')."/".$movimiento->nombrearchivo;?>" target="_blank" data-toggle="tooltip" title="Abrir Comprobante"><span class="glyphicon glyphicon-paperclip"></span></a>
                         <?php }else{ ?>
                               &nbsp;

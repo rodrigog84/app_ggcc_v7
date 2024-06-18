@@ -1,5 +1,47 @@
         <!-- Main content -->
         <section class="content" >
+          <form id="basicBootstrapForm" action="<?php echo base_url();?>reports/fondo_reserva" id="basicBootstrapForm" method="post"> 
+            <div class="row">
+
+                <div class="col-md-9">
+                  <div class="box box-primary">
+                    <div class="box-header">
+                      <h3 class="box-title">B&uacute;squeda</h3>  
+                    </div><!-- /.box-header -->
+
+                    <div class="box-body" >
+                      <div class='row'>
+                          <div class='col-md-4'>
+                            <div class="form-group">
+                                <label for="anno">Tipo Cartola</label>
+                                <select name="tiporeporte" id="tiporeporte" class="form-control">
+                                  <option value="">Seleccione tipo reporte</option>
+                                  <?php $fr_selected = $tiporeporte == 'fr' ? 'selected' : ''; ?>
+                                  <option value="fr" <?php echo $fr_selected;?> >Fondo de Reserva</option>
+                                  <?php foreach($fondos as $fondo){ ?>
+                                      <?php $fondo_selected = $tiporeporte == $fondo->id ? 'selected' : ''; ?>
+                                  <option value="<?php echo $fondo->id;?>" <?php echo $fondo_selected;?>><?php echo $fondo->nombre;?></option>
+                                  <?php } ?>
+                                </select>
+                            </div>
+                          </div>                                                   
+                      </div>
+                      <div class='row'>
+                          <div class='col-md-3'>
+                            <div class="form-group ">
+                            <label for="ruttitular">&nbsp;</label> 
+                            <button type="submit" class="btn btn-primary btn-block">Buscar</button>
+                          </div>
+                          </div>                  
+                      </div>                                           
+                    </div><!-- /.box-body -->
+                  </div>
+                </div>
+
+
+            </div>    
+
+
 
           <div class="row">
             
@@ -23,13 +65,31 @@
                   </thead>
                   <tbody>
                     <?php if(count($movimientos) > 0 ){ ?>
+                      <?php $sumasaldo = false; ?>
+                      <?php $saldo_siguiente = 0; ?>
                       <?php foreach ($movimientos as $movimiento) { ?>
                        <tr >
+                        <?php if($tiporeporte == 'fr'){
+
+                                $saldo = $movimiento->saldo;
+                              }else{
+                                if($sumasaldo){
+                                  $saldo = $saldo_siguiente;
+                                  $saldo_siguiente =  $saldo + $movimiento->monto*(-1);
+                                }else{
+                                  $saldo = $saldo_total;
+                                  $saldo_siguiente =  $saldo + $movimiento->monto*(-1);
+                                }
+
+                                $sumasaldo = true;
+
+                              }
+                          ?>
                         <td><?php echo $movimiento->fecha;?></td>
                         <td><?php echo $movimiento->glosa;?></td>
                         <td><?php echo trackid($movimiento->id);?></td>
                         <td class="text-right">$&nbsp;<?php echo number_format($movimiento->monto,0,".","."); ?></td>
-                        <td class="text-right">$&nbsp;<?php echo number_format($movimiento->saldo,0,".",".");?></td>
+                        <td class="text-right">$&nbsp;<?php echo number_format($saldo,0,".",".");?></td>
                         <td class="text-right">
                           <center>
                           <?php if(!is_null($movimiento->nombrearchivo)){ ?>
@@ -50,6 +110,8 @@
               </div>
             </div>
           </div>
+
+        </form>
        
         </section><!-- /.content -->
 

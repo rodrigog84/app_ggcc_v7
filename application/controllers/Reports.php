@@ -2912,8 +2912,28 @@ class Reports extends CI_Controller {
 
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
 
+
+			//var_dump($_POST); exit;
+
+			$tiporeporte = $this->input->post('tiporeporte');
+			$tiporeporte = $tiporeporte == '' ? 'fr' : $tiporeporte;
+
+			$this->load->model('admin');
+			$data_fondos = $this->admin->get_fondos();
+
+
 			$this->load->model('account');
-			$movimientos = $this->account->get_cartola_fondo_reserva(500,null,null,true);
+			$saldo_total = 0;
+			if($tiporeporte == 'fr'){
+				$movimientos = $this->account->get_cartola_fondo_reserva(500,null,null,true);	
+			}else{
+				$movimientos = $this->account->get_cartola_otros_fondos($tiporeporte);
+				
+				foreach($movimientos as $movimiento){
+					$saldo_total = $saldo_total + $movimiento->monto;
+				}	
+			}
+			
 
 			//$this->load->model('admin');
 			//$datoscomunidad = $this->admin->get_comunidad_by_id($this->session->userdata('comunidadid'));
@@ -2931,6 +2951,9 @@ class Reports extends CI_Controller {
 			$vars['content_menu'] = $content;				
 			$vars['content_view'] = 'reports/fondo_reserva';
 			$vars['movimientos'] = $movimientos;
+			$vars['fondos'] = $data_fondos;
+			$vars['tiporeporte'] = $tiporeporte;
+			$vars['saldo_total'] = $saldo_total;
 			//$vars['datoscomunidad'] = $datoscomunidad;
 			//$vars['saldo_disponible'] = $saldo_disponible;
 			//$vars['classinfo_disponible'] = $saldo_disponible > 0 ? 'bg-green' : 'bg-red';

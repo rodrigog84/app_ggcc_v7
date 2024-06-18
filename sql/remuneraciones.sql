@@ -3749,4 +3749,10 @@ ALTER TABLE `gc_cuenta`
 ALTER TABLE `gc_cartola_otros_fondos`
 	ADD COLUMN `idcuenta` INT(11) UNSIGNED NULL DEFAULT NULL AFTER `idcuentaindividual`;
 
+
+/********************************************************************************************/
+
+UPDATE `gasto_ggcc`.`gc_app` SET `name`='Fondos' WHERE  `id`=85;
+
+
 	

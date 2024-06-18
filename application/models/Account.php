@@ -757,7 +757,7 @@ class Account extends CI_Model
 				$this->db->where('idcuenta',$idcuenta);
 				$this->db->delete('gc_cartola_otros_fondos');
 
-					
+
 				$this->db->where('idcomunidad',$this->session->userdata('comunidadid'));
 				$this->db->where('id',$idcuenta);
 				$this->db->delete('gc_cuenta');
@@ -2389,6 +2389,41 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 		return $query->result();*/
 		
 	}
+
+
+
+	public function get_cartola_otros_fondos($idfondo, $limit = null,$fechadesde = null, $fechahasta = null){
+
+		$sql_limit = is_null($limit) ? '' : 'limit ' . $limit;
+		$sql_fec_desde  = is_null($fechadesde) ? '' : "and left(c.created_at,10) > '" . $fechadesde ."'"; 
+		$sql_fec_hasta  = is_null($fechahasta) ? '' : "and left(c.created_at,10) <=  '" . $fechahasta ."'"; 
+
+		$queryQuestion = $this->db->query('select 		date_format(c.created_at,"%d/%m/%Y") as fecha , c.glosa, c.id, c.monto, 0 as saldo, "" as nombrearchivo
+						  from 			gc_cartola_otros_fondos c
+						  where 		c.idcomunidad = ' . $this->session->userdata('comunidadid') . '
+						  and 			c.idfondo = ' . $idfondo . '
+						  and 			c.activo = 1 ' . $sql_fec_desde . ' ' . $sql_fec_hasta . '						  order by 		c.created_at desc, c.id desc ' . $sql_limit);
+
+		//echo $this->db->last_query(); exit;
+
+		return $queryQuestion->result();
+						 
+
+		/*$cartola_data = $this->db->select('date_format(c.created_at,"%d/%m/%Y") as fecha , c.glosa, c.id, c.monto, c.saldo ')
+						  ->from('gc_cartola_fondo_reserva c')
+						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
+						  ->where('c.activo = 1')
+		                  ->order_by('c.created_at desc')
+		                  ->order_by('c.id desc');
+
+		$cartola_data = is_null($limit) ? $cartola_data : $cartola_data->limit($limit);  		                  
+		$cartola_data = is_null($fechadesde) ? $cartola_data : $cartola_data->where("left(c.created_at,10) > '" . $fechadesde ."'");  
+		$cartola_data = is_null($fechahasta) ? $cartola_data : $cartola_data->where("left(c.created_at,10) <= '" . $fechahasta ."'");  
+		$query = $this->db->get();
+		return $query->result();*/
+		
+	}
+
 
 
 	public function get_movimiento_by_id($idmovimiento = null){

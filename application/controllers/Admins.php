@@ -3612,12 +3612,13 @@ class Admins extends CI_Controller
                 'subtitle' => 'Administraci&oacute;n de Bodegas'
             );
 
+
             $datos_form = array(
-                'idbodega' => is_null($bodega) ? 0 : $bodega->id,
-                'nombre' => is_null($bodega) ? '' : $bodega->nombre,
-                'idpropiedad' => is_null($bodega) ? 0 : $bodega->idpropiedad,
-                'idcomunidad' => is_null($bodega) ? '' : $bodega->idcomunidad,
-                'prorrateo' => is_null($bodega) ? '' : $bodega->prorrateo,
+                'idbodega' => !isset($bodega->id) ? 0 : $bodega->id,
+                'nombre' => !isset($bodega->id) ? '' : $bodega->nombre,
+                'idpropiedad' => !isset($bodega->id) ? 0 : $bodega->idpropiedad,
+                'idcomunidad' => !isset($bodega->id) ? '' : $bodega->idcomunidad,
+                'prorrateo' => !isset($bodega->id) ? '' : $bodega->prorrateo,
             );
 
             $vars['content_menu'] = $content;
@@ -3988,11 +3989,11 @@ public function submit_fondo()
             );
 
             $datos_form = array(
-                'idestacionamiento' => is_null($estacionamiento) ? 0 : $estacionamiento->id,
-                'nombre' => is_null($estacionamiento) ? '' : $estacionamiento->nombre,
-                'idpropiedad' => is_null($estacionamiento) ? 0 : $estacionamiento->idpropiedad,
-                'idcomunidad' => is_null($estacionamiento) ? '' : $estacionamiento->idcomunidad,
-                'prorrateo' => is_null($estacionamiento) ? '' : $estacionamiento->prorrateo,
+                'idestacionamiento' => !isset($estacionamiento->id) ? 0 : $estacionamiento->id,
+                'nombre' => !isset($estacionamiento->id) ? '' : $estacionamiento->nombre,
+                'idpropiedad' => !isset($estacionamiento->id) ? 0 : $estacionamiento->idpropiedad,
+                'idcomunidad' => !isset($estacionamiento->id) ? '' : $estacionamiento->idcomunidad,
+                'prorrateo' => !isset($estacionamiento->id) ? '' : $estacionamiento->prorrateo,
             );
 
             $vars['content_menu'] = $content;

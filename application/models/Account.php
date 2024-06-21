@@ -1126,6 +1126,9 @@ class Account extends CI_Model
 
 			$fecuso = substr($parametros['fecuso'],6,4)."-".substr($parametros['fecuso'],3,2)."-".substr($parametros['fecuso'],0,2);
 
+			$parametros['tipo_concepto'] = isset($parametros['tipo_concepto']) ? $parametros['tipo_concepto'] : 'td';
+
+
 			if($parametros['tipo_concepto'] == 'td'){
 				$concepto = $parametros['concepto'];
 				$fondo = 0;

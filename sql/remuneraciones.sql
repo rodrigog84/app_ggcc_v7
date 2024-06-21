@@ -3755,4 +3755,12 @@ ALTER TABLE `gc_cartola_otros_fondos`
 UPDATE `gasto_ggcc`.`gc_app` SET `name`='Fondos' WHERE  `id`=85;
 
 
+/**********************************************************************************************/
+
+ALTER TABLE `gc_comunicados`
+	CHANGE COLUMN `titulo` `titulo` VARCHAR(500) NULL COLLATE 'latin1_swedish_ci' AFTER `idcomunidad`,
+	CHANGE COLUMN `txt_comunicado` `txt_comunicado` TEXT NULL COLLATE 'latin1_swedish_ci' AFTER `titulo`;
+
+	
+
 	

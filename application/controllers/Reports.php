@@ -2919,7 +2919,7 @@ class Reports extends CI_Controller {
 			$tiporeporte = $tiporeporte == '' ? 'fr' : $tiporeporte;
 
 			$this->load->model('admin');
-			$data_fondos = $this->admin->get_fondos();
+			$data_fondos = $this->admin->get_fondos($this->session->userdata('comunidadid'));
 
 
 			$this->load->model('account');

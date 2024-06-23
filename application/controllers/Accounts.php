@@ -64,7 +64,7 @@ class Accounts extends CI_Controller {
 
 			$this->load->model('account');
 			$this->load->model('admin');
-			$data_fondos = $this->admin->get_fondos();
+			$data_fondos = $this->admin->get_fondos($this->session->userdata('comunidadid'));
 
 			$content = array(
 						'menu' => 'Cuentas',

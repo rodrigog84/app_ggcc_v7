@@ -3022,7 +3022,17 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 			//}
 
 
-			$this->load->library("mpdf");
+
+			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 8,
+									'margin-top' => 16,
+									'margin-bottom' => 16,
+									'margin-header' => 9,
+									'margin-footer' => 9,
+									'margin-left' => 10,
+									'margin-right' => 5,
+									]);
+
+			/*$this->load->library("mpdf");
 			$this->mpdf->mPDF(
 				'',    // mode - default ''
 				'',    // format - A4, for example, default ''
@@ -3035,17 +3045,17 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 				9,     // margin header
 				9,     // margin footer
 				'L'    // L - landscape, P - portrait
-				);  
+				);  */
 			//echo $html; exit;
-			$this->mpdf->SetTitle('Tu Gasto Común - Comprobante de Egreso');
-			$this->mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
-			$this->mpdf->WriteHTML($content);
-			$this->mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
+			$mpdf->SetTitle('Tu Gasto Común - Comprobante de Egreso');
+			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
+			$mpdf->WriteHTML($content);
+			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 
 			// SE ALMACENA EL ARCHIVO
 			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_Egreso_".$idegreso.".pdf";
-			$this->mpdf->Output($nombre_archivo, "I");
+			$mpdf->Output($nombre_archivo, "I");
 			
 	}
 

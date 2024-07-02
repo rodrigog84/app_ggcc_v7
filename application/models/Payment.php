@@ -1045,7 +1045,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 												from 	gc_deuda_propiedad
 												where 	idperiodo = ' . $idperiodo . '
 												and 	idpropiedad = p.id
-												and 	idtipodeudadetalle = 7),0) as multas
+												AND (idtipodeudadetalle = 7 OR (idtipodeudadetalle = 0 AND idfondo = 1))),0) as multas
 											, COALESCE((select sum(monto) as monto
 												from 	gc_deuda_propiedad
 												where 	idperiodo = ' . $idperiodo . '
@@ -1055,12 +1055,12 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 												from 	gc_deuda_propiedad
 												where 	idperiodo = ' . $idperiodo . '
 												and 	idpropiedad = p.id
-												and 	idtipodeudadetalle = 9),0) as cuotas_especiales
+												and (idtipodeudadetalle = 9 OR (idtipodeudadetalle = 0 AND idfondo NOT IN (1,2)))),0) as cuotas_especiales
 											, COALESCE((select sum(monto) as monto
 												from 	gc_deuda_propiedad
 												where 	idperiodo = ' . $idperiodo . '
 												and 	idpropiedad = p.id
-												and 	idtipodeudadetalle not in (7,8,9,23,24)),0) as otros_cobros	
+												and 	(idtipodeudadetalle NOT in (0,7, 8, 9, 23, 24) OR  (idtipodeudadetalle = 0 and idfondo = 2))),0) as otros_cobros	
 											, gp.monto
 											, gs.monto as saldo_anterior
 											, gp.abonado

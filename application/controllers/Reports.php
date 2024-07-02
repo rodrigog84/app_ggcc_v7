@@ -1379,7 +1379,7 @@ class Reports extends CI_Controller {
 				 $sheet->setCellValue('K'.$i, 'Ajustes');					 
 				 $sheet->mergeCells('L'.$i . ':L' . ($i+1));
 				 $sheet->getColumnDimension('L')->setWidth(17);
-				 $sheet->setCellValue('L'.$i, 'Cuotas Especiales');					 
+				 $sheet->setCellValue('L'.$i, 'Cobros Indivisuales');					 
 				 $sheet->mergeCells('M'.$i . ':M' . ($i+1));
 				 $sheet->getColumnDimension('M')->setWidth(17);
 				 $sheet->setCellValue('M'.$i, 'Intereses');					 

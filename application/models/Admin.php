@@ -1050,7 +1050,7 @@ public function get_fondo_by_id($fondoid)
 
         //echo '<pre>';
         
-        $data_conceptos2 = $this->get_fondos();
+        $data_conceptos2 = $this->get_fondos($this->session->userdata('comunidadid'));
 
 
         foreach ($data_conceptos2 as $obj) {

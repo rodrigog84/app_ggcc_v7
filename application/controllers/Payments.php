@@ -590,6 +590,9 @@ class Payments extends CI_Controller {
 
 			$datosindividual = $this->payment->get_detalle_by_ggcc_individual($ggccid);
 
+			//echo '<pre>';
+			//var_dump($datosindividual); exit;
+
 			$saldoanterior = $muestra_saldo == 1 ? $this->payment->get_saldo_anterior_by_ggcc($ggccid) : 0;
 
 			$totalggcc = $this->payment->get_ggcc_by_ggcc($ggccid);

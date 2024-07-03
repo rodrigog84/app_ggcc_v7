@@ -39,11 +39,11 @@
                      ?>
                       <tr>
                         <td><?php echo $i; ?></td>
-                        <td><?php echo $individual->item;?></td>
+                        <td><?php echo $individual->idtipodeudadetalle == 0 ? $individual->nombrefondo : $individual->item;?></td>
                         <td><?php echo $individual->descripcion;?></td>
-                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 ? "" : $individual->consumo." " . $unidadmedida ." [" . $individual->valor ." " . $unidadmedida . " - ". $individual->valor_ant . " " . $unidadmedida . "]";?></td>
-                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 ? "" : $individual->consumo_total." " . $unidadmedida;?></td>
-                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 ? "" : "$&nbsp;" . number_format($individual->montounidad,4,",",".");?></td>
+                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 || $individual->idtipodeudadetalle == 0 ? "" : $individual->consumo." " . $unidadmedida ." [" . $individual->valor ." " . $unidadmedida . " - ". $individual->valor_ant . " " . $unidadmedida . "]";?></td>
+                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 || $individual->idtipodeudadetalle == 0 ? "" : $individual->consumo_total." " . $unidadmedida;?></td>
+                        <td><?php echo $individual->itemid == 8 || $individual->itemid == 9 || $individual->itemid == 12 || $individual->idtipodeudadetalle == 0 ? "" : "$&nbsp;" . number_format($individual->montounidad,4,",",".");?></td>
                         <td>$&nbsp;<?php echo number_format($individual->monto,0,".",".");?></td>
                       </tr>
                     <?php $i++; ?>

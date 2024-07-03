@@ -928,9 +928,10 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 
 	public function get_detalle_by_propiedadid_periodoid_individual($propiedadid,$periodoid){
 
-		$this->db->select('td.id as itemid, td.nombre as item, dp.descripcion, dp.monto, dp.interes, dls.valor_ant, dls.valor, format(dls.valor - dls.valor_ant,3) as consumo, format((select sum(valor) as consumo_total from gc_detalle_lectura_servicio where idlectura = ls.id) - (select sum(valor_ant) as consumo_total from gc_detalle_lectura_servicio where idlectura = ls.id),3) as consumo_total, c.unidadmedida, c.montounidad', false)
+		$this->db->select('td.id as itemid, dp.idtipodeudadetalle, f.nombre as nombrefondo,  td.nombre as item, dp.descripcion, dp.monto, dp.interes, dls.valor_ant, dls.valor, format(dls.valor - dls.valor_ant,3) as consumo, format((select sum(valor) as consumo_total from gc_detalle_lectura_servicio where idlectura = ls.id) - (select sum(valor_ant) as consumo_total from gc_detalle_lectura_servicio where idlectura = ls.id),3) as consumo_total, c.unidadmedida, c.montounidad', false)
 						  ->from('gc_deuda_propiedad as dp')
-						  ->join('gc_tipo_deuda_detalle as td','dp.idtipodeudadetalle = td.id')
+						  ->join('gc_tipo_deuda_detalle as td','dp.idtipodeudadetalle = td.id','LEFT')
+						  ->join('gc_fondos as f','dp.idfondo = f.id','LEFT')
 						  ->join('gc_lectura_servicio as ls','dp.idcuenta = ls.idcuenta','left')
 						  ->join('gc_detalle_lectura_servicio as dls','ls.id = dls.idlectura and dls.idpropiedad = dp.idpropiedad','left')
 						  ->join('gc_cuenta c','dp.idcuenta = c.id','left')
@@ -2400,6 +2401,9 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 
 			$datos_detalle_individual_ggcc = $this->get_detalle_by_propiedadid_periodoid_individual($idpropiedad,$idperiodo);
 
+			//echo '<pre>'; 
+			//var_dump($datos_detalle_individual_ggcc); exit;
+
 			$saldo_anterior = $this->get_saldo_anterior_by_propiedadid_periodoid($idpropiedad,$idperiodo);
 
 			$estacionamientos = $this->admin->get_estacionamientos_by_propiedad($idpropiedad);
@@ -2599,6 +2603,10 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 						if(!is_null($detalle->valor)){ # SI ES LECTURA INDIVIDUAL SE MUESTRA LA LECTURA
 							$unidadmedida = is_null($detalle->unidadmedida) ? "unidad" : $detalle->unidadmedida;
 							$dato_extra = ". Consumo: ".$detalle->consumo." " . $unidadmedida . " [". $detalle->valor." " . $unidadmedida . " - " . $detalle->valor_ant . " " . $unidadmedida . "]/ Consumo Comunidad: " . (int) $detalle->consumo_total . " " . $unidadmedida.". Valor " . $unidadmedida . " : $ " . number_format($detalle->montounidad,0,",",".") . "." ;
+						}else if($detalle->idtipodeudadetalle == 0){
+								$cobro_mes = false;
+								$texto_item = $detalle->nombrefondo;
+								$dato_extra = " ( ".$detalle->descripcion . " )";	
 						}else if($detalle->itemid == 8 || $detalle->itemid == 9){ # SI ES CUOTA ESPECIAL SE MUESTRA LA DESCRIPCION
 							$cobro_mes = false;
 							$dato_extra = " ( ".$detalle->descripcion . " )";

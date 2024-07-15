@@ -275,7 +275,7 @@ class Accounts extends CI_Controller {
 			$proveedores = $this->admin->get_proveedor_comunidad_by_id();
 			$tipodoc = $this->admin->get_tipodoc_tributario_by_id();
 			$conceptos = $this->admin->get_tipos_cuentas_comunidad_by_id();
-			$data_fondos = $this->admin->get_fondos();
+			$data_fondos = $this->admin->get_fondos($this->session->userdata('comunidadid'));
 
 			$this->load->model('account');
 

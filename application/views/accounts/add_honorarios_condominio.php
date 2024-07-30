@@ -13,7 +13,19 @@
           <?php endif; ?>
           <br>
           <div class="alert alert-warning" role="alert">
-            Se les recuerda que a partir del 01/01/2021, los pagos de honorarios est&aacute;n sujetos a una retenci&oacute;n del 11,5%
+          <?php if (date('Y') == 2024){ // 2024
+                  $porcentaje = '13,75%';
+                }else if (date('Y') == 2025){ // 2025
+                  $porcentaje = '14,5%';
+                }else if (date('Y') == 2026){ // 2026
+                  $porcentaje = '15,25%';
+                }else if (date('Y') == 2027){ // 2027
+                  $porcentaje = '16%';
+                }else if (date('Y') == 2028){ // 2027
+                  $porcentaje = '17%';
+                } ?>
+
+            Se les recuerda que a partir del 01/01/<?php echo date('Y');?>, los pagos de honorarios est&aacute;n sujetos a una retenci&oacute;n del <?php echo $porcentaje; ?>
           </div>
           <br>
           <div class="row">

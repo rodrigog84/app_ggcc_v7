@@ -5502,7 +5502,9 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
 
 
         foreach ($lista_email as $lista) {
-            array_push($array_email, $lista->email);
+            if (!in_array($lista->email, $array_email) && $lista->email != '') {
+                array_push($array_email, $lista->email);
+            }
         }
 
 

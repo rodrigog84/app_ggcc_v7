@@ -5285,6 +5285,7 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
 					 ", false)
             ->from('gc_comunicados c')
             ->where('c.estado', '2')
+            ->where('c.fec_comienzo_envio is null')
             ->where('active', 1);
         $comunicados_data = is_null($idcomunicado) ? $comunicados_data : $comunicados_data->where('id', $idcomunicado);
         $query = $this->db->get();
@@ -5525,6 +5526,13 @@ public function envia_mail_prueba($from, $toList, $subject, $content, $type, $al
         $datos_comunicados = $this->get_comunicados_pendientes_envio();
         //print_r($datos_comunicados); exit;
         foreach ($datos_comunicados as $comunicado) {
+
+            $array_datos = array(
+                'fec_comienzo_envio' => date('Y-m-d H:i:s')
+            );
+
+            $this->db->where('id', $comunicado->id);
+            $this->db->update('gc_comunicados', $array_datos);
 
             $idcomunidad = $comunicado->idcomunidad;
             $propiedades = $this->get_propiedades($idcomunidad);

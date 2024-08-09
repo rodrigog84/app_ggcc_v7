@@ -3762,5 +3762,9 @@ ALTER TABLE `gc_comunicados`
 	CHANGE COLUMN `txt_comunicado` `txt_comunicado` TEXT NULL COLLATE 'latin1_swedish_ci' AFTER `titulo`;
 
 	
+/*****************************************************************************************************/
+
+ALTER TABLE `gc_comunicados`
+	ADD COLUMN `fec_comienzo_envio` DATETIME NULL DEFAULT NULL AFTER `fec_marca_envio`;
 
 	

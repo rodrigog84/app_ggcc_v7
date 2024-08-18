@@ -5203,7 +5203,8 @@ public function delete_fondo($idfondo = 0)
                 'subtitle' => is_null($idcomunicado) ? 'Agregar Comunicado' : 'Editar Comunicado'
             );
 
-            $vars['wysihtml5'] = true;
+            //$vars['wysihtml5'] = true;
+            $vars['ckeditor'] = true;
             $vars['formValidation'] = true;
             $vars['content_menu'] = $content;
             $vars['agrega'] = $agrega;

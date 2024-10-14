@@ -348,7 +348,7 @@ class Report extends CI_Model
 								INNER JOIN 	gc_periodo p ON g.idperiodo = p.id
 								INNER JOIN 	gc_periodo_estado e ON p.id = e.idperiodo AND e.idcomunidad = '" . $idcomunidad . "'   AND e.publica IS NOT null
 								WHERE 	g.idpropiedad = '" . $idpropiedad . "'
-								AND 		g.monto > 0
+								AND 		g.monto <> 0
 								union
 								SELECT 	CAST(l.created_at AS DATE) AS fec_ingreso
 											,0 AS Cargo
@@ -360,6 +360,8 @@ class Report extends CI_Model
 								AND 		l.activo = 1
 								)b
 					ORDER BY fec_ingreso desc");	
+
+		//echo $this->db->last_query(); exit;
 		return $queryQuestion->result_array();
 	}
 

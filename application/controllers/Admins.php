@@ -2031,7 +2031,7 @@ class Admins extends CI_Controller
             $this->load->model('admin');
             $propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
 
-           // var_dump(count($propiedad)); //exit;
+           // var_dump($propiedad); //exit;
 
             $lista_email = $this->admin->get_propiedad_email_by_id($idpropiedad);
 
@@ -2053,7 +2053,9 @@ class Admins extends CI_Controller
                 'subtitle' => 'Administraci&oacute;n de Propiedades'
             );
 
-            if($idpropiedad == 0 || $permite_editar_saldo == 1){
+            //var_dump($permite_editar_saldo); exit;
+            if($idpropiedad == 0){
+
 
                 $datos_form = array(
                     'idpropiedad' => 0,
@@ -2075,7 +2077,7 @@ class Admins extends CI_Controller
             }else{
 
 
-
+                //echo 'entra aca'; exit;
                 $datos_form = array(
                     'idpropiedad' => is_null($propiedad) ? 0 : $propiedad->id,
                     'idcomunidad' => is_null($propiedad) ? '' : $propiedad->idcomunidad,
@@ -5403,7 +5405,8 @@ public function deletefile_comunicado($data = '')
                 'subtitle' => 'Ver Comunicado'
             );
 
-            $vars['wysihtml5'] = true;
+            //$vars['wysihtml5'] = true;
+            $vars['ckeditor'] = true;
             $vars['formValidation'] = true;
             $vars['content_menu'] = $content;
             $vars['datos_comunicado'] = $array_datos;

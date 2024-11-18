@@ -2917,22 +2917,47 @@ class Reports extends CI_Controller {
 
 			$tiporeporte = $this->input->post('tiporeporte');
 			$tiporeporte = $tiporeporte == '' ? 'fr' : $tiporeporte;
+			$this->session->set_flashdata('tiporeporte_fondos',$tiporeporte);
 
 			$this->load->model('admin');
 			$data_fondos = $this->admin->get_fondos($this->session->userdata('comunidadid'));
 
 
+
+
+			if($this->input->post('mes') != ''){
+				$mes = $this->input->post('mes');
+				$this->session->set_flashdata('mes_mensualdata',$mes);
+			}else{
+				$mes = $this->session->flashdata('mes_mensualdata') == '' ? date('m') : $this->session->flashdata('mes_mensualdata');				
+			}
+
+
+
+			if($this->input->post('anno') != ''){
+				$anno = $this->input->post('anno');
+				$this->session->set_flashdata('anno_mensualdata',$anno);
+			}else{
+				$anno = $this->session->flashdata('anno_mensualdata') == '' ? date('Y') : $this->session->flashdata('anno_mensualdata');				
+			}
+
+
+
 			$this->load->model('account');
 			$saldo_total = 0;
 			if($tiporeporte == 'fr'){
-				$movimientos = $this->account->get_cartola_fondo_reserva(500,null,null,true);	
+				$movimientos = $this->account->get_cartola_fondo_reserva(500,null,null,true,$mes,$anno);	
 			}else{
-				$movimientos = $this->account->get_cartola_otros_fondos($tiporeporte);
+				$movimientos = $this->account->get_cartola_otros_fondos($tiporeporte,null,null,null,$mes,$anno);
 				
 				foreach($movimientos as $movimiento){
 					$saldo_total = $saldo_total + $movimiento->monto;
 				}	
 			}
+
+			$this->session->keep_flashdata('tiporeporte_fondos');
+			$this->session->keep_flashdata('mes_mensualdata');
+			$this->session->keep_flashdata('anno_mensualdata');						
 			
 
 			//$this->load->model('admin');
@@ -2953,6 +2978,8 @@ class Reports extends CI_Controller {
 			$vars['movimientos'] = $movimientos;
 			$vars['fondos'] = $data_fondos;
 			$vars['tiporeporte'] = $tiporeporte;
+			$vars['mes'] = $mes;	
+			$vars['anno'] = $anno;				
 			$vars['saldo_total'] = $saldo_total;
 			//$vars['datoscomunidad'] = $datoscomunidad;
 			//$vars['saldo_disponible'] = $saldo_disponible;

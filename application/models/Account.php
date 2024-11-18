@@ -2350,11 +2350,15 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 		return $query->result();*/
 	}
 
-	public function get_cartola_fondo_reserva($limit = null,$fechadesde = null, $fechahasta = null,$eliminados = false){
+	public function get_cartola_fondo_reserva($limit = null,$fechadesde = null, $fechahasta = null,$eliminados = false,$mes=null,$anno=null){
 
 		$sql_limit = is_null($limit) ? '' : 'limit ' . $limit;
 		$sql_fec_desde  = is_null($fechadesde) ? '' : "and left(c.created_at,10) > '" . $fechadesde ."'"; 
 		$sql_fec_hasta  = is_null($fechahasta) ? '' : "and left(c.created_at,10) <=  '" . $fechahasta ."'"; 
+
+
+		$sql_mes = is_null($mes) ? '' : "and month(c.created_at) = '" . $mes ."'"; 
+		$sql_anno = is_null($anno) ? '' : "and year(c.created_at) = '" . $anno ."'"; 		
 
 		$sql_eliminados = $eliminados ? 'and 			(idcuenta in  (
 																			select 		idcuenta
@@ -2370,7 +2374,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 						  from 			gc_cartola_fondo_reserva c
 						  left join 	gc_cuenta cu on c.idcuenta = cu.id
 						  where 		c.idcomunidad = ' . $this->session->userdata('comunidadid') . '
-						  and 			c.activo = 1 ' . $sql_fec_desde . ' ' . $sql_fec_hasta . ' ' . $sql_eliminados . '
+						  and 			c.activo = 1 ' . $sql_fec_desde . ' ' . $sql_fec_hasta . ' ' . $sql_mes . ' ' . $sql_anno . ' ' . $sql_eliminados . '
 						  order by 		c.created_at desc, c.id desc ' . $sql_limit);
 
 	
@@ -2395,17 +2399,22 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 
 
 
-	public function get_cartola_otros_fondos($idfondo, $limit = null,$fechadesde = null, $fechahasta = null){
+	public function get_cartola_otros_fondos($idfondo, $limit = null,$fechadesde = null, $fechahasta = null,$mes=null,$anno=null){
+
+
 
 		$sql_limit = is_null($limit) ? '' : 'limit ' . $limit;
 		$sql_fec_desde  = is_null($fechadesde) ? '' : "and left(c.created_at,10) > '" . $fechadesde ."'"; 
 		$sql_fec_hasta  = is_null($fechahasta) ? '' : "and left(c.created_at,10) <=  '" . $fechahasta ."'"; 
 
+		$sql_mes = is_null($mes) ? '' : "and month(c.created_at) = '" . $mes ."'"; 
+		$sql_anno = is_null($anno) ? '' : "and year(c.created_at) = '" . $anno ."'"; 
+
 		$queryQuestion = $this->db->query('select 		date_format(c.created_at,"%d/%m/%Y") as fecha , c.glosa, c.id, c.monto, 0 as saldo, "" as nombrearchivo
 						  from 			gc_cartola_otros_fondos c
 						  where 		c.idcomunidad = ' . $this->session->userdata('comunidadid') . '
 						  and 			c.idfondo = ' . $idfondo . '
-						  and 			c.activo = 1 ' . $sql_fec_desde . ' ' . $sql_fec_hasta . '						  order by 		c.created_at desc, c.id desc ' . $sql_limit);
+						  and 			c.activo = 1 ' . $sql_fec_desde . ' ' . $sql_fec_hasta . ' ' . $sql_mes . ' ' . $sql_anno . '						  order by 		c.created_at desc, c.id desc ' . $sql_limit);
 
 		//echo $this->db->last_query(); exit;
 

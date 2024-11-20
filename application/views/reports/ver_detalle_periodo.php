@@ -73,7 +73,7 @@
                           <td><?php echo $cuenta->proveedor;?></td>
                           <td><?php echo $cuenta->concepto;?></td>
                           <td><?php echo $cuenta->tipodocumentotributario;?></td>
-                          <td>$&nbsp;<?php echo number_format($cuenta->monto,0,".",".");?><input type="hidden" id="des_cuenta_monto-<?php echo $cuenta->id;?>" value="<?php echo $cuenta->idtipodoctrib == 4 ? $cuenta->monto*(-1) : $cuenta->monto;?>" /></td>
+                          <td>$&nbsp;<?php echo number_format($cuenta->monto,0,".",".");?><input type="hidden" id="des_cuenta_monto-<?php echo $cuenta->id;?>" value="<?php echo $cuenta->idtipodoctrib == 4 || $cuenta->idtipodoctrib == 18  ? $cuenta->monto*(-1) : $cuenta->monto;?>" /></td>
                           <td>$&nbsp;<?php echo number_format($cuenta->abonado,0,".",".");?></td>
                           <td><span class="label <?php echo $cuenta->saldo <= 0 ? 'label-success' : 'label-danger'; ?>"><i class="fa fa-dollar">&nbsp;<?php echo number_format($cuenta->saldo,0,".",".");?></i></span></td>
                           <td>

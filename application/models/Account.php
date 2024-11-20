@@ -1406,7 +1406,7 @@ class Account extends CI_Model
 						  ->where('c.idggcc is null')
 						  ->where("c.formapago = 'gc'")
 						  ->where('c.idtipodeudadetalle in (52,53,54,55,80,123)')
-						  ->where("c.idtipodoctrib <> 4") //NO ES NOTA DE CREDITO
+						  ->where("c.idtipodoctrib not in (4,18)") //NO ES NOTA DE CREDITO
 						  ->where("c.idproveedor is null")
 						  ->where("pr.aprueba is not null")
 						  ->where("c.active = 1")
@@ -1434,7 +1434,7 @@ class Account extends CI_Model
 						  ->where('c.idggcc is null')
 						  ->where("c.formapago = 'gc'")
 						  ->where('c.idtipodeudadetalle in (53,54)')
-						  ->where("c.idtipodoctrib <> 4") //NO ES NOTA DE CREDITO
+						  ->where("c.idtipodoctrib not in  (4,18)") //NO ES NOTA DE CREDITO
 						  ->where("c.idproveedor is null")
 						  ->where("pr.anticipo is not null")
 						  ->where("pr.aprueba is null")
@@ -1483,7 +1483,7 @@ class Account extends CI_Model
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('c.idggcc is null')
 						  ->where('(p.id is not null or c.retencionidctaasoc is not null)')
-						  ->where('(c.idtipodoctrib <> 4 or c.idtipodoctrib is null)')
+						  ->where('(c.idtipodoctrib not in  (4,18) or c.idtipodoctrib is null)')
 						  ->where("c.formapago = 'gc'")
 						  ->where("c.active = 1")
 		                  ->order_by('c.updated_at desc');
@@ -1508,7 +1508,7 @@ class Account extends CI_Model
 						  ->join('gc_tipo_documento_tributario tdt','c.idtipodoctrib = tdt.id','left')
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('c.idggcc is null')
-						  ->where('c.idtipodoctrib = 4')
+						  ->where('c.idtipodoctrib in (4,18)')
 						  ->where("c.formapago = 'gc'")
 		                  ->order_by('c.updated_at desc');
 		$cuentas_data = is_null($idcuenta) ? $cuentas_data : $cuentas_data->where('c.id',$idcuenta);  		                  
@@ -1565,7 +1565,7 @@ class Account extends CI_Model
 						  ->join('gc_periodo_remuneracion pr','c.idperiodoremuneracion = pr.idperiodo and c.idcomunidad = pr.idcomunidad','left')
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('(c.idperiodoremuneracion is null or (c.idperiodoremuneracion is not null and pr.aprueba is not null) or (c.idperiodoremuneracion is not null and pr.anticipo is not null and c.idtipodeudadetalle in (53,54)))')
-						  ->where('(c.idtipodoctrib is null or c.idtipodoctrib <> 4)') #NO SE CONSIDERAN LAS NOTAS DE CRÉDITO
+						  ->where('(c.idtipodoctrib is null or c.idtipodoctrib not in (4,18)   )') #NO SE CONSIDERAN LAS NOTAS DE CRÉDITO
 
 						  //->where('c.idggcc is not null and c.saldo > 0')
 						  //->where("c.formapago <> 'ci'")
@@ -1590,7 +1590,7 @@ class Account extends CI_Model
 						  ->join('gc_periodo_remuneracion pr','c.idperiodoremuneracion = pr.idperiodo and c.idcomunidad = pr.idcomunidad','left')
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('(c.idperiodoremuneracion is null or (c.idperiodoremuneracion is not null and pr.aprueba is not null) or (c.idperiodoremuneracion is not null and pr.anticipo is not null and c.idtipodeudadetalle in (53,54)))')
-						  ->where('(c.idtipodoctrib is null or c.idtipodoctrib <> 4)') #NO SE CONSIDERAN LAS NOTAS DE CRÉDITO
+						  ->where('(c.idtipodoctrib is null or c.idtipodoctrib not in (4,18) )') #NO SE CONSIDERAN LAS NOTAS DE CRÉDITO
 						  //->where('c.idggcc is not null and c.saldo > 0')
 						  //->where("c.formapago <> 'ci'")
 						  ->where('c.saldo > 0')
@@ -1627,7 +1627,7 @@ public function get_notas_credito($idcuenta = null){
 						  ->join('gc_periodo_remuneracion pr','c.idperiodoremuneracion = pr.idperiodo and c.idcomunidad = pr.idcomunidad','left')
 						  ->where('c.idcomunidad',$this->session->userdata('comunidadid'))
 						  ->where('(c.idperiodoremuneracion is null or (c.idperiodoremuneracion is not null and pr.aprueba is not null))')
-						  ->where('c.idtipodoctrib = 4') #SOLO NOTAS DE CRÉDITO
+						  ->where('c.idtipodoctrib in (4,18)') #SOLO NOTAS DE CRÉDITO
 						  //->where('c.idggcc is not null and c.saldo > 0')
 						  ->where('c.saldo > 0')
 		                  ->order_by('c.created_at desc');
@@ -1928,7 +1928,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 
 		$cuenta = $this->account->get_cuentas_by_ggcc($idggcc,$idcuenta);
 		if(!is_null($cuenta)){
-			$monto = $cuenta->idtipodoctrib == 4 ? $cuenta->monto*(-1) : $cuenta->monto;
+			$monto = $cuenta->idtipodoctrib == 4 ||  $cuenta->idtipodoctrib == 18  ? $cuenta->monto*(-1) : $cuenta->monto;
 			// ACTUALIZA MONTO DEUDA
 			$this->db->query("update gc_ggcc_comunidad set 
 														monto = monto - " . $monto . ",
@@ -2168,7 +2168,7 @@ public function get_activo_fijo_impago_by_id($idcuenta = null){
 			$idtipodoctrib = $result->idtipodoctrib; #4 = NOTA DE CRÉDITO
 
 			#SI ES NOTA DE CRÉDITO, LOS MONTOS SE RESTAN
-			$monto_abono = $idtipodoctrib == 4 ? $cuenta_pago['monto_abono']*(-1) : $cuenta_pago['monto_abono'];
+			$monto_abono = $idtipodoctrib == 4  || $idtipodoctrib == 18 ? $cuenta_pago['monto_abono']*(-1) : $cuenta_pago['monto_abono'];
 
 			$monto_pago += $monto_abono;
 

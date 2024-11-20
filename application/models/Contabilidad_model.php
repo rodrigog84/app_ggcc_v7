@@ -742,8 +742,8 @@ class Contabilidad_model extends CI_Model
 
 			$query = $this->db->query("
 							select COALESCE(SUM(saldo+pago_fuera_corte),0) as monto from
-							(select c.id, c.idggcc, left(c.fecautoriza,10) as fecautoriza, (select max(left(created_at,10)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id) as fec_ultimo_pago, monto, if(c.idtipodoctrib=4,saldo*(-1),saldo) as saldo,
-								(select if(c.idtipodoctrib=4,COALESCE(SUM(monto),0)*(-1),COALESCE(SUM(monto),0)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id and left(created_at,10) > '" . $fec_corte ."') as pago_fuera_corte
+							(select c.id, c.idggcc, left(c.fecautoriza,10) as fecautoriza, (select max(left(created_at,10)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id) as fec_ultimo_pago, monto, if(c.idtipodoctrib in (4,18),saldo*(-1),saldo) as saldo,
+								(select if(c.idtipodoctrib in (4,18),COALESCE(SUM(monto),0)*(-1),COALESCE(SUM(monto),0)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id and left(created_at,10) > '" . $fec_corte ."') as pago_fuera_corte
 							from gc_cuenta c
 							where idcomunidad = " . $this->session->userdata('comunidadid') . " and 
 							left(c.created_at,10) <= '" . $fec_corte ."'
@@ -1375,7 +1375,7 @@ class Contabilidad_model extends CI_Model
 				break;	
 			case 12: #CUENTAS POR PAGAR
 				$query = $this->db->query('select * from
-										(select c.id, c.idggcc, if(p.nombre is null,c.nombreproveedor,p.nombre) as proveedor, tdt.nombre as tipodocumentotributario, c.nrodocumento, date_format(c.fecdocumento,"%d/%m/%Y") as fecdocumento, d.nombre as concepto, left(c.fecautoriza,10) as fecautoriza, (select max(left(created_at,10)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id) as fec_ultimo_pago,  date_format(c.fecvencimiento,"%d/%m/%Y") as fecvencimiento, c.descripcion, c.monto, if(c.idtipodoctrib=4,saldo*(-1),saldo) as saldo,							(select if(c.idtipodoctrib=4,COALESCE(SUM(monto),0)*(-1),COALESCE(SUM(monto),0)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id and left(created_at,10) > "'. $balance->corte . '") as pago_fuera_corte
+										(select c.id, c.idggcc, if(p.nombre is null,c.nombreproveedor,p.nombre) as proveedor, tdt.nombre as tipodocumentotributario, c.nrodocumento, date_format(c.fecdocumento,"%d/%m/%Y") as fecdocumento, d.nombre as concepto, left(c.fecautoriza,10) as fecautoriza, (select max(left(created_at,10)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id) as fec_ultimo_pago,  date_format(c.fecvencimiento,"%d/%m/%Y") as fecvencimiento, c.descripcion, c.monto, if(c.idtipodoctrib in (4,18),saldo*(-1),saldo) as saldo,							(select if(c.idtipodoctrib in (4,18),COALESCE(SUM(monto),0)*(-1),COALESCE(SUM(monto),0)) from gc_cartola_pagos where activo = 1 and idcuenta = c.id and left(created_at,10) > "'. $balance->corte . '") as pago_fuera_corte
 										from gc_cuenta c
 										left join gc_proveedor p on c.idproveedor = p.id
 										left join gc_tipo_documento_tributario tdt on c.idtipodoctrib = tdt.id

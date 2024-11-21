@@ -3853,6 +3853,27 @@ public function accept_payprop($token = null,$tokentgc = null)
 
 
 
+
+    public function valida_existe_mail_comunidad($email, $iduser)
+    {
+
+        $user_data = $this->db->select('u.id ')
+            ->from('gc_users u')
+            ->join('gc_usuario_propiedad up','u.id = up.idusuario')
+            ->join('gc_propiedad p','up.idpropiedad = p.id')
+            ->where('u.email', $email)
+            ->where('p.idcomunidad', $this->session->userdata('comunidadid'))
+            ->where('u.active', 1);
+
+        $user_data = $iduser == 0 ? $user_data : $user_data->where('u.id <>', $iduser);
+        $query = $this->db->get();
+
+       // echo $this->db->last_query();
+        return count($query->result()) > 0 ? true : false;
+    }
+
+
+
     public function valida_existe_mail_user($email)
     {
 

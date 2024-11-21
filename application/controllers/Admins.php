@@ -4679,7 +4679,16 @@ public function delete_fondo($idfondo = 0)
             $iduser = $this->input->post('iduser');
 
             $this->load->model('admin');
-            $existe = $this->admin->valida_existe_mail($email, $iduser);
+
+            if ($this->session->userdata('level') == 4) { // SI ES ADM DE SISTEMA, PASA DIRECTO
+                    $existe = $this->admin->valida_existe_mail($email, $iduser);
+            }else{
+
+                    $existe = $this->admin->valida_existe_mail_comunidad($email, $iduser);
+            }
+
+
+            
             $data = array();
             if ($existe) {
                 $data['result'] = "error";

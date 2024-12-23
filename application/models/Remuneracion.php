@@ -1868,6 +1868,8 @@ limit 1		*/
             }
             //echo $aportesegcesantia; exit;
 
+            $imponibles_no_trabajo_imposiciones = 0;
+            $imponibles_no_trabajo_afc = 0;
 
             if ($tiene_licencia && $datos_remuneracion->diastrabajo < 30) { // SI TIENE LICENCIA SE DEBE SUMAR AL SEGURO LOS DÍAS NO TRABAJADOS POR EL PROPORCIONAL
                 $imponibles_no_trabajo = round((($trabajador->sueldobase + $aguinaldo_bruto + $bonos_imponibles + $gratificacion) / $diastrabajo) * ($diastrabajo - $datos_remuneracion->diastrabajo), 0);

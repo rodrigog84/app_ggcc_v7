@@ -135,8 +135,16 @@
                     <tr>
                       <td><?php echo $propiedad->numero;?></td>
                       <td class="form-group">
-                        <input type="text" class="lectura lect_anterior" name="lectura_anterior-<?php echo $propiedad->id;?>" id="lectura_anterior-<?php echo $propiedad->id;?>" value="<?php echo isset($idcuenta) ? $datos_lectura_ant[$propiedad->id] : $datos_lectura[$propiedad->id];?>" <?php /*echo $readonly; */?> >
-                        <input type="hidden" class="lecturah lect_anteriorh" name="hlectura_anteriorh-<?php echo $propiedad->id;?>" id="hlectura_anterior-<?php echo $propiedad->id;?>" value="<?php echo isset($idcuenta) ? $datos_lectura_ant[$propiedad->id] : $datos_lectura[$propiedad->id];?>" >
+                        <?php if(isset($idcuenta)){
+                                $lectura_anterior = isset($datos_lectura_ant[$propiedad->id]) ? $datos_lectura_ant[$propiedad->id] : 0;
+                        }else{
+                                $lectura_anterior = isset($datos_lectura[$propiedad->id]) ? $datos_lectura[$propiedad->id] : 0;
+
+                        } ?>
+
+
+                        <input type="text" class="lectura lect_anterior" name="lectura_anterior-<?php echo $propiedad->id;?>" id="lectura_anterior-<?php echo $propiedad->id;?>" value="<?php echo $lectura_anterior;?>" <?php /*echo $readonly; */?> >
+                        <input type="hidden" class="lecturah lect_anteriorh" name="hlectura_anteriorh-<?php echo $propiedad->id;?>" id="hlectura_anterior-<?php echo $propiedad->id;?>" value="<?php echo $lectura_anterior;?>" >
                       </td>
                       <td class="form-group"> 
                               <input type="text" class="lectura lect_actual" name="lectura_actual-<?php echo $propiedad->id;?>" id="lectura_actual-<?php echo $propiedad->id;?>" value="<?php echo $datos_lectura[$propiedad->id];?>" >

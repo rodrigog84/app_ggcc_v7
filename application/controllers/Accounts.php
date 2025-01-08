@@ -991,7 +991,8 @@ class Accounts extends CI_Controller {
 
 				$this->session->keep_flashdata('cuenta');
 
-				if(count($datos_cuenta) == 0){
+				//if(count($datos_cuenta) == 0){
+				if (is_null($datos_cuenta)) {
 						$this->session->set_flashdata('editar_cuenta_result', 9);
 						redirect('accounts/editar_cuenta');	
 				}

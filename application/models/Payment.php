@@ -938,10 +938,16 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 						  ->join('gc_cuenta c','dp.idcuenta = c.id','left')
 		                  ->where('dp.idpropiedad', $propiedadid)
 		                  ->where('dp.idperiodo', $periodoid)
-		                  ->order_by('td.nombre asc');
+		                  ->order_by("CASE 
+                    WHEN td.nombre IS NULL THEN CAST(td.id AS INT) 
+                    ELSE CAST(dp.monto AS INT) 
+                END, td.nombre ASC", FALSE)
+		                  ->order_by("td.nombre ASC", FALSE);
 
 
 		$query = $this->db->get();
+
+		//echo $this->db->last_query();
 		return $query->result();
 
 	}	
@@ -2595,15 +2601,27 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 								  </tr>	';
 						$subtotal += $detalle->monto;
 				}
-				//print_r($datos_detalle_individual_ggcc); exit;
+				//echo '<pre>';
+				//var_dump($datos_detalle_individual_ggcc); //exit;
 				$subtotal_otros_cobros = 0;
 				$html_otros_cobros = "";
 				foreach($datos_detalle_individual_ggcc as $detalle){ // COBROS INDIVIDUALES
 						$texto_item = $detalle->item;
+
+						var_dump($texto_item);
 						$cobro_mes = true;
 						if(!is_null($detalle->valor)){ # SI ES LECTURA INDIVIDUAL SE MUESTRA LA LECTURA
+
+							$consumo_individual_ggcc = $detalle->consumo;
+							$consumo_individual_ggcc = number_format($consumo_individual_ggcc,1,',','.');
+
+							$consumo_total_ggcc = $detalle->consumo_total;
+							$consumo_total_ggcc = str_replace(',','',$consumo_total_ggcc);
+							$consumo_total_ggcc = number_format($consumo_total_ggcc,1,',','.');
+
+
 							$unidadmedida = is_null($detalle->unidadmedida) ? "unidad" : $detalle->unidadmedida;
-							$dato_extra = ". Consumo: ".$detalle->consumo." " . $unidadmedida . " [". $detalle->valor." " . $unidadmedida . " - " . $detalle->valor_ant . " " . $unidadmedida . "]/ Consumo Comunidad: " . (int) $detalle->consumo_total . " " . $unidadmedida.". Valor " . $unidadmedida . " : $ " . number_format($detalle->montounidad,0,",",".") . "." ;
+							$dato_extra = ". Consumo: ".$consumo_individual_ggcc." " . $unidadmedida . " [". $detalle->valor." " . $unidadmedida . " - " . $detalle->valor_ant . " " . $unidadmedida . "]/ Consumo Comunidad: " . $consumo_total_ggcc . " " . $unidadmedida.". Valor " . $unidadmedida . " : $ " . number_format($detalle->montounidad,0,",",".") . "." ;
 						}else if($detalle->idtipodeudadetalle == 0){
 								$cobro_mes = false;
 								$texto_item = $detalle->nombrefondo;
@@ -2796,7 +2814,7 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 
 			$html .=	"</body>
 						</html>";
-					
+				//	echo $html; exit;
 				
 				$this->db->where('idpropiedad',$idpropiedad);
 				$this->db->where('idperiodo',$idperiodo);
@@ -3077,6 +3095,164 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 				$this->db->where('idperiodo',$idperiodo);
 				$this->db->update('gc_periodo_estado', array('pdf_content' => $html));			
 
+	}		
+
+
+
+
+public function generar_contenido_detalle_deuda($comunidadid,$idperiodo){
+
+
+			$this->load->model('report');
+
+			
+
+
+			$deudas = $this->report->get_ranking_morosos_by_comunidad($comunidadid);
+			//echo "<pre>";
+			//var_dump($deudas); exit;
+
+
+
+			$this->load->model('admin');
+			$comunidad = $this->admin->get_comunidades($comunidadid);
+			$datosperiodo = $this->admin->get_periodos($comunidadid,$idperiodo);
+
+
+			$html = '<html>
+					<head>
+					<style type="text/css">
+					.rounded {
+					 border:0.1mm solid #220044;
+					 background-color: #FAFAFA;
+					 background-clip: border-box;
+					 padding: 1em;
+						}
+
+					.recto {
+					 border:0.1mm solid #000000;
+					 background-color: #FAFAFA;
+					 background-clip: border-box;
+					 padding: 1em;
+						}
+
+
+					.tableClass { 
+						background-color: #e3ece4; 
+						border-collapse: collapse;
+						font-family: DejaVuSansCondensed;
+						font-size: 10pt; 
+						line-height: 1.2;
+						margin-top: 2pt; 
+						margin-bottom: 5pt; 
+						width: 70%;
+						topntail: 0.02cm solid #495b4a; 
+					}
+
+					.theadClass { 
+						font-weight: bold; 
+						vertical-align: bottom; 
+					}
+
+					.tdClass { 
+						padding-left: 4mm; 
+						vertical-align: top; 
+						text-align:left;
+						padding-right: 4mm; 
+						padding-top: 0.5mm; 
+						padding-bottom: 0.5mm;
+						border-top: 1px solid #FFFFFF; 
+					}
+
+					.tdClassCenter { 
+						padding-left: 4mm; 
+						vertical-align: top; 
+						text-align:center;
+						padding-right: 4mm; 
+						padding-top: 0.5mm; 
+						padding-bottom: 0.5mm;
+						border-top: 1px solid #FFFFFF; 
+					}					
+
+					.tdClassNumber { 
+						text-align:right;
+					}
+
+					.headerRow td, .headerRow th { 
+						background-gradient: linear #b7cebd #ffffff 0 1 0 0.2; 
+						padding: 1mm; 
+					}	
+
+					.header4 { 
+						font-weight: ; 
+						font-size: 13pt; 
+						color: #080636;
+						font-family: DejaVuSansCondensed, sans-serif; 
+						margin-top: 10pt; 
+						margin-bottom: 7pt;
+						text-align: center;
+						margin-collapse:collapse; page-break-after:avoid; }										
+					</style>
+			</head>
+					<body>';
+
+
+			$logo = $comunidad->logo == '' || is_null($comunidad->logo) ? 'img/logo4_1_80p_color.png' : 'uploads/logos/'. $this->session->userdata('comunidadid') . '/' . $comunidad->logo;
+
+			$html .= '
+						<p><h4 class="header4"><br>Listado de Morosos<br><br><img src="' . $logo . '" width="100px"></h4></p>
+						<hr>
+						<br>
+						<div class="recto">
+						<table class="" width="100%"  >
+						<thead class="theadClass">
+						<tr class="headerRow">
+						<th width="40%"><p>Direcci&oacute;n</p></th>
+						<th width="30%"><p>N&uacute;mero</p></th>
+						<th width="30%"><p>Valor Mora</p></th>
+						</tr>
+						</thead>
+						<tbody>';
+						$remuneraciones = 0; //NO SE PUEDE MOSTRAR EL DETALLE DE REMUNERACIONES
+						$tiene_remuneracion = false;						
+					    foreach ($deudas as $deuda) { 
+
+			$html .= 	'<tr>
+							<td style="font-size: 8pt;">' . $deuda->direccion . '</td>
+							<td style="font-size: 8pt;">' . $deuda->numero . '</td>
+							<td class="tdClass tdClassNumber" style="font-size: 8pt;"><b>$ ' . number_format($deuda->saldo,0,".",".") . '</b></td>
+						</tr>';
+
+					
+
+						}
+
+
+				
+				$html .= '
+						<tr>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+							<td class="tdClass">&nbsp;</td>
+						</tr>
+						</tbody>
+						</table>
+						<br><br>
+						</div>
+						<br>
+						<hr>
+
+		';
+
+			$html .=	"</body>
+						</html>";
+				
+				$this->db->where('idcomunidad',$comunidadid);
+				$this->db->where('idperiodo',$idperiodo);
+				$this->db->update('gc_periodo_estado', array('pdf_content_deuda' => $html));			
+
 	}			
 
 
@@ -3093,7 +3269,7 @@ public function generar_contenido_detalle($comunidadid,$idperiodo){
 
 	private function get_pdf_content_detalle($comunidadid,$idperiodo){
 
-		$this->db->select('pdf_content ')
+		$this->db->select('pdf_content, pdf_content_deuda ')
 						  ->from('gc_periodo_estado ')
 						  ->where('idcomunidad', $comunidadid)
 						  ->where('idperiodo',$idperiodo);
@@ -3246,7 +3422,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$datos_propiedad = $this->admin->get_propiedad_by_id($idpropiedad);
 			$datosperiodo = $this->admin->get_periodos($comunidadid,$idperiodo);
 
-
+			//$this->generar_contenido_comprobante($comunidadid,$idperiodo,$idpropiedad);
 			$content = $this->get_pdf_content($idpropiedad,$idperiodo);
 
 			if($content->pdf_content == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
@@ -3259,10 +3435,17 @@ public function comprobante_detalle_ggcc($idperiodo){
 
 			if($content_detalle->pdf_content == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
 				$this->generar_contenido_detalle($comunidadid,$idperiodo);
-				$content_detalle = $this->get_pdf_content_detalle($comunidadid,$idperiodo);
+				//$content_detalle = $this->get_pdf_content_detalle($comunidadid,$idperiodo);
 			}		
 
 
+			/*if($content_detalle->pdf_content_deuda == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
+				$this->generar_contenido_detalle_deuda($comunidadid,$idperiodo);
+
+			}		*/
+
+
+			$content_detalle = $this->get_pdf_content_detalle($comunidadid,$idperiodo);
 
 			$mpdf = new \Mpdf\Mpdf(['default_font_size' => 7,
 									'margin-top' => 16,
@@ -3295,7 +3478,9 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
 			$mpdf->WriteHTML($content->pdf_content);
 			$mpdf->AddPage();
-			$mpdf->WriteHTML($content_detalle->pdf_content);			
+			$mpdf->WriteHTML($content_detalle->pdf_content);	
+			$mpdf->AddPage();
+			$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
 			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 

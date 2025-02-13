@@ -939,15 +939,16 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		                  ->where('dp.idpropiedad', $propiedadid)
 		                  ->where('dp.idperiodo', $periodoid)
 		                  ->order_by("CASE 
-                    WHEN td.nombre IS NULL THEN CAST(td.id AS INT) 
-                    ELSE CAST(dp.monto AS INT) 
-                END, td.nombre ASC", FALSE)
-		                  ->order_by("td.nombre ASC", FALSE);
+									    WHEN nombrefondo IS NULL THEN CAST(1 AS INT) 
+									    ELSE CAST(0 AS INT) 
+									  END", FALSE)
+		                  ->order_by("f.nombre ASC", FALSE)
+		                  ->order_by("td.id", FALSE);
 
 
 		$query = $this->db->get();
 
-		//echo $this->db->last_query();
+		//echo $this->db->last_query(); exit;
 		return $query->result();
 
 	}	
@@ -2608,7 +2609,7 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 				foreach($datos_detalle_individual_ggcc as $detalle){ // COBROS INDIVIDUALES
 						$texto_item = $detalle->item;
 
-						var_dump($texto_item);
+						//var_dump($texto_item);
 						$cobro_mes = true;
 						if(!is_null($detalle->valor)){ # SI ES LECTURA INDIVIDUAL SE MUESTRA LA LECTURA
 

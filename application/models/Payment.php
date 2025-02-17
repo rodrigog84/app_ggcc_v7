@@ -3426,6 +3426,8 @@ public function comprobante_detalle_ggcc($idperiodo){
 			//$this->generar_contenido_comprobante($comunidadid,$idperiodo,$idpropiedad);
 			$content = $this->get_pdf_content($idpropiedad,$idperiodo);
 
+
+
 			if($content->pdf_content == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
 				$this->generar_contenido_comprobante($comunidadid,$idperiodo,$idpropiedad);
 				$content = $this->get_pdf_content($idpropiedad,$idperiodo);
@@ -3474,14 +3476,14 @@ public function comprobante_detalle_ggcc($idperiodo){
 				);  */
 
 				
-			//echo $html; exit;
+			//var_dump($content->pdf_content); exit;
 			$mpdf->SetTitle('Tu Gasto Común - Comprobante');
 			$mpdf->SetHeader('Condominio '. $datos_comunidad->nombre . ' - ' .$datos_comunidad->comuna . ' - RUT: ' .number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);
 			$mpdf->WriteHTML($content->pdf_content);
 			$mpdf->AddPage();
 			$mpdf->WriteHTML($content_detalle->pdf_content);	
 			$mpdf->AddPage();
-			$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
+			//$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
 			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 

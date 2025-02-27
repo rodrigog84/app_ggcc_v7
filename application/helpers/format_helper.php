@@ -1283,6 +1283,22 @@ if (!function_exists('dias_mes_rango'))
 }
 
 
+if (!function_exists('calcula_edad'))
+{
+
+  function calcula_edad($fecha_nacimiento)
+  {
+
+    //$fecha_nac = new DateTime($fecha_nacimiento);
+    $fecha_nac = DateTime::createFromFormat('d/m/Y', $fecha_nacimiento);
+    $hoy = new DateTime(); // Fecha actual
+    $edad = $hoy->diff($fecha_nac);
+    return $edad->y; // Devuelve la edad en años
+  }
+}
+
+
+
 
 } 
 

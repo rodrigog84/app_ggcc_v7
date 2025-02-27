@@ -1520,6 +1520,11 @@ class Remuneracion extends CI_Model
 
         $personal = $this->get_personal();
         foreach ($personal as $trabajador) { // calculo de sueldos por cada trabajador
+            $fecnacimiento = $trabajador->fecnacimiento;
+
+            //var_dump($fecnacimiento); 
+            $edad = calcula_edad($fecnacimiento);
+            //var_dump($edad); //exit;
             $datos_remuneracion = $this->get_datos_remuneracion_by_periodo($idperiodo, $trabajador->id);
             $datos_bonos = $this->get_bonos($trabajador->id);
             $bonos_imponibles = 0;
@@ -1805,7 +1810,11 @@ class Remuneracion extends CI_Model
 
             $sueldo_liquido = $total_haberes - $total_descuentos;
 
-            if ($trabajador->pensionado == 1) {
+            //if ($trabajador->pensionado == 1) {
+
+            if ($edad > 65) {
+                $seginvalidez = 0;
+            }else if($edad <= 65 && $trabajador->pensionado == 1){
                 $seginvalidez = 0;
             } else {
                 if ($datos_remuneracion->diastrabajo < 30) {

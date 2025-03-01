@@ -4686,7 +4686,7 @@ public function cartola_vacaciones_personal()
             $this->load->model('remuneracion');
 
             $descjurada_data = $this->remuneracion->archivo_decjurada_rentas($anno);
-
+            exit;
 
             $content = array(
                 'menu' => 'Remuneraciones',

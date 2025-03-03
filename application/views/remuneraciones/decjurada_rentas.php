@@ -85,6 +85,10 @@
                             <th >Renta Total Neta Pagada (Art. 42 Nro. 1, Ley de Renta)</th>
                             <th>$&nbsp;<?php echo number_format($linea->rentatotalsinactualizar,0,'.','.'); ?></th>
                           </tr>
+                          <tr>
+                            <th >Renta Total Neta Actualizada</th>
+                            <th>$&nbsp;<?php echo number_format($linea->rentatotalneta,0,'.','.'); ?></th>
+                          </tr>
 
                           <tr>
                             <th >Impuesto Unico de Segunda Categoria Retenido Por Renta Total Neta Pagada Durante el A&ntilde;o</th>

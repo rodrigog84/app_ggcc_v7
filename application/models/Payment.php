@@ -3401,7 +3401,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 
 
 			// SE ALMACENA EL ARCHIVO
-			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$datos_propiedad->numero.".pdf";
+			$nombre_archivo = date("Y")."_".date("m")."_".date("d").".pdf";
 
 
 
@@ -4445,7 +4445,7 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 
 			$this->load->model('admin');
 			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
-
+			
 			$content = $this->get_pdf_ingreso_content($listado_abonos_id);
 
 			if($content->pdf_content == ''){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA

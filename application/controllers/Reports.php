@@ -3111,6 +3111,107 @@ public function mensual_data($resultid = '')
 	}
 
 
+
+	
+public function flujo_efectivo($resultid = '')
+	{
+		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
+
+
+			$resultid = $this->session->flashdata('mensualdata_result');
+			if($resultid == 1){
+				$vars['message'] = "Error al exportar informaci&oacute;n";
+				$vars['classmessage'] = 'danger';
+				$vars['icon'] = 'fa-ban';			
+			}
+
+			//print_r($this->input->post(NULL,true)); exit;
+
+			if($this->input->post('tiporeporte') != ''){
+				$tiporeporte = $this->input->post('tiporeporte');
+				$this->session->set_flashdata('tiporeporte_mensualdata',$tiporeporte);
+			}else{
+				$tiporeporte = $this->session->flashdata('tiporeporte_mensualdata') == '' ? '' : $this->session->flashdata('tiporeporte_mensualdata');				
+			}
+
+
+			if($this->input->post('mes') != ''){
+				$mes = $this->input->post('mes');
+				$this->session->set_flashdata('mes_mensualdata',$mes);
+			}else{
+				$mes = $this->session->flashdata('mes_mensualdata') == '' ? date('m') : $this->session->flashdata('mes_mensualdata');				
+			}
+
+
+			if($this->input->post('anno') != ''){
+				$anno = $this->input->post('anno');
+				$this->session->set_flashdata('anno_mensualdata',$anno);
+			}else{
+				$anno = $this->session->flashdata('anno_mensualdata') == '' ? date('Y') : $this->session->flashdata('anno_mensualdata');				
+			}
+
+			$this->session->keep_flashdata('tiporeporte_mensualdata');
+			$this->session->keep_flashdata('mes_mensualdata');
+			$this->session->keep_flashdata('anno_mensualdata');
+
+ 
+			$mensual_data = array();
+			$this->load->model('report');
+			if($tiporeporte == 'li'){				
+				$mensual_data = $this->report->get_lecturas_individuales(null,$mes,$anno);
+			}else if($tiporeporte == 'ri'){
+				$mensual_data = $this->report->get_intereses_mensuales($mes,$anno);
+			}else if($tiporeporte == 'ra'){
+				$mensual_data = $this->report->get_ajustes_mensuales($mes,$anno);				
+			}else if($tiporeporte == 'rm'){
+				$mensual_data = $this->report->get_multas_mensuales($mes,$anno);				
+			}else if($tiporeporte == 'rce'){
+				$mensual_data = $this->report->get_cuotas_especiales_mensuales($mes,$anno);				
+			}else if($tiporeporte == 'ric'){
+				$mensual_data = $this->report->get_ingresos_mensuales($mes,$anno);				
+			}else if($tiporeporte == 'rsc'){
+				$mensual_data = $this->report->get_cuentas_sin_cobro($mes,$anno);				
+			}else if($tiporeporte == 'cgc'){
+				$mensual_data = $this->report->get_cobro_gasto_comun($mes,$anno);				
+			}else if($tiporeporte == 'rec'){
+				$mensual_data = $this->report->get_cuentas_espacios_comunes($mes,$anno);				
+			}
+
+			$content = array(
+						'menu' => 'Informaci&oacute;n',
+						'title' => 'Informaci&oacute;n',
+						'subtitle' => 'Reportes Mensuales');
+
+			$vars['content_menu'] = $content;				
+			$vars['mensual_data'] = $mensual_data;	
+			$vars['tiporeporte'] = $tiporeporte;	
+			$vars['mes'] = $mes;	
+			$vars['anno'] = $anno;	
+			$vars['content_view'] = 'reports/mensual_data';
+			$vars['formValidation'] = true;
+			$vars['dataTables'] = true;
+
+			$template = "template";
+			
+
+			$this->load->view($template,$vars);	
+
+		}else{
+			$content = array(
+						'menu' => 'Error 403',
+						'title' => 'Error 403',
+						'subtitle' => '403 error');
+
+
+			$vars['content_menu'] = $content;				
+			$vars['content_view'] = 'forbidden';
+			$this->load->view('template',$vars);
+
+		}
+
+	}
+
+
 	public function reporte_egresos()
 	{
 

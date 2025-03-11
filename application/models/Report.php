@@ -141,6 +141,187 @@ class Report extends CI_Model
 
 
 
+
+	public function get_flujo_efectivo_ingresos($fecha_inicial=null,$fecha_final=null){
+
+		$query = $this->db->query('SELECT 			anno
+													,mes
+													,SUM(monto) AS monto
+													FROM			(
+																	SELECT 	id
+																				, folio
+																				, idpropiedad
+																				, DATE_FORMAT(fecha, "%d/%m/%Y") AS fecha
+																				, DATE_FORMAT(fechapago, "%d/%m/%Y") AS fechapago_format
+																				, fechapago
+																				, anno
+																				, mes
+																				, DATE_FORMAT(fechaconciliacion, "%d/%m/%Y") AS fechaconciliacion
+																				, monto
+																				, glosa
+																				, tipo_movimiento
+																				, created_at
+																				, protesto
+																				, NULL AS idingreso
+																				, 0 AS monto_listado
+																				, cheque
+																				, activo
+																				, idcaja
+																	FROM (
+																					SELECT la.id
+																							, la.folio
+																							, la.idpropiedad
+																							, la.created_at AS fecha
+																							, la.fechapago AS fechapago
+																							, YEAR(la.fechapago) AS anno
+																							, MONTH(la.fechapago) AS mes
+																							, la.fechaconciliacion AS fechaconciliacion
+																							, la.monto
+																							, if(la.idprotesto IS NULL, 
+																										CONCAT("Abono GC de Propiedad # ",p.numero),
+																										concat("Protesto de Documento en Movimiento A",lpad((select folio from gc_listado_abonos where id = la.idprotesto),5,"0"))
+																								) as glosa
+																							, "a" as tipo_movimiento
+																							, la.created_at
+																							, la.protesto
+																							, la.cheque
+																							, la.activo
+																							, c.id as idcaja 
+																						#INGRESOS
+																					FROM 			gc_listado_abonos la 
+																					left JOIN 	gc_cartola_propiedad cp on la.id = cp.idlistado  # SACAR PERIODO DESDE ACA
+																					left JOIN 	gc_cartola_caja c on cp.id = c.idabono 
+																					inner JOIN 	gc_propiedad p on la.idpropiedad = p.id 
+																					WHERE 		la.idcomunidad = ' . $this->session->userdata('comunidadid') . ' 
+																					AND 			la.activo = 1 
+																					AND 			la.fechaconciliacion is not NULL 
+																					#AND 			(la.fechapago) = 2024
+																					AND 			la.fechapago between "' .  $fecha_inicial . '" and "' . $fecha_final  . '" 
+																					group BY 	la.id 
+																					
+																								
+																					UNION 
+																					
+																					SELECT 		cc.id
+																									, cc.id as folio
+																									, "" as idpropiedad
+																									, cc.created_at AS fecha
+																									, cc.fechapago
+																									, YEAR(cc.fechapago) AS anno
+																									, MONTH(cc.fechapago) AS mes
+																									, cc.fechaconciliacion
+																									, cc.monto
+																									, cc.glosa
+																									, "i" as tipo_movimiento
+																									, cc.created_at
+																									, cc.protesto
+																									, "" as cheque
+																									, cc.activo
+																									, cc.id as idcaja 
+																					FROM 			gc_cartola_caja cc 
+																					left JOIN 	gc_ingresos i on cc.idingreso = i.id 
+																					WHERE 		cc.idcomunidad = ' . $this->session->userdata('comunidadid') . ' 
+																					AND 			(cc.idingreso is not null or cc.exingreso = 1) 
+																					AND 			(i.tipoingreso <> "na" OR i.tipoingreso IS NULL) 
+																					AND 			cc.activo = 1 
+																					AND 			cc.fechaconciliacion is not NULL 
+																					#AND 			YEAR(cc.fechapago) = 2024
+																					AND 			cc.fechapago between "' .  $fecha_inicial . '" and "' . $fecha_final  . '" 
+																					
+																					) as tmp order by fechapago desc, created_at desc, id desc
+																		)b
+													GROUP BY anno, mes	');
+
+		return $query->result();		
+	}
+
+
+
+	public function get_flujo_efectivo_egresos($fecha_inicial=null,$fecha_final=null){
+
+		$query = $this->db->query('SELECT		anno
+												,mes
+												,formapago_desc
+												,concepto
+												,SUM(monto) AS monto
+								FROM 			(
+												SELECT 	id
+															, folio
+															, idpropiedad
+															, DATE_FORMAT(fecha, "%d/%m/%Y") AS fecha
+															, DATE_FORMAT(fechapago, "%d/%m/%Y") AS fechapago_format
+															, fechapago
+															, concepto
+															, concepto_hijo
+															, formapago
+															, formapago_desc
+															, anno
+															, mes
+															, DATE_FORMAT(fechaconciliacion, "%d/%m/%Y") AS fechaconciliacion
+															, monto
+															, glosa
+															, tipo_movimiento
+															, created_at
+															, protesto
+															, NULL AS idingreso
+															, 0 AS monto_listado
+															, cheque
+															, activo
+															, idcaja
+												FROM (
+														
+																SELECT 		lp.id
+																				, lp.folio
+																				, "" as idpropiedad
+																				, lp.created_at AS fecha
+																				, lp.fechapago AS fechapago
+																				, if(d2.nombre is null,"Otras Cuentas",d2.nombre) as concepto
+																				, 	if(d.nombre is null,"Otros Cargos",d.nombre) as concepto_hijo
+																				, 	cta.formapago
+																				,	case when cta.formapago = "gc" then "Gasto Común"
+																						  when cta.formapago = "ci" then "Cobro por Lectura Individual"
+																						  when cta.formapago = "sc" then "Sin Cobro"
+																						  when cta.formapago = "af" then "Activo Fijo"
+																						  when cta.formapago = "f" then "Fondos"
+																						  ELSE ""
+																					END AS formapago_desc
+																				, YEAR(lp.fechapago) AS anno
+																				, MONTH(lp.fechapago) AS mes
+																				, lp.fechaconciliacion AS fechaconciliacion
+																				, lp.monto as monto
+																				, if(lp.idprotesto is null,if(lp.paguesea="",c.glosa,concat("Pago de Cuentas de Condominio. ",lp.paguesea)),concat("Protesto de Documento en Movimiento P",lpad((select folio from gc_listado_pagos where id = lp.idprotesto limit 1),5,"0"))) as glosa
+																				, "p" as tipo_movimiento
+																				, lp.created_at
+																				, lp.protesto
+																				, lp.cheque
+																				, lp.activo
+																				, c.id as idcaja 
+																FROM 			gc_listado_pagos lp 
+																left JOIN 	gc_cartola_pagos cp on lp.id = cp.idlistado 
+																left JOIN 	gc_cartola_caja c on cp.id = c.idpago 
+																LEFT JOIN 	gc_cuenta cta ON cp.idcuenta = cta.id
+																LEFT JOIN 	gc_tipo_deuda_detalle d ON cta.idtipodeudadetalle = d.id
+																LEFT JOIN 	gc_tipo_deuda_detalle d2 ON d.idpadre = d2.id
+																#CRUZAR CON GC_CUENTA PARA OBTENER EL PERIODO
+																WHERE 		lp.idcomunidad = ' . $this->session->userdata('comunidadid') . '  
+																AND 			lp.activo = 1 
+																AND 			lp.fechaconciliacion is not null 
+																AND 			lp.fechapago between "' .  $fecha_inicial . '" and "' . $fecha_final  . '" 
+																#AND 			YEAR(lp.fechapago) = 2024
+																group BY 	lp.id 		
+																			
+																) as tmp order by fechapago desc, created_at desc, id desc
+													)b		
+								GROUP BY		anno
+												,mes
+												,formapago_desc
+												,concepto');
+
+		return $query->result();		
+	}
+
+
+
 	public function get_intereses_mensuales($mes=null,$anno=null){
 
 		$query = $this->db->query('select p.numero, dp.descripcion, date_format(dp.fechadeuda,"%d/%m/%Y") as fechadeuda, pe.mes, pe.anno, dp.monto from gc_deuda_propiedad dp 
@@ -311,6 +492,30 @@ class Report extends CI_Model
 		return $query->result();		
 	}	
 
+
+
+
+
+	public function get_ranking_morosos_by_comunidad($idcomunidad){
+
+		$query = $this->db->query("select p.id, p.numero, p.responsable, p.direccion, p.saldo_publicado as saldo,
+										(select count(gp.id) as cantidad
+										from gc_ggcc_propiedad as gp
+										inner join gc_periodo as per on gp.idperiodo = per.id
+										inner join gc_periodo_estado as pe on per.id = pe.idperiodo and pe.idcomunidad = '" . $this->session->userdata('comunidadid') . "'
+										where gp.idpropiedad = p.id
+										and pe.publica is not null
+										and gp.saldo > 0) as cuentas_impagas
+ 										from
+										gc_propiedad as p
+										where p.idcomunidad = '" . $idcomunidad . "'
+										and p.active = 1
+										and p.saldo_publicado > 0
+										order by p.saldo_publicado 
+										desc");
+
+		return $query->result();		
+	}	
 
 
 	public function get_resumen_medios_pago(){

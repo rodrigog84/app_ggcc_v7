@@ -3112,7 +3112,7 @@ public function mensual_data($resultid = '')
 
 
 
-	
+
 public function flujo_efectivo($resultid = '')
 	{
 		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
@@ -3126,13 +3126,6 @@ public function flujo_efectivo($resultid = '')
 			}
 
 			//print_r($this->input->post(NULL,true)); exit;
-
-			if($this->input->post('tiporeporte') != ''){
-				$tiporeporte = $this->input->post('tiporeporte');
-				$this->session->set_flashdata('tiporeporte_mensualdata',$tiporeporte);
-			}else{
-				$tiporeporte = $this->session->flashdata('tiporeporte_mensualdata') == '' ? '' : $this->session->flashdata('tiporeporte_mensualdata');				
-			}
 
 
 			if($this->input->post('mes') != ''){
@@ -3150,44 +3143,24 @@ public function flujo_efectivo($resultid = '')
 				$anno = $this->session->flashdata('anno_mensualdata') == '' ? date('Y') : $this->session->flashdata('anno_mensualdata');				
 			}
 
-			$this->session->keep_flashdata('tiporeporte_mensualdata');
 			$this->session->keep_flashdata('mes_mensualdata');
 			$this->session->keep_flashdata('anno_mensualdata');
 
  
 			$mensual_data = array();
 			$this->load->model('report');
-			if($tiporeporte == 'li'){				
-				$mensual_data = $this->report->get_lecturas_individuales(null,$mes,$anno);
-			}else if($tiporeporte == 'ri'){
-				$mensual_data = $this->report->get_intereses_mensuales($mes,$anno);
-			}else if($tiporeporte == 'ra'){
-				$mensual_data = $this->report->get_ajustes_mensuales($mes,$anno);				
-			}else if($tiporeporte == 'rm'){
-				$mensual_data = $this->report->get_multas_mensuales($mes,$anno);				
-			}else if($tiporeporte == 'rce'){
-				$mensual_data = $this->report->get_cuotas_especiales_mensuales($mes,$anno);				
-			}else if($tiporeporte == 'ric'){
-				$mensual_data = $this->report->get_ingresos_mensuales($mes,$anno);				
-			}else if($tiporeporte == 'rsc'){
-				$mensual_data = $this->report->get_cuentas_sin_cobro($mes,$anno);				
-			}else if($tiporeporte == 'cgc'){
-				$mensual_data = $this->report->get_cobro_gasto_comun($mes,$anno);				
-			}else if($tiporeporte == 'rec'){
-				$mensual_data = $this->report->get_cuentas_espacios_comunes($mes,$anno);				
-			}
+
 
 			$content = array(
 						'menu' => 'Informaci&oacute;n',
 						'title' => 'Informaci&oacute;n',
-						'subtitle' => 'Reportes Mensuales');
+						'subtitle' => 'Reportes Flujo Efectivo');
 
 			$vars['content_menu'] = $content;				
 			$vars['mensual_data'] = $mensual_data;	
-			$vars['tiporeporte'] = $tiporeporte;	
 			$vars['mes'] = $mes;	
 			$vars['anno'] = $anno;	
-			$vars['content_view'] = 'reports/mensual_data';
+			$vars['content_view'] = 'reports/flujo_efectivo';
 			$vars['formValidation'] = true;
 			$vars['dataTables'] = true;
 
@@ -3210,6 +3183,1379 @@ public function flujo_efectivo($resultid = '')
 		}
 
 	}
+
+
+
+	public function export_flujo_efectivo($tiporeporte = null,$mes = null,$anno = null)
+	{
+
+		if($this->ion_auth->is_allowed($this->router->fetch_class(),$this->router->fetch_method())){
+			set_time_limit(0);
+
+
+			$this->session->keep_flashdata('tiporeporte_mensualdata');
+			$this->session->keep_flashdata('mes_mensualdata');
+			$this->session->keep_flashdata('anno_mensualdata');
+
+			$tiporeporte = 'cgc';
+			//$mes = '2';
+			//$anno = '2025';
+			$mes = $this->input->post('mes');
+			$anno = $this->input->post('anno');
+			if(is_null($mes) || is_null($anno)){
+				$this->session->set_flashdata('mensualdata_result',1);
+				redirect('reports/mensual_data/');			
+			}
+
+
+			$i = 1;
+			$mes_final = $mes;
+			$anno_final = $anno;
+			$array_meses = array();
+
+			array_push($array_meses,array('mes' => $mes_final,
+													'anno' => $anno_final,
+													'texto' => month2string($mes_final).' '.$anno_final)
+											);
+			while($i < 12){
+				$mes_final = $mes_final + 1;
+				if($mes_final == 13){
+					$mes_final = 1;
+					$anno_final = $anno_final + 1;
+				}
+
+				array_push($array_meses,array('mes' => $mes_final,
+													'anno' => $anno_final,
+													'texto' => month2string($mes_final).' '.$anno_final)
+											);
+
+				$i++;
+
+			}
+
+
+
+
+
+			//$anno_final = $mes == 1 ? $anno : $anno + 1;
+
+
+			$fecha_inicial = $anno.'-'.str_pad($mes,2,'0',STR_PAD_LEFT).'-01';
+			$fecha_final = $anno_final.'-'.str_pad($mes_final,2,'0',STR_PAD_LEFT).'-'.ultimo_dia_mes($mes_final,$anno_final);
+			echo '<pre>';
+			//var_dump($array_meses);
+			//var_dump($fecha_inicial);
+			//var_dump($fecha_final);
+			//exit;
+
+
+			$this->load->model('report');
+
+			$detalle_flujo_efectivo_ingresos = $this->report->get_flujo_efectivo_ingresos($fecha_inicial,$fecha_final);
+			$detalle_flujo_efectivo_egresos = $this->report->get_flujo_efectivo_egresos($fecha_inicial,$fecha_final);
+
+			// Extraer los valores únicos de la columna "nombre"
+			
+
+			//var_dump($detalle_flujo_efectivo_egresos); exit;
+
+			// Extraer valores únicos de la columna "formapago_desc"
+			$formasPagoUnicas = array_unique(array_map(fn($item) => $item->formapago_desc, $detalle_flujo_efectivo_egresos));
+
+			// Reiniciar índices para obtener un array limpio
+			$formasPagoUnicas = array_values($formasPagoUnicas);			
+
+
+			$conceptoUnicos = array_unique(array_map(fn($item) => $item->concepto, $detalle_flujo_efectivo_egresos));
+			$conceptoUnicos = array_values($conceptoUnicos);	
+
+
+			// Extraer y filtrar pares únicos formapago_desc + concepto
+			$paresUnicos = array_unique(array_map(fn($item) => $item->formapago_desc . ' - ' . $item->concepto, $detalle_flujo_efectivo_egresos));
+
+			// Convertir el resultado de strings a array asociativo si es necesario
+			$paresUnicos = array_map(function($par) {
+			    [$formapago_desc, $concepto] = explode(" - ", $par);
+			    return ["formapago_desc" => $formapago_desc, "concepto" => $concepto];
+			}, array_values($paresUnicos));
+
+			// Imprimir resultado
+			//var_dump($paresUnicos);			
+
+			// Imprimir el resultado
+			//var_dump($formasPagoUnicas); 
+			//var_dump($conceptoUnicos); 
+			//exit;
+
+			/*else{
+				$this->session->set_flashdata('mensualdata_result',1);
+				redirect('reports/mensual_data/');
+			}*/
+
+
+			$title_libro = 'detalle_flujo_efectivo';
+			$title_report = 'Detalle Flujo Efectivo';
+
+	        /*$this->load->library('PHPExcel');
+	  	    $this->phpexcel->setActiveSheetIndex(0);
+	        $sheet = $this->phpexcel->getActiveSheet();*/
+
+        	$spreadsheet = new Spreadsheet();
+        	$sheet = $spreadsheet->getActiveSheet();	        
+	        $sheet->setTitle($title_libro);
+
+			
+			
+
+			$this->load->model('admin');
+			$datos_comunidad = $this->admin->datos_comunidad($this->session->userdata('comunidadid'));
+			
+
+			/********* COMIENZA A CREAR EXCEL *******/
+	        // DATOS INICIALES
+			$sheet->getColumnDimension('A')->setWidth(5);
+
+	        $sheet->mergeCells('B2:D2');
+	        $sheet->setCellValue('B2', $title_report);
+	        $sheet->getColumnDimension('B')->setWidth(50);
+	        $sheet->setCellValue('B3', 'Nombre Comunidad');
+	        $sheet->setCellValue('C3',html_entity_decode($this->session->userdata('comunidadnombre')));
+	        $sheet->mergeCells('C3:D3');
+	        $sheet->setCellValue('B4', 'Rut Comunidad');
+	        $sheet->setCellValue('C4',number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv);	        
+	        $sheet->mergeCells('C4:D4');
+	        $sheet->setCellValue('B5', 'Direccion Comunidad');
+	        $sheet->setCellValue('C5',$datos_comunidad->direccion.", ".$datos_comunidad->comuna);	        	        
+	        $sheet->mergeCells('C5:D5');
+	        $sheet->setCellValue('B6', 'Fecha emision Reporte');
+	        $sheet->setCellValue('C6',date('d/m/Y') );
+	        $sheet->mergeCells('C6:D6');
+	        
+			$sheet->getStyle("B2:B6")->getFont()->setBold(true);
+			$sheet->getStyle("B2:D6")->getFont()->setSize(10);    	
+
+
+			/****************** TABLA INICIAL ****************/
+
+			/*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+
+			/*************************bordes cuadro principal (externo) *************************************/
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+		
+			/**********************************************************************************************************/			        
+				
+			/***** COLOR TABLA ****************/
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
+
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
+
+
+			$i = 8;
+			$filaInicio = $i; 
+
+
+			//ENCABEZADOS
+			 $sheet->getColumnDimension('B')->setWidth(50);
+			 $sheet->setCellValue('B'.$i, 'Ingresos');
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+			 	
+				 $sheet->getColumnDimension(ordenLetrasExcel($orden_mes))->setWidth(20);
+				 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $row_mes['texto']);
+				 $orden_mes++;
+			 }
+
+
+			 $i++;
+
+			 //FILA TOTAL INGRESOS
+			 $sheet->setCellValue('B'.$i, 'Total Ingresos');
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+
+			 	$monto_mes = 0;
+			 	 foreach($detalle_flujo_efectivo_ingresos as $row_flujo_efectivo_ingresos){
+			 	 		if($row_mes['mes'] == $row_flujo_efectivo_ingresos->mes && $row_mes['anno'] == $row_flujo_efectivo_ingresos->anno){
+			 	 				$monto_mes = $row_flujo_efectivo_ingresos->monto;
+			 	 		}
+
+
+			 	 }
+			 	
+				 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+				 $sheet->getStyle(ordenLetrasExcel($orden_mes).$i)->getFont()->setBold(true);
+				 $orden_mes++;
+			 }
+
+
+
+			 //var_dump("C".$i.":".ordenLetrasExcel($orden_mes-1).$i); exit;
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+
+
+			/*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($orden_mes-1).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);			 
+
+			/*************************bordes cuadro principal (externo) *************************************/
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde superior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle(ordenLetrasExcel(($orden_mes-1)).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/**********************************************************************************************************/		
+
+
+			/***************************** Segundo borde superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/******************************************************************************************************/
+
+
+		/***************************** Penultimo borde izquierdo ********************************************************/
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+		/******************************************************************************************************/			
+
+
+			/***************************** Color fila superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //color fondo inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFont()->setBold(true);
+					}
+			
+			/******************************************************************************************************/
+
+
+		/***************************** Color primera columna ********************************************************/
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFont()->setBold(true);
+			
+			/******************************************************************************************************/
+
+
+
+			 $i = $i+2;
+			$filaInicioCuadro = $i;
+
+			//ENCABEZADOS EGRESOS
+			 $sheet->getColumnDimension('B')->setWidth(50);
+			 $sheet->setCellValue('B'.$i, 'Egresos');
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+			 	
+				 $sheet->getColumnDimension(ordenLetrasExcel($orden_mes))->setWidth(20);
+				 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $row_mes['texto']);
+
+				 $orden_mes++;
+			 }
+
+			 $i++;
+
+			 //FILAS EGRESOS
+
+			 foreach($formasPagoUnicas as $row_forma_pago){
+
+					 $sheet->setCellValue('B'.$i, $row_forma_pago);
+					 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+					 $orden_mes = 2;
+					 foreach($array_meses as $row_mes){
+
+					 	$monto_mes = 0;
+					 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+					 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+					 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno
+					 	 				&& $row_forma_pago == $row_flujo_efectivo_egresos->formapago_desc){
+					 	 				$monto_mes += $row_flujo_efectivo_egresos->monto;
+					 	 		}
+
+
+					 	 }
+					 	
+						 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+						 $orden_mes++;
+					 }
+
+					 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+					 $i++;
+
+					 
+					 foreach($conceptoUnicos as $row_concepto){
+
+					 	 $concepto_fp_corresponde = false;
+					 	 foreach($paresUnicos as $row_par){
+					 	 		if($row_forma_pago == $row_par['formapago_desc'] && $row_concepto == $row_par['concepto']){
+
+					 	 			$concepto_fp_corresponde = true;
+					 	 		}
+
+					 	 }
+
+					 	 if($concepto_fp_corresponde){
+
+								 $sheet->setCellValue('B'.$i, $row_concepto);
+								 $orden_mes = 2;
+								 foreach($array_meses as $row_mes){
+
+								 	$monto_mes = 0;
+								 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+								 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+								 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno
+								 	 				&&  $row_forma_pago == $row_flujo_efectivo_egresos->formapago_desc
+								 	 				&&  $row_concepto == $row_flujo_efectivo_egresos->concepto){
+								 	 				$monto_mes = $row_flujo_efectivo_egresos->monto;
+								 	 		}
+
+
+								 	 }
+								 	
+									 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+									 $orden_mes++;
+								 }
+
+								 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+								 $i++;
+
+
+
+					 	 }
+
+
+					 }
+
+					 
+
+			 }
+
+
+			 //FILA TOTAL EGRESOS
+			 $sheet->setCellValue('B'.$i, 'Total Egresos');
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+
+				 	$monto_mes = 0;
+				 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+				 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+				 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno){
+				 	 				$monto_mes += $row_flujo_efectivo_egresos->monto;
+				 	 		}
+
+
+				 	 }
+				 	
+					 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+					 $sheet->getStyle(ordenLetrasExcel($orden_mes).$i)->getFont()->setBold(true);
+					 $orden_mes++;
+			 }
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+
+
+			 /*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B".$filaInicioCuadro.":".ordenLetrasExcel($orden_mes-1).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);			 
+
+
+
+
+			/*************************bordes cuadro principal (externo) *************************************/
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde superior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde izquierdo
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle(ordenLetrasExcel(($orden_mes-1)).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/**********************************************************************************************************/		
+
+
+			/***************************** Segundo borde superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/******************************************************************************************************/
+
+		/***************************** Penultimo borde izquierdo ********************************************************/
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+		/******************************************************************************************************/			
+
+
+			/***************************** Color fila superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //color fondo inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFill()->getStartColor()->setRGB('E8EDFF');
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFont()->setBold(true);
+					}
+			
+			/******************************************************************************************************/
+
+		/***************************** Color primera columna ********************************************************/
+						$sheet->getStyle("B".$filaInicioCuadro.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicioCuadro.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+			
+			/******************************************************************************************************/
+
+
+			 $i = $i+2;
+			 $filaInicioCuadro = $i;
+
+			//ENCABEZADOS
+			 $sheet->getColumnDimension('B')->setWidth(50);
+			 $sheet->setCellValue('B'.$i, 'Totales');
+
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+			 	
+				 $sheet->getColumnDimension(ordenLetrasExcel($orden_mes))->setWidth(20);
+				 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $row_mes['texto']);
+				 
+				 $orden_mes++;
+			 }
+
+			 $i++;
+
+
+			 $sheet->setCellValue('B'.$i, 'Total Ingresos');
+			 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+
+			 	$monto_mes = 0;
+			 	 foreach($detalle_flujo_efectivo_ingresos as $row_flujo_efectivo_ingresos){
+			 	 		if($row_mes['mes'] == $row_flujo_efectivo_ingresos->mes && $row_mes['anno'] == $row_flujo_efectivo_ingresos->anno){
+			 	 				$monto_mes = $row_flujo_efectivo_ingresos->monto;
+			 	 		}
+
+
+			 	 }
+			 	
+				 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+				 $orden_mes++;
+			 }			 
+
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+			 $i++;
+
+			 //FILA TOTAL EGRESOS
+			 $sheet->setCellValue('B'.$i, 'Total Egresos');
+			 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+			 $orden_mes = 2;
+			 foreach($array_meses as $row_mes){
+
+				 	$monto_mes = 0;
+				 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+				 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+				 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno){
+				 	 				$monto_mes += $row_flujo_efectivo_egresos->monto;
+				 	 		}
+
+
+				 	 }
+				 	
+					 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+					 $orden_mes++;
+			 }
+
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+
+			 $i++;
+			 //FILA TOTAL SALDO MES
+			 $sheet->setCellValue('B'.$i, 'Saldo del Mes');
+			 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+			 $orden_mes = 2;
+
+			 foreach($array_meses as $row_mes){
+
+				 	$monto_mes = 0;
+				 	$monto_ingreso = 0;
+				 	$monto_egreso = 0;
+
+
+			 	 foreach($detalle_flujo_efectivo_ingresos as $row_flujo_efectivo_ingresos){
+			 	 		if($row_mes['mes'] == $row_flujo_efectivo_ingresos->mes && $row_mes['anno'] == $row_flujo_efectivo_ingresos->anno){
+			 	 				$monto_ingreso = $row_flujo_efectivo_ingresos->monto;
+			 	 		}
+
+
+			 	 }
+
+
+				 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+				 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+				 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno){
+				 	 				$monto_egreso += $row_flujo_efectivo_egresos->monto;
+				 	 		}
+
+
+				 	 }
+
+
+				 	 $monto_mes = $monto_ingreso - $monto_egreso;
+				 	
+					 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+					 $orden_mes++;
+			 }
+
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+			 $i++;
+
+			 //FILA TOTAL ACUMULADO
+			 $sheet->setCellValue('B'.$i, 'Acumulado');
+			 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+			 $orden_mes = 2;
+			 $saldo_acumulado = 0;
+
+			 foreach($array_meses as $row_mes){
+
+				 	$monto_mes = 0;
+				 	$monto_ingreso = 0;
+				 	$monto_egreso = 0;
+
+
+			 	 foreach($detalle_flujo_efectivo_ingresos as $row_flujo_efectivo_ingresos){
+			 	 		if($row_mes['mes'] == $row_flujo_efectivo_ingresos->mes && $row_mes['anno'] == $row_flujo_efectivo_ingresos->anno){
+			 	 				$monto_ingreso = $row_flujo_efectivo_ingresos->monto;
+			 	 		}
+
+
+			 	 }
+
+
+				 	 foreach($detalle_flujo_efectivo_egresos as $row_flujo_efectivo_egresos){
+				 	 		if(		$row_mes['mes'] == $row_flujo_efectivo_egresos->mes 
+				 	 				&& $row_mes['anno'] == $row_flujo_efectivo_egresos->anno){
+				 	 				$monto_egreso += $row_flujo_efectivo_egresos->monto;
+				 	 		}
+
+
+				 	 }
+
+
+				 	 $saldo_acumulado = ($monto_ingreso - $monto_egreso) + $saldo_acumulado;
+
+				 	
+					 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $saldo_acumulado);
+					 $orden_mes++;
+			 }			 
+			 		
+			 $sheet->getStyle("C".$i.":".ordenLetrasExcel($orden_mes-1).$i)->getNumberFormat()->setFormatCode('#,##0');
+
+			 /*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B".$filaInicioCuadro.":".ordenLetrasExcel($orden_mes-1).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);			 
+
+			/*************************bordes cuadro principal (externo) *************************************/
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde superior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde izquierdo
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle(ordenLetrasExcel(($orden_mes-1)).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/**********************************************************************************************************/		
+
+
+
+			/***************************** Segundo borde superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/******************************************************************************************************/
+			
+
+		/***************************** Penultimo borde izquierdo ********************************************************/
+			
+					for($n=$filaInicioCuadro;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+		/******************************************************************************************************/		
+
+	
+			/***************************** Color fila superior********************************************************/
+			
+					for($j=1;$j<=($orden_mes-1);$j++){ //color fondo inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFill()->getStartColor()->setRGB('E8EDFF');
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicioCuadro)->getFont()->setBold(true);
+					}
+			
+			/******************************************************************************************************/
+
+		/***************************** Color primera columna ********************************************************/
+						$sheet->getStyle("B".$filaInicioCuadro.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicioCuadro.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+			
+			/******************************************************************************************************/
+
+
+
+			 $sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($orden_mes-1).$i)->getFont()->setSize(10);
+
+
+
+
+			$sheet->setSelectedCells('E1'); //celda seleccionada
+
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
+	        header("Content-Type: application/vnd.ms-excel");
+			
+	        $nombreArchivo = $title_libro;
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
+	        header("Cache-Control: max-age=0");
+	        // Genera Excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
+	        //$writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        // Escribir
+	        //$writer->setIncludeCharts(TRUE);			
+	        $writer->save('php://output');
+	        exit;			
+
+			//D7E4BC
+
+
+			/****************** TABLA INICIAL ****************/
+
+			/*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B2:D6")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+
+			/*************************bordes cuadro principal (externo) *************************************/
+			$sheet->getStyle("B2:D2")->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:D2")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B6:D6")->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("B2:B6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+			$sheet->getStyle("D2:D6")->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+		
+			/**********************************************************************************************************/			        
+				
+			/***** COLOR TABLA ****************/
+			$sheet->getStyle("B2:D2")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+			$sheet->getStyle("B2:D2")->getFill()->getStartColor()->setRGB('D7E4BC');
+
+			$sheet->getStyle("B2:B6")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+			$sheet->getStyle("B2:B6")->getFill()->getStartColor()->setRGB('D7E4BC');			
+
+
+			$i = 8;
+
+
+
+			//ENCABEZADO REPORTE
+
+			if($tiporeporte == 'ri'){
+
+			 $sheet->getColumnDimension('B')->setWidth(10);
+			 $sheet->setCellValue('B'.$i, '#');
+			 $sheet->getColumnDimension('C')->setWidth(20);
+			 $sheet->setCellValue('c'.$i, 'Nro. Propiedad');
+			 $sheet->getColumnDimension('D')->setWidth(25);
+			 $sheet->setCellValue('D'.$i, 'Descripción');
+			 $sheet->getColumnDimension('E')->setWidth(15);
+			 $sheet->setCellValue('E'.$i, 'Fecha Cobro');
+			 $sheet->getColumnDimension('F')->setWidth(15);
+			 $sheet->setCellValue('F'.$i, 'Período Cobro');
+			 $sheet->getColumnDimension('G')->setWidth(17);
+			 $sheet->setCellValue('G'.$i, 'Monto');
+
+			 $columnaFinal = 6;
+			 $mergeTotal = 5;
+			 $columnaTotales = 6;
+			 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+			 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->descripcion);
+	            	$sheet->setCellValue("E".$i,$libro->fechadeuda);
+	            	$sheet->setCellValue("F".$i,date2string($libro->mes,$libro->anno));
+	            	$sheet->setCellValue("G".$i,$libro->monto);
+	            	$sheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+			}else if($tiporeporte == 'ra'){
+				
+			 $sheet->getColumnDimension('B')->setWidth(10);
+			 $sheet->setCellValue('B'.$i, '#');
+			 $sheet->getColumnDimension('C')->setWidth(20);
+			 $sheet->setCellValue('c'.$i, 'Nro. Propiedad');
+			 $sheet->getColumnDimension('D')->setWidth(25);
+			 $sheet->setCellValue('D'.$i, 'Descripción');
+			 $sheet->getColumnDimension('E')->setWidth(15);
+			 $sheet->setCellValue('E'.$i, 'Fecha Cobro');
+			 $sheet->getColumnDimension('F')->setWidth(15);
+			 $sheet->setCellValue('F'.$i, 'Período Cobro');
+			 $sheet->getColumnDimension('G')->setWidth(17);
+			 $sheet->setCellValue('G'.$i, 'Monto');
+
+			 $columnaFinal = 6;
+			 $mergeTotal = 5;
+			 $columnaTotales = 6;
+			 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+			 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->descripcion);
+	            	$sheet->setCellValue("E".$i,$libro->fechadeuda);
+	            	$sheet->setCellValue("F".$i,date2string($libro->mes,$libro->anno));
+	            	$sheet->setCellValue("G".$i,$libro->monto);
+	            	$sheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}else if($tiporeporte == 'rm'){
+				
+			 $sheet->getColumnDimension('B')->setWidth(10);
+			 $sheet->setCellValue('B'.$i, '#');
+			 $sheet->getColumnDimension('C')->setWidth(20);
+			 $sheet->setCellValue('c'.$i, 'Nro. Propiedad');
+			 $sheet->getColumnDimension('D')->setWidth(25);
+			 $sheet->setCellValue('D'.$i, 'Descripción');
+			 $sheet->getColumnDimension('E')->setWidth(15);
+			 $sheet->setCellValue('E'.$i, 'Fecha Cobro');
+			 $sheet->getColumnDimension('F')->setWidth(15);
+			 $sheet->setCellValue('F'.$i, 'Período Cobro');
+			 $sheet->getColumnDimension('G')->setWidth(17);
+			 $sheet->setCellValue('G'.$i, 'Monto');
+
+			 $columnaFinal = 6;
+			 $mergeTotal = 5;
+			 $columnaTotales = 6;
+			 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+			 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->descripcion);
+	            	$sheet->setCellValue("E".$i,$libro->fechadeuda);
+	            	$sheet->setCellValue("F".$i,date2string($libro->mes,$libro->anno));
+	            	$sheet->setCellValue("G".$i,$libro->monto);
+	            	$sheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}else if($tiporeporte == 'rce'){
+				
+			 $sheet->getColumnDimension('B')->setWidth(10);
+			 $sheet->setCellValue('B'.$i, '#');
+			 $sheet->getColumnDimension('C')->setWidth(20);
+			 $sheet->setCellValue('c'.$i, 'Nro. Propiedad');
+			 $sheet->getColumnDimension('D')->setWidth(25);
+			 $sheet->setCellValue('D'.$i, 'Descripción');
+			 $sheet->getColumnDimension('E')->setWidth(15);
+			 $sheet->setCellValue('E'.$i, 'Fecha Cobro');
+			 $sheet->getColumnDimension('F')->setWidth(15);
+			 $sheet->setCellValue('F'.$i, 'Período Cobro');
+			 $sheet->getColumnDimension('G')->setWidth(17);
+			 $sheet->setCellValue('G'.$i, 'Monto');
+
+			 $columnaFinal = 6;
+			 $mergeTotal = 5;
+			 $columnaTotales = 6;
+			 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+			 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->descripcion);
+	            	$sheet->setCellValue("E".$i,$libro->fechadeuda);
+	            	$sheet->setCellValue("F".$i,date2string($libro->mes,$libro->anno));
+	            	$sheet->setCellValue("G".$i,$libro->monto);
+	            	$sheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}else if($tiporeporte == 'ric'){
+				
+				 $sheet->getColumnDimension('B')->setWidth(10);
+				 $sheet->setCellValue('B'.$i, '#');
+				 $sheet->getColumnDimension('C')->setWidth(25);
+				 $sheet->setCellValue('c'.$i, 'Proveedor');
+				 $sheet->getColumnDimension('D')->setWidth(25);
+				 $sheet->setCellValue('D'.$i, 'Concepto');
+				 $sheet->getColumnDimension('E')->setWidth(30);
+				 $sheet->setCellValue('E'.$i, 'Descripción');
+				 $sheet->getColumnDimension('F')->setWidth(15);
+				 $sheet->setCellValue('F'.$i, 'Tipo Ingreso');
+				 $sheet->getColumnDimension('G')->setWidth(15);
+				 $sheet->setCellValue('G'.$i, 'Fecha Documento');	
+				 $sheet->getColumnDimension('H')->setWidth(15);
+				 $sheet->setCellValue('H'.$i, 'Nro Documento');					 			 
+				 $sheet->getColumnDimension('I')->setWidth(15);
+				 $sheet->setCellValue('I'.$i, 'Fecha Vencimiento');				 				 
+				 $sheet->getColumnDimension('J')->setWidth(17);
+				 $sheet->setCellValue('J'.$i, 'Monto');
+
+				 $columnaFinal = 9;
+				 $mergeTotal = 8;
+				 $columnaTotales = 9;
+				 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+				 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->proveedor);
+	            	$sheet->setCellValue("D".$i,$libro->concepto);
+	            	$sheet->setCellValue("E".$i,$libro->descripcion);
+	            	$sheet->setCellValue("F".$i,tipo_ingreso($libro->tipoingreso));
+	            	$sheet->setCellValue("G".$i,$libro->fecdocumento);
+	            	$sheet->setCellValue("H".$i,$libro->nrodocumento);
+	            	$sheet->setCellValue("I".$i,$libro->fecvencimiento);
+	            	$sheet->setCellValue("J".$i,$libro->monto);
+	            	$sheet->getStyle('J'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}else if($tiporeporte == 'rsc'){
+				
+				 $sheet->getColumnDimension('B')->setWidth(10);
+				 $sheet->setCellValue('B'.$i, '#');
+				 $sheet->getColumnDimension('C')->setWidth(25);
+				 $sheet->setCellValue('c'.$i, 'Proveedor');
+				 $sheet->getColumnDimension('D')->setWidth(25);
+				 $sheet->setCellValue('D'.$i, 'Concepto');
+				 $sheet->getColumnDimension('E')->setWidth(30);
+				 $sheet->setCellValue('E'.$i, 'Descripción');
+				 $sheet->getColumnDimension('F')->setWidth(15);
+				 $sheet->setCellValue('F'.$i, 'Fecha Documento');	
+				 $sheet->getColumnDimension('G')->setWidth(15);
+				 $sheet->setCellValue('G'.$i, 'Nro Documento');					 			 
+				 $sheet->getColumnDimension('H')->setWidth(15);
+				 $sheet->setCellValue('H'.$i, 'Fecha Vencimiento');				 				 
+				 $sheet->getColumnDimension('I')->setWidth(17);
+				 $sheet->setCellValue('I'.$i, 'Monto');
+
+				 $columnaFinal = 8;
+				 $mergeTotal = 7;
+				 $columnaTotales = 8;
+				 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+				 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->proveedor);
+	            	$sheet->setCellValue("D".$i,$libro->concepto);
+	            	$sheet->setCellValue("E".$i,$libro->descripcion);
+	            	$sheet->setCellValue("F".$i,$libro->fecdocumento);
+	            	$sheet->setCellValue("G".$i,$libro->nrodocumento);
+	            	$sheet->setCellValue("H".$i,$libro->fecvencimiento);
+	            	$sheet->setCellValue("I".$i,$libro->monto);
+	            	$sheet->getStyle('I'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}else if($tiporeporte == 'cgc'){
+				 $sheet->mergeCells('B'.$i . ':B' . ($i+1));
+				 $sheet->getColumnDimension('B')->setWidth(10);
+				 $sheet->setCellValue('B'.$i, '#');
+				 $sheet->mergeCells('C'.$i . ':C' . ($i+1));
+				 $sheet->getColumnDimension('C')->setWidth(15);
+				 $sheet->setCellValue('c'.$i, 'Nro');
+				 $sheet->mergeCells('D'.$i . ':D' . ($i+1));
+				 $sheet->getColumnDimension('D')->setWidth(35);
+				 $sheet->setCellValue('D'.$i, 'Responsable');
+				 $sheet->mergeCells('E'.$i . ':E' . ($i+1));
+				 $sheet->getColumnDimension('E')->setWidth(15);
+				 $sheet->setCellValue('E'.$i, 'Prorrateo');
+				 $sheet->mergeCells('F'.$i . ':F' . ($i+1));
+				 $sheet->getColumnDimension('F')->setWidth(17);
+				 $sheet->setCellValue('F'.$i, 'Cobro Individual');	
+				 $sheet->mergeCells('G'.$i . ':G' . ($i+1));
+				 $sheet->getColumnDimension('G')->setWidth(17);
+				 $sheet->setCellValue('G'.$i, 'Fondo de Reserva');	
+
+				 $sheet->mergeCells('H'.$i . ':I' . $i);
+				 $sheet->getColumnDimension('H')->setWidth(34);
+				 $sheet->setCellValue('H'.$i, 'Cobro Lectura Individual');	
+
+
+					
+
+				 $sheet->mergeCells('J'.$i . ':J' . ($i+1)); 
+				 $sheet->getColumnDimension('J')->setWidth(17);
+				 $sheet->setCellValue('J'.$i, 'Multas');					 
+				 $sheet->mergeCells('K'.$i . ':K' . ($i+1));
+				 $sheet->getColumnDimension('K')->setWidth(17);
+				 $sheet->setCellValue('K'.$i, 'Ajustes');					 
+				 $sheet->mergeCells('L'.$i . ':L' . ($i+1));
+				 $sheet->getColumnDimension('L')->setWidth(17);
+				 $sheet->setCellValue('L'.$i, 'Cobros Indivisuales');					 
+				 $sheet->mergeCells('M'.$i . ':M' . ($i+1));
+				 $sheet->getColumnDimension('M')->setWidth(17);
+				 $sheet->setCellValue('M'.$i, 'Intereses');					 
+
+				 $sheet->mergeCells('N'.$i . ':N' . ($i+1));
+				 $sheet->getColumnDimension('N')->setWidth(17);
+				 $sheet->setCellValue('N'.$i, 'Cobro del Mes');	
+
+
+				 $sheet->mergeCells('O'.$i . ':O' . ($i+1));
+				 $sheet->getColumnDimension('O')->setWidth(2);
+				 $sheet->setCellValue('O'.$i, '');	
+
+				 $sheet->mergeCells('P'.$i . ':P' . ($i+1));
+				 $sheet->getColumnDimension('P')->setWidth(17);
+				 $sheet->setCellValue('P'.$i, 'Saldo Anterior');	
+				 $sheet->mergeCells('Q'.$i . ':Q' . ($i+1));				 			 
+				 $sheet->getColumnDimension('Q')->setWidth(17);
+				 $sheet->setCellValue('Q'.$i, 'Cobro Total');	
+
+				 $sheet->mergeCells('R'.$i . ':R' . ($i+1));
+				 $sheet->getColumnDimension('R')->setWidth(2);
+				 $sheet->setCellValue('R'.$i, '');	
+
+
+				 $sheet->mergeCells('S'.$i . ':S' . ($i+1));			 				 
+				 $sheet->getColumnDimension('S')->setWidth(17);
+				 $sheet->setCellValue('S'.$i, 'Cuotas Impagas');	
+				 $sheet->mergeCells('T'.$i . ':T' . ($i+1));
+				 $sheet->getColumnDimension('T')->setWidth(17);
+				 $sheet->setCellValue('T'.$i, 'Observación');
+
+				 $sheet->getColumnDimension('H')->setWidth(17);
+				 $sheet->setCellValue('H'.($i+1), 'Agua');	
+				 $sheet->getColumnDimension('I')->setWidth(17);
+				 $sheet->setCellValue('I'.($i+1), 'Gas');	
+				 
+				 $columnaFinal = 19;
+				 $mergeTotal = 6;
+				 $columnaTotales = 19;
+				 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).($i+1))->getFont()->setBold(true);
+				 $i=$i+2;
+				$filaInicio = $i-2; 
+
+
+				$comunidad = $this->admin->get_comunidades($this->session->userdata('comunidadid'));
+
+				$mes_aldia = $comunidad->mes_aldia;
+				$mes_moroso = $comunidad->mes_moroso;
+				$mes_corteluz = $comunidad->mes_corteluz;
+				$mes_prejudicial = $comunidad->mes_prejudicial;
+				$mes_judicial = $comunidad->mes_judicial;
+
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->responsable);
+	            	$sheet->setCellValue("E".$i,$libro->prorrateo."%");
+	            	$sheet->setCellValue("F".$i,$libro->cobro_individual);
+	            	$sheet->getStyle('F'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("G".$i,$libro->fondo_reserva);
+	            	$sheet->getStyle('G'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+	            	$sheet->setCellValue("H".$i,$libro->agua);
+	            	$sheet->getStyle('H'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("I".$i,$libro->gas);
+	            	$sheet->getStyle('I'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("J".$i,$libro->multas);
+	            	$sheet->getStyle('J'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("K".$i,$libro->ajustes);
+	            	$sheet->getStyle('K'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("L".$i,$libro->cuotas_especiales);
+	            	$sheet->getStyle('L'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("M".$i,$libro->otros_cobros);
+	            	$sheet->getStyle('M'.$i)->getNumberFormat()->setFormatCode('#,##0');	            		            		            		            	
+
+	            	$sheet->setCellValue("N".$i,$libro->monto);
+	            	$sheet->getStyle('N'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$sheet->setCellValue("O".$i,'');
+
+	            	$sheet->setCellValue("P".$i,$libro->saldo_anterior);
+	            	$sheet->getStyle('P'.$i)->getNumberFormat()->setFormatCode('#,##0');
+	            	$cobro_total = $libro->monto+$libro->saldo_anterior > 0 ? $libro->monto+$libro->saldo_anterior : 0;
+
+	            	$sheet->setCellValue("Q".$i,$cobro_total);
+	            	$sheet->getStyle('Q'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+	            	$sheet->setCellValue("R".$i,'');
+
+	            	$sheet->setCellValue("S".$i,$libro->cuentas_impagas);
+	            	//var_dump($mes_judicial); exit; 
+	            	$txt_obs = '';
+	            	$txt_obs = $libro->cuentas_impagas >= $mes_aldia && $mes_aldia != '-1' ? 'Al día' : $txt_obs;
+	            	$txt_obs = $libro->cuentas_impagas >= $mes_moroso  && $mes_moroso != '-1' ? 'Moroso' : $txt_obs;
+	            	$txt_obs = $libro->cuentas_impagas >= $mes_corteluz  && $mes_corteluz != '-1' ? 'Corte de Luz' : $txt_obs;
+	            	$txt_obs = $libro->cuentas_impagas >= $mes_prejudicial  && $mes_prejudicial != '-1' ? 'Cobranza Prejudicial' : $txt_obs;
+	            	$txt_obs = $libro->cuentas_impagas >= $mes_judicial  && $mes_judicial != '-1' ? 'Cobranza Judicial' : $txt_obs;
+	            	
+
+
+	            	$sheet->setCellValue("T".$i,$txt_obs);
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+			/*********************** Color Cobro Individual********************************************************/
+						$sheet->getStyle("F".$filaInicio.":F".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("F".$filaInicio.":F".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+			
+						$sheet->getStyle("N".$filaInicio.":N".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("N".$filaInicio.":N".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+
+						$sheet->getStyle("Q".$filaInicio.":Q".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("Q".$filaInicio.":Q".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+
+						$sheet->getStyle("B".($filaInicio+1).":". ordenLetrasExcel($columnaFinal) .($filaInicio+1))->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".($filaInicio+1).":". ordenLetrasExcel($columnaFinal) .($filaInicio+1))->getFill()->getStartColor()->setRGB('E8EDFF');
+
+
+
+
+					
+					
+					
+			/******************************************************************************************************/
+
+
+
+			}else if($tiporeporte == 'rec'){
+				
+			 $sheet->getColumnDimension('B')->setWidth(10);
+			 $sheet->setCellValue('B'.$i, '#');
+			 $sheet->getColumnDimension('C')->setWidth(20);
+			 $sheet->setCellValue('c'.$i, 'Nro. Propiedad');
+			 $sheet->getColumnDimension('D')->setWidth(25);
+			 $sheet->setCellValue('D'.$i, 'Concepto');
+			 $sheet->getColumnDimension('E')->setWidth(15);			 
+			 $sheet->setCellValue('E'.$i, 'Descripción');
+			 $sheet->getColumnDimension('F')->setWidth(15);
+			 $sheet->setCellValue('F'.$i, 'Fecha Cobro');
+			 $sheet->getColumnDimension('G')->setWidth(15);
+			 $sheet->setCellValue('G'.$i, 'Período Cobro');
+			 $sheet->getColumnDimension('H')->setWidth(17);
+			 $sheet->setCellValue('H'.$i, 'Monto');
+
+			 $columnaFinal = 7;
+			 $mergeTotal = 6;
+			 $columnaTotales = 7;
+			 $sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setBold(true);
+			 $i++;
+				$filaInicio = $i-1; 
+				
+				//$sheet->getStyle("B7:I7")->getFont()->setSize(11);  
+				$linea = 1;
+	            foreach ($detalle_libro as $libro) {
+	            	$sheet->setCellValue("B".$i,$linea);
+	            	$sheet->setCellValue("C".$i,$libro->numero);
+	            	$sheet->setCellValue("D".$i,$libro->concepto);
+	            	$sheet->setCellValue("E".$i,$libro->descripcion);
+	            	$sheet->setCellValue("F".$i,$libro->fechadeuda);
+	            	$sheet->setCellValue("G".$i,date2string($libro->mes,$libro->anno));
+	            	$sheet->setCellValue("H".$i,$libro->monto);
+	            	$sheet->getStyle('H'.$i)->getNumberFormat()->setFormatCode('#,##0');
+
+		 			if($i % 2 != 0){
+		 				//echo "consulta 4: -- i : ".$i. "  -- mod : ". ($i % 2)."<br>";
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$i.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('F7F9FD');	  				
+		 			}	            	
+	            	$i++;
+	            	$linea++;
+	              }
+
+	             $i--;
+
+
+
+			}
+
+
+			         	
+			$sheet->getStyle("B" . $filaInicio . ":".ordenLetrasExcel($columnaFinal).$i)->getFont()->setSize(10);
+
+			/*************************todos los bordes internos *************************************/
+			$sheet->getStyle("B".$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+
+			/*************************bordes cuadro principal (externo) *************************************/
+					for($j=1;$j<=$columnaFinal;$j++){ //borde superior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$i)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde izquierdo
+						$sheet->getStyle("B".$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/**********************************************************************************************************/			        
+				
+
+			/***************************** Segundo borde superior********************************************************/
+			
+					for($j=1;$j<=$columnaFinal;$j++){ //borde inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+			/******************************************************************************************************/
+			
+
+		/***************************** Penultimo borde izquierdo ********************************************************/
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle("B".$n)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+		/******************************************************************************************************/			
+
+
+
+		/***************************** Penultimo borde derecho ********************************************************/
+			
+					for($n=$filaInicio;$n<=$i;$n++){ //borde derecho
+						$sheet->getStyle(ordenLetrasExcel($columnaFinal).$n)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+					}
+			
+		/******************************************************************************************************/			
+
+			/***************************** Color fila superior********************************************************/
+			
+					for($j=1;$j<=$columnaFinal;$j++){ //color fondo inferior
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($j).$filaInicio)->getFill()->getStartColor()->setRGB('E8EDFF');
+					}
+			
+			/******************************************************************************************************/
+
+
+		/***************************** Color primera columna ********************************************************/
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle("B".$filaInicio.":B".$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+			
+			/******************************************************************************************************/
+
+
+		/***************************** Color montos ********************************************************/
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($columnaTotales).$filaInicio.":".ordenLetrasExcel($columnaFinal).$i)->getFill()->getStartColor()->setRGB('E8EDFF');
+			
+			/******************************************************************************************************/
+
+
+			if($tiporeporte == 'cgc'){
+
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getFill()->getStartColor()->setRGB('FFFFFF');
+
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+
+
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+
+				$sheet->getStyle("O".$filaInicio.":O".$i)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+
+
+
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getFill()->getStartColor()->setRGB('FFFFFF');
+
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE);
+
+
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+
+				$sheet->getStyle("R".$filaInicio.":R".$i)->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM);
+
+			}
+
+
+	
+
+
+
+			$sheet->setSelectedCells('E1'); //celda seleccionada
+
+			if (ob_get_level() > 0) {
+			    ob_end_clean();
+			}
+	        header("Content-Type: application/vnd.ms-excel");
+			
+	        $nombreArchivo = $title_libro;
+	        header("Content-Disposition: attachment; filename=\"$nombreArchivo.xlsx\"");
+	        header("Cache-Control: max-age=0");
+	        // Genera Excel
+	        $writer = new Xlsx($spreadsheet); //objeto de PHPExcel, para escribir en el excel
+	        //$writer = new PHPExcel_Writer_Excel5($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        //$writer = new PHPExcel_Writer_Excel2007($this->phpexcel); //objeto de PHPExcel, para escribir en el excel
+	        // Escribir
+	        //$writer->setIncludeCharts(TRUE);			
+	        $writer->save('php://output');
+	        exit;			
+
+		}else{
+			$content = array(
+						'menu' => 'Error 403',
+						'title' => 'Error 403',
+						'subtitle' => '403 error');
+
+
+			$vars['content_menu'] = $content;				
+			$vars['content_view'] = 'forbidden';
+			$this->load->view('template',$vars);
+
+		}
+
+	}
+
 
 
 	public function reporte_egresos()

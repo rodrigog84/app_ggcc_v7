@@ -3242,7 +3242,7 @@ public function flujo_efectivo($resultid = '')
 
 			$fecha_inicial = $anno.'-'.str_pad($mes,2,'0',STR_PAD_LEFT).'-01';
 			$fecha_final = $anno_final.'-'.str_pad($mes_final,2,'0',STR_PAD_LEFT).'-'.ultimo_dia_mes($mes_final,$anno_final);
-			echo '<pre>';
+			//echo '<pre>';
 			//var_dump($array_meses);
 			//var_dump($fecha_inicial);
 			//var_dump($fecha_final);
@@ -3486,6 +3486,9 @@ public function flujo_efectivo($resultid = '')
 
 					 $sheet->setCellValue('B'.$i, $row_forma_pago);
 					 $sheet->getStyle('B'.$i)->getFont()->setBold(true);
+					 $sheet->getStyle('B'.$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+					 $sheet->getStyle('B'.$i)->getFill()->getStartColor()->setRGB('D7E4BC');					 
+
 					 $orden_mes = 2;
 					 foreach($array_meses as $row_mes){
 
@@ -3501,6 +3504,9 @@ public function flujo_efectivo($resultid = '')
 					 	 }
 					 	
 						 $sheet->setCellValue(ordenLetrasExcel($orden_mes).$i, $monto_mes);
+						 $sheet->getStyle(ordenLetrasExcel($orden_mes).$i)->getFont()->setBold(true);
+						 $sheet->getStyle(ordenLetrasExcel($orden_mes).$i)->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+						$sheet->getStyle(ordenLetrasExcel($orden_mes).$i)->getFill()->getStartColor()->setRGB('D7E4BC');	  	
 						 $orden_mes++;
 					 }
 

@@ -780,7 +780,7 @@ class Remuneraciones extends CI_Controller
            //     var_dump($dias_vacaciones);
              //   var_dump($num_dias_progresivos);
 
-            if($this->session->userdata('identity') == 'csandoval@aurbana.cl' || $this->session->userdata('identity') == 'fsandoval@aurbana.cl'|| $this->session->userdata('identity') == 'admin@admin.com'){
+            if($this->session->userdata('identity') == 'csandoval@aurbana.cl' || $this->session->userdata('identity') == 'fsandoval@aurbana.cl'|| $this->session->userdata('identity') == 'admin@admin.com'|| $this->session->userdata('identity') == 'jgomez@aurbana.cl'){
                 $datos_finiquito['mes_aviso'] = number_format($personal->sueldobase + $personal->bonos_fijos + $personal->movilizacion + $personal->colacion,0,".",".");
                 $datos_finiquito['renta_antiguedad'] = number_format(($personal->sueldobase + $personal->bonos_fijos + $personal->movilizacion + $personal->colacion)*$personal->annos_empresa,0,".",".");
                 $datos_finiquito['renta_vacaciones'] = number_format(($personal->sueldobase + $personal->bonos_fijos + $personal->movilizacion + $personal->colacion)/30*($vacaciones_totales)*1.4,0,".",".");

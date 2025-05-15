@@ -4911,9 +4911,23 @@ public function delete_fondo($idfondo = 0)
                 if (isset($user->level)) {
                     if ($user->level == 1) {
                         $lista_comunidad = $this->admin->comunidades_asignadas($user->id, $user->level);
-                        if (count($lista_comunidad) == 1) {
+
+                        if(is_array($lista_comunidad)){
+
+                            $num_comunidades = count($lista_comunidad);                
+                        }else if(isset($lista_comunidad->id)){
+
+                            $num_comunidades = 1;
+                        }else{
+                            $num_comunidades = 0;
+                        }
+
+                        //if (count($lista_comunidad) == 1) {
+
+                        if (isset($lista_comunidad->id)  && $num_comunidades > 0) {
                             array_push($array_comunidades, $lista_comunidad->nombre);
-                        } else if (count($lista_comunidad) > 1) {
+                        //} else if (count($lista_comunidad) > 1) {
+                        } else if (is_array($lista_comunidad) && $num_comunidades > 0) {
                             foreach ($lista_comunidad as $comunidad) {
                                 array_push($array_comunidades, $comunidad->nombre);
                             }

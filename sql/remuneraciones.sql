@@ -3767,4 +3767,9 @@ ALTER TABLE `gc_comunicados`
 ALTER TABLE `gc_comunicados`
 	ADD COLUMN `fec_comienzo_envio` DATETIME NULL DEFAULT NULL AFTER `fec_marca_envio`;
 
+/********************************************************************************************************/
+
+ALTER TABLE `gc_comunidad`
+	ADD COLUMN `listadodeuda` TINYINT(3) UNSIGNED NULL DEFAULT '0' AFTER `pagoonline`;
+
 	

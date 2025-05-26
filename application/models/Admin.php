@@ -151,7 +151,7 @@ class Admin extends CI_Model
     public function datos_comunidad($comunidadid)
     {
 
-        $this->db->select('c.id, c.nombre, c.rut, c.dv, c.direccion, co.nombre as comuna, c.maxfolioabono, c.maxfoliopago, c.textoggcc, c.logo, c.firma')
+        $this->db->select('c.id, c.nombre, c.rut, c.dv, c.direccion, co.nombre as comuna, c.maxfolioabono, c.maxfoliopago, c.textoggcc, c.logo, c.firma, c.listadodeuda')
             ->from('gc_comunidad as c')
             ->join('gc_comuna as co', 'c.idcomuna = co.idcomuna', 'left')
             ->where('c.id', $comunidadid)

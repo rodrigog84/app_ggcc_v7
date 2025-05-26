@@ -3201,7 +3201,7 @@ public function generar_contenido_detalle_deuda($comunidadid,$idperiodo){
 			$logo = $comunidad->logo == '' || is_null($comunidad->logo) ? 'img/logo4_1_80p_color.png' : 'uploads/logos/'. $this->session->userdata('comunidadid') . '/' . $comunidad->logo;
 
 			$html .= '
-						<p><h4 class="header4"><br>Listado de Morosos<br><br><img src="' . $logo . '" width="100px"></h4></p>
+						<p><h4 class="header4"><br>Listado de Deuda<br><br><img src="' . $logo . '" width="100px"></h4></p>
 						<hr>
 						<br>
 						<div class="recto">
@@ -3442,10 +3442,12 @@ public function comprobante_detalle_ggcc($idperiodo){
 			}		
 
 
-			/*if($content_detalle->pdf_content_deuda == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
+
+
+			if($content_detalle->pdf_content_deuda == '' || is_null($datosperiodo->publica)){ // EN CASO QUE POR ALGUN MOTIVO FALLARA LA EJECUCION INICIAL, SE CREA AHORA
 				$this->generar_contenido_detalle_deuda($comunidadid,$idperiodo);
 
-			}		*/
+			}		
 
 
 			$content_detalle = $this->get_pdf_content_detalle($comunidadid,$idperiodo);
@@ -3482,8 +3484,11 @@ public function comprobante_detalle_ggcc($idperiodo){
 			$mpdf->WriteHTML($content->pdf_content);
 			$mpdf->AddPage();
 			$mpdf->WriteHTML($content_detalle->pdf_content);	
-			$mpdf->AddPage();
-			//$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
+
+			if($datos_comunidad->listadodeuda == 1){
+				$mpdf->AddPage();
+				$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
+			}
 			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
 
 

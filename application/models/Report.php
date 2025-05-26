@@ -505,12 +505,15 @@ class Report extends CI_Model
 										inner join gc_periodo_estado as pe on per.id = pe.idperiodo and pe.idcomunidad = '" . $this->session->userdata('comunidadid') . "'
 										where gp.idpropiedad = p.id
 										and pe.publica is not null
-										and gp.saldo > 0) as cuentas_impagas
+										and gp.saldo > 0
+										AND CURDATE() > pe.fecha_vencimiento
+										) as cuentas_impagas
  										from
 										gc_propiedad as p
 										where p.idcomunidad = '" . $idcomunidad . "'
 										and p.active = 1
 										and p.saldo_publicado > 0
+										HAVING cuentas_impagas > 0
 										order by p.saldo_publicado 
 										desc");
 

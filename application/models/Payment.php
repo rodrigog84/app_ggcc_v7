@@ -3210,7 +3210,8 @@ public function generar_contenido_detalle_deuda($comunidadid,$idperiodo){
 						<tr class="headerRow">
 						<th width="40%"><p>Direcci&oacute;n</p></th>
 						<th width="30%"><p>N&uacute;mero</p></th>
-						<th width="30%"><p>Valor Mora</p></th>
+						<th width="30%"><p>Valor Deuda</p></th>
+						<th width="30%"><p>Meses Mora</p></th>
 						</tr>
 						</thead>
 						<tbody>';
@@ -3222,6 +3223,7 @@ public function generar_contenido_detalle_deuda($comunidadid,$idperiodo){
 							<td style="font-size: 8pt;">' . $deuda->direccion . '</td>
 							<td style="font-size: 8pt;">' . $deuda->numero . '</td>
 							<td class="tdClass tdClassNumber" style="font-size: 8pt;"><b>$ ' . number_format($deuda->saldo,0,".",".") . '</b></td>
+							<td class="tdClass tdClassNumber" style="font-size: 10pt;"><b>' . number_format($deuda->cuentas_impagas,0,".",".") . '</b></td>
 						</tr>';
 
 					

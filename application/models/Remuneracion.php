@@ -2476,7 +2476,8 @@ limit 1		*/
             ->join('gc_periodo_remuneracion as pr', 'p.id = pr.idperiodo')
             ->where('pr.idcomunidad', $comunidadid)
             ->where('pr.cierre is not null')
-            ->order_by('p.updated_at desc');
+            ->order_by('p.anno desc, p.mes desc');
+            //->order_by('p.updated_at desc');
         $comunidades_data = is_null($idperiodo) ? $periodo_data : $periodo_data->where('pr.idperiodo', $idperiodo);
         $query = $this->db->get();
         $datos = is_null($idperiodo) ? $query->result() : $query->row();

@@ -1589,6 +1589,19 @@ class Remuneracion extends CI_Model
             $porc_cot_oblig = $datos_afp->exregimen == 2 ? 0 : 0.1;
 
 
+           // echo (int)$periodo->anno.str_pad($periodo->mes,2,'0',STR_PAD_LEFT); exit;
+
+            if((int)$periodo->anno.str_pad($periodo->mes,2,'0',STR_PAD_LEFT) >= 202508){
+                $porc_cap_individual = 0.1/100;
+                $porc_seg_social_prev = 0.9/100;
+
+            }else{
+                $porc_cap_individual = 0;
+                $porc_seg_social_prev = 0;
+
+            }
+
+
             //$gratificacion = $trabajador->sueldobase*0.25;
 
 
@@ -1678,6 +1691,11 @@ class Remuneracion extends CI_Model
             $cot_obligatoria = round($sueldo_imponible_afp * $porc_cot_oblig, 0);
             $comision_afp = round($sueldo_imponible_afp * ($porc_com_afp / 100), 0);
             $adic_afp = round($sueldo_imponible * ($trabajador->adicafp / 100), 0);
+
+
+            $cot_cap_individual = round($sueldo_imponible_afp * $porc_cap_individual, 0);
+            $cot_seg_social_prev = round($sueldo_imponible_afp * $porc_seg_social_prev, 0);
+
 
 
             // SOLO SE PAGA POR 11 AÑOS
@@ -1972,6 +1990,8 @@ limit 1		*/
                 'seginvalidez' => $seginvalidez,
                 'aportesegcesantia' => $aportesegcesantia,
                 'aportepatronal' => $aportepatronal,
+                'cotcapindividual' => $cot_cap_individual,
+                'cotsegsocialprev' => $cot_seg_social_prev,                
                 'pdf_content' => null,
                 'active' => 1
             );

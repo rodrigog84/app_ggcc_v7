@@ -349,7 +349,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 		                  ->where('gp.idpropiedad', $propiedadid)
 		                  ->where('pe.publica is not null')
 		                  ->where('gp.saldo >', 0)
-		                  ->order_by('p.id');
+		                  ->order_by('p.anno desc, p.mes desc');
 		$query = $this->db->get();
 		return $query->result();
 

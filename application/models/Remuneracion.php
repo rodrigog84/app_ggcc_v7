@@ -2092,7 +2092,7 @@ limit 1		*/
             //calculamos los montos detinados a afp
 
             if ($datos_afp->exregimen != 2) { // omitimos No Cotiza y Pensionado
-                $monto_afp = $cot_obligatoria + $comision_afp;
+                $monto_afp = $cot_obligatoria + $comision_afp + $cot_cap_individual + $cot_seg_social_prev;
                 if (!array_key_exists($trabajador->idafp, $array_pago_afp)) {
                     $array_pago_afp[$trabajador->idafp]['monto_afp'] = 0;
                     $array_pago_afp[$trabajador->idafp]['monto_sis'] = 0;
@@ -3772,6 +3772,8 @@ limit 1		*/
                 $linea .= "00000000"; //Otros descuentos CCAF *****************
                 $linea .= str_pad($cotccaffon, 8, "0", STR_PAD_LEFT); //Cotización a CCAF de no afiliados a Isapres
                 $linea .= str_pad($asigfamiliar_mes, 8, "0", STR_PAD_LEFT); //Descuento Cargas Familiares CCAF
+
+                
                 $linea .= str_pad($rentaimponible_mes_anterior, 8, "0", STR_PAD_LEFT); //Renta Imponible Mes Anterior a la Licencia (RIMA)************  (*)
                 $linea .= $tipojornada; //Tipo de Jornada ***************** (*)
                 $linea .= str_pad($cot_expectativa_vida, 8, "0", STR_PAD_LEFT); //Cotización Expectativa de Vida ***************** (*)

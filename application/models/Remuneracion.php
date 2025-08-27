@@ -1720,8 +1720,13 @@ class Remuneracion extends CI_Model
             $adic_afp = round($sueldo_imponible * ($trabajador->adicafp / 100), 0);
 
 
-            $cot_cap_individual = round($sueldo_imponible_afp * $porc_cap_individual, 0);
-            $cot_seg_social_prev = round($sueldo_imponible_afp * $porc_seg_social_prev, 0);
+            $cot_cap_individual = 0;
+            $cot_seg_social_prev = 0;
+            if($trabajador->pensionado == 0){
+                $cot_cap_individual = round($sueldo_imponible_afp * $porc_cap_individual, 0);
+                $cot_seg_social_prev = round($sueldo_imponible_afp * $porc_seg_social_prev, 0);
+
+            }
 
 
 

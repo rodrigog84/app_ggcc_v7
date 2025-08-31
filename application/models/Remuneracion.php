@@ -3656,9 +3656,21 @@ limit 1		*/
 
                 }
 
+                $datos_trabajador = $this->get_personal($idtrabajador);
+                $sueldoimponible_ant = isset($datos_trabajador->sueldobase) ? $datos_trabajador->sueldobase : 0;
+
                 $rentaimponible_mes_anterior = $linea_trabajador['codprevired'] == 3 || $linea_trabajador['codprevired'] == 6 ? $sueldoimponible_ant : 0;
 
+                /*if($idtrabajador == 462){
+                    echo '<pre>';
+                    //var_dump($this->get_personal($idtrabajador));
+                    //$datos_trabajador = $this->get_personal($idtrabajador);
+                    var_dump($sueldoimponible_ant);
 
+                    //$trabajador->sueldobase
+                    var_dump($rentaimponible_mes_anterior);
+                    var_dump($linea_trabajador); exit;
+                }*/
                 // DATOS DEL TRABAJADOR
                 $linea  = str_pad($remuneracion->rut, 11, "0", STR_PAD_LEFT); // rut
                 $linea .= $remuneracion->dv; // dv

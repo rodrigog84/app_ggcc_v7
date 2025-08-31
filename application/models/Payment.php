@@ -444,7 +444,8 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 				                  ->where('gp.saldo >', 0)
 				                  ->where('pe.publica is not null')
 				                 // ->where('pe.genera is not null')
-				                  ->order_by('gp.idperiodo asc')
+				                  ->order_by('p.anno asc, p.mes asc')
+				                  //->order_by('gp.idperiodo asc')
 				                  ->limit(1);
 				$query = $this->db->get();
 				$ggcc_propiedad = $query->row();
@@ -616,7 +617,8 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 						                  ->where('gp.saldo >', 0)
 						                  //->where('pe.publica is not null')
 						                  ->where('pe.genera is not null')
-						                  ->order_by('gp.idperiodo asc')
+						                  ->order_by('p.anno asc, p.mes asc')
+						                  //->order_by('gp.idperiodo asc')
 						                  ->limit(1);
 						$query = $this->db->get();
 						$ggcc_propiedad = $query->row();

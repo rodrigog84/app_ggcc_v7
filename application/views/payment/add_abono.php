@@ -36,8 +36,16 @@
                             <label for="periodo">Per&iacute;odo</label>
                             <select name="periodo" id="periodo" class="form-control" <?php echo $datosdeuda->saldo_publicado <= 0 ? 'disabled' : ''; ?> >
                               <option value=""> <?php echo $datosdeuda->saldo_publicado <= 0 ? 'Sin Per&iacute;odos con deuda' : 'Seleccione Periodo'; ?></option>
-                              <?php $selected = true; ?>
-                              <?php foreach($datosperiodo as $periodo){ ?>
+                              <?php $selected = false; ?>
+                              <?php foreach($datosperiodo as $key => $periodo){ ?>
+
+                                <?php
+                                    // Establecer el último período como seleccionado
+                                    if ($key === count($datosperiodo) - 1) {
+                                        $selected = true;
+                                    }
+                                ?>
+                                                                
                               <option value="<?php echo $periodo->id;?>" <?php echo $selected ? 'selected' : ''; ?>><?php echo date2string($periodo->mes,$periodo->anno)." : $ ".number_format($periodo->saldo,0,".",".");?></option>
                               <?php $selected = false; ?>
                               <?php } ?>

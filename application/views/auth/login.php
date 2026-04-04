@@ -113,7 +113,7 @@
                                         <!-- end section -->
                                         <div class="section">
                                             <a href="<?php echo base_url();?>auth/forgot_password">¿Has olvidado tu contraseña?</a><br><br>
-                                            <a href="<?php echo base_url();?>guest/add_comunidad" class="text-success"><b>Registra tu comunidad y obten tu prueba gratuita</b></a>
+                                            <!--a href="<?php echo base_url();?>guest/add_comunidad" class="text-success"><b>Registra tu comunidad y obten tu prueba gratuita</b></a-->
                                                                               </div>
                                             <?php if($message): ?>
                                                   <div class="alert alert-danger alert-dismissable">

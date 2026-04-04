@@ -15,6 +15,8 @@ class Guest extends CI_Controller {
 	public function add_comunidad($idcomunidad = 0)
 	{
 
+		if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
+
 			$this->load->model('admin');
 			$comunidad = $this->admin->get_comunidades($idcomunidad);
 			$regiones = $this->admin->get_regiones();
@@ -38,7 +40,9 @@ class Guest extends CI_Controller {
 			
 
 			$this->load->view($template,$vars);	
-
+		} else {
+            redirect('main/dashboard');
+        }
 
 	}
 
@@ -60,6 +64,8 @@ class Guest extends CI_Controller {
 
 
 	public function submit_comunidades(){
+
+		if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
 			//$nuevo_proveedor = $this->input->post('proveedor');
 			$comunidad = $this->input->post('comunidad');
@@ -199,6 +205,10 @@ class Guest extends CI_Controller {
 						
 				}
 			}
+
+		} else {
+            redirect('main/dashboard');
+        }
 
 
 	}	

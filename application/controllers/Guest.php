@@ -12,7 +12,7 @@ class Guest extends CI_Controller {
    }
 
 
-	public function add_comunidad($idcomunidad = 0)
+	/*public function add_comunidad($idcomunidad = 0)
 	{
 
 		if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
@@ -41,10 +41,10 @@ class Guest extends CI_Controller {
 
 			$this->load->view($template,$vars);	
 		} else {
-            redirect('main/dashboard');
+            redirect('auth/login', 'refresh');
         }
 
-	}
+	}*/
 
 
 	public function get_comunas($idregion){
@@ -63,7 +63,7 @@ class Guest extends CI_Controller {
 
 
 
-	public function submit_comunidades(){
+/*public function submit_comunidades(){
 
 		if ($this->ion_auth->is_allowed($this->router->fetch_class(), $this->router->fetch_method())) {
 
@@ -207,11 +207,11 @@ class Guest extends CI_Controller {
 			}
 
 		} else {
-            redirect('main/dashboard');
+            redirect('auth/login', 'refresh');
         }
 
 
-	}	
+	}	*/
 
 
 

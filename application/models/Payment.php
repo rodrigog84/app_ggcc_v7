@@ -1113,6 +1113,7 @@ public function get_egresos_totales_by_periodo($comunidadid,$idperiodo){
 
 		$ggcc_data = is_null($idperiodo) ? $ggcc_data : $ggcc_data->where('gc.idperiodo',$idperiodo);                 
 		$query = $this->db->get();
+		//echo $this->db->last_query(); exit;
 
 		return is_null($idperiodo) ? $query->result() : $query->row();
 
@@ -2521,7 +2522,7 @@ public function generar_contenido_comprobante($comunidadid,$idperiodo,$idpropied
 
 
 			$html .= '
-						<p><h4 class="header4"><br>Gastos Comunes Individuales de ' . date2string($datos_periodo->mes,$datos_periodo->anno) . '<br><br><img src="' .  $logo  .  '" width="100px"></h4></p>
+						<p><h4 class="header4"><br>Obligación Económica de ' . date2string($datos_periodo->mes,$datos_periodo->anno) . '<br><br><img src="' .  $logo  .  '" width="100px"></h4></p>
 						<hr>
 						<br>
 						<div class="recto">
@@ -3494,7 +3495,7 @@ public function comprobante_detalle_ggcc($idperiodo){
 				$mpdf->WriteHTML($content_detalle->pdf_content_deuda);						
 			}
 			$mpdf->SetFooter('Para más información visite: http://www.tugastocomun.cl');
-
+			
 
 			// SE ALMACENA EL ARCHIVO
 			$nombre_archivo = date("Y")."_".date("m")."_".date("d")."_".$datos_propiedad->numero.".pdf";

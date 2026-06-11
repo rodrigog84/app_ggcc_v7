@@ -95,7 +95,8 @@ class Remuneraciones extends CI_Controller
                 'tasasis' => $this->input->post('tasasis'),
                 'topeimponible' => str_replace(",", ".", str_replace(".", "", $this->input->post('topeimponible'))),
                 'topeimponibleips' => str_replace(",", ".", str_replace(".", "", $this->input->post('topeimponibleips'))),
-                'topeimponibleafc' => str_replace(",", ".", str_replace(".", "", $this->input->post('topeimponibleafc')))
+                'topeimponibleafc' => str_replace(",", ".", str_replace(".", "", $this->input->post('topeimponibleafc'))),
+                'envio_mail' => $this->input->post('envio_mail'),
             );
             $this->load->model('remuneracion');
             $this->remuneracion->edit_parametros_generales($parametros);

@@ -59,6 +59,11 @@
                         </div>                         
 
 
+                        <div class="form-group">
+                              <label for="cf_maternales">Envio Mail</label>    
+                               <input type="text" class="form-control miles" name="envio_mail" id="envio_mail" placeholder="Envio de Mail" value="<?php echo $parametros_generales->envio_mail; ?>">
+                        </div>      
+
                   </div><!-- /.box-body -->
                   <div class="box-footer">
                     <button type="submit" class="btn btn-success">Actualiza Datos</button>

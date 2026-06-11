@@ -49,7 +49,7 @@ class Remuneracion extends CI_Model
     public function get_parametros_generales()
     {
 
-        $comunidades_data = $this->db->select('uf , sueldominimo, csimples, cinvalidas, cmaternales, tasasis, topeimponible, topeimponibleips, topeimponibleafc ')
+        $comunidades_data = $this->db->select('uf , sueldominimo, csimples, cinvalidas, cmaternales, tasasis, topeimponible, topeimponibleips, topeimponibleafc, envio_mail ')
             ->from('gc_parametros_generales');
         $query = $this->db->get();
         return $query->row();

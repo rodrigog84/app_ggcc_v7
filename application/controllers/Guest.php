@@ -434,7 +434,8 @@ public function prueba_envio_correo(){
 		$this->load->model('admin');
 		$array_email = array('rodrigog.84@gmail.com');
 		$messageBody = 'Prueba Envio';
-		$this->admin->envia_mail_prueba('robot@tugastocomun.cl', $array_email, 'Prueba envio', $messageBody, 'html');
+		//$this->admin->envia_mail_prueba('robot@tugastocomun.cl', $array_email, 'Prueba envio', $messageBody, 'html');
+		$this->admin->envia_mail('robot@tugastocomun.cl', $array_email, 'Prueba envio', $messageBody, 'html');
 
 
 }

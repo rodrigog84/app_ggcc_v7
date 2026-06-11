@@ -4046,7 +4046,12 @@ public function accept_payprop($token = null,$tokentgc = null)
 
     public function envia_mail_turbosmtp($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común")
     {
-        if (ENVIO_MAIL) {
+
+        $parametros_generales = $this->remuneracion->get_parametros_generales();
+
+       // $parametros_generales->envio_mail;
+        //if (ENVIO_MAIL) {
+        if ($parametros_generales->envio_mail == 1) {
             include_once $this->ruta_turbosmtp();
             //$toList = array('rodrigog.84@gmail.com');
             if (is_array($toList)) {
@@ -4122,8 +4127,11 @@ public function accept_payprop($token = null,$tokentgc = null)
 
 public function envia_mail($from, $toList, $subject, $content, $type, $alias = "Tu Gasto Común", $attachments = null)
     {
+        $parametros_generales = $this->remuneracion->get_parametros_generales();
 
-        if (ENVIO_MAIL) {
+       // $parametros_generales->envio_mail;
+        //if (ENVIO_MAIL) {
+        if ($parametros_generales->envio_mail == 1) {
 
                 // Configure API key authorization: api-key
                 $credentials = SendinBlue\Client\Configuration::getDefaultConfiguration()->setApiKey('api-key', 'xkeysib-'.API_KEY_MAIL);

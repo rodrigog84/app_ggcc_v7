@@ -3773,3 +3773,7 @@ ALTER TABLE `gc_comunidad`
 	ADD COLUMN `listadodeuda` TINYINT(3) UNSIGNED NULL DEFAULT '0' AFTER `pagoonline`;
 
 	
+/************************************************************************************************************/
+
+ALTER TABLE `gc_parametros_generales`
+	ADD COLUMN `envio_mail` INT NOT NULL DEFAULT 0 AFTER `topeimponibleafc`;

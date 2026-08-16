@@ -1621,10 +1621,15 @@ class Remuneracion extends CI_Model
             if((int)$periodo->anno.str_pad($periodo->mes,2,'0',STR_PAD_LEFT) >= 202508){
                 $porc_cap_individual = 0.1/100;
                 $porc_seg_social_prev = 0.9/100;
+                $porc_çot_exp_vida = 0.5/100;
+
+
+                
 
             }else{
                 $porc_cap_individual = 0;
                 $porc_seg_social_prev = 0;
+                $porc_çot_exp_vida = 0;
 
             }
 
@@ -1725,6 +1730,10 @@ class Remuneracion extends CI_Model
             if($trabajador->pensionado == 0){
                 $cot_cap_individual = round($sueldo_imponible_afp * $porc_cap_individual, 0);
                 $cot_seg_social_prev = round($sueldo_imponible_afp * $porc_seg_social_prev, 0);
+                $cot_expectativa_vida = round($sueldo_imponible_afp * $porc_çot_exp_vida, 0);
+
+
+                
 
             }
 
@@ -2023,7 +2032,8 @@ limit 1		*/
                 'aportesegcesantia' => $aportesegcesantia,
                 'aportepatronal' => $aportepatronal,
                 'cotcapindividual' => $cot_cap_individual,
-                'cotsegsocialprev' => $cot_seg_social_prev,                
+                'cotsegsocialprev' => $cot_seg_social_prev,   
+                'cotexpectvida' => $cot_expectativa_vida,               
                 'pdf_content' => null,
                 'active' => 1
             );
@@ -2577,7 +2587,7 @@ limit 1		*/
     {
         //$periodo_data = $this->db->select('r.id, pe.id as idtrabajador, pe.nombre, pe.apaterno, pe.amaterno, r.sueldobase, r.totalhaberes, r.totaldescuentos, r.sueldoliquido')
         //$periodo_data = $this->db->select('r.id, pe.id as idtrabajador, p.mes, p.anno, pe.nombre, pe.apaterno, pe.amaterno, date_format(pe.fecingreso,"%d/%m/%Y") as fecingreso, pe.rut, pe.dv, i.nombre as prev_salud, pe.idisapre, pe.valorpactado, c.nombre as cargo, a.nombre as afp, a.porc, r.sueldobase, r.gratificacion, r.bonosimponibles, r.valorhorasextras50, r.montohorasextras50, r.valorhorasextras100, r.montohorasextras100, r.aguinaldo, r.diastrabajo, r.totalhaberes, r.totaldescuentos, r.sueldoliquido, r.horasextras50, r.horasextras100, r.horasdescuento, pe.cargassimples, pe.cargasinvalidas, pe.cargasmaternales, pe.cargasretroactivas, r.sueldoimponible, r.movilizacion, r.colacion, r.bonosnoimponibles, r.asigfamiliar, r.totalhaberes, r.cotizacionobligatoria, r.comisionafp, r.adicafp, r.segcesantia, r.cotizacionsalud, r.fonasa, r.inp, r.adicisapre, r.impuesto, r.montoahorrovol, r.montocotapv, r.anticipo, r.montodescuento, pr.cierre')
-        $periodo_data = $this->db->select('r.id, r.idperiodo, pe.id as idtrabajador, p.mes, p.anno, pe.nombre, pe.apaterno, pe.amaterno, pe.sexo, pe.nacionalidad, date_format(pe.fecingreso,"%d/%m/%Y") as fecingreso, pe.rut, pe.dv, i.nombre as prev_salud, pe.idisapre, pe.valorpactado, c.nombre as cargo, a.id as idafp, a.nombre as afp, a.porc, r.sueldobase, r.gratificacion, r.bonosimponibles, r.valorhorasextras50, r.montohorasextras50, r.valorhorasextras100, r.montohorasextras100, r.aguinaldo, r.aguinaldobruto, r.diastrabajo, r.totalhaberes, r.totaldescuentos, r.sueldoliquido, r.horasextras50, r.horasextras100, r.horasdescuento, pe.cargassimples, pe.cargasinvalidas, pe.cargasmaternales, pe.cargasretroactivas, r.sueldoimponible, r.movilizacion, r.colacion, r.bonosnoimponibles, r.asigfamiliar, r.totalhaberes, r.cotizacionobligatoria, r.comisionafp, r.adicafp, r.segcesantia, r.cotizacionsalud, r.fonasa, r.inp, r.adicisapre, r.cotadicisapre, r.adicsalud, r.impuesto, r.montoahorrovol, r.montocotapv, r.anticipo, r.montodescuento, pr.cierre, r.sueldonoimponible, r.totalleyessociales, r.otrosdescuentos, r.montocargaretroactiva, r.seginvalidez, pe.idasigfamiliar, r.valorpactado as valorpactadoperiodo, ap.id as idapv, pe.nrocontratoapv, pe.formapagoapv, pe.depconvapv, co.idmutual, r.aportepatronal, co.idcaja, pe.segcesantia as afilsegcesantia, r.aportesegcesantia, r.sueldoimponibleimposiciones, r.sueldoimponibleafc, r.sueldoimponibleips, pe.idregion, pe.idcomuna, pe.parttime, a.codlre, i.codlre as codlreisapre, ccaf.codlre as codlrecaja, m.codprevired as codlremutual, f.tramo as tramo_asig_familiar, r.sueldoimponibleafcnotrabajo, r.sueldoimponibleimposicionesnotrabajo, r.cotcapindividual, r.cotsegsocialprev')
+        $periodo_data = $this->db->select('r.id, r.idperiodo, pe.id as idtrabajador, p.mes, p.anno, pe.nombre, pe.apaterno, pe.amaterno, pe.sexo, pe.nacionalidad, date_format(pe.fecingreso,"%d/%m/%Y") as fecingreso, pe.rut, pe.dv, i.nombre as prev_salud, pe.idisapre, pe.valorpactado, c.nombre as cargo, a.id as idafp, a.nombre as afp, a.porc, r.sueldobase, r.gratificacion, r.bonosimponibles, r.valorhorasextras50, r.montohorasextras50, r.valorhorasextras100, r.montohorasextras100, r.aguinaldo, r.aguinaldobruto, r.diastrabajo, r.totalhaberes, r.totaldescuentos, r.sueldoliquido, r.horasextras50, r.horasextras100, r.horasdescuento, pe.cargassimples, pe.cargasinvalidas, pe.cargasmaternales, pe.cargasretroactivas, r.sueldoimponible, r.movilizacion, r.colacion, r.bonosnoimponibles, r.asigfamiliar, r.totalhaberes, r.cotizacionobligatoria, r.comisionafp, r.adicafp, r.segcesantia, r.cotizacionsalud, r.fonasa, r.inp, r.adicisapre, r.cotadicisapre, r.adicsalud, r.impuesto, r.montoahorrovol, r.montocotapv, r.anticipo, r.montodescuento, pr.cierre, r.sueldonoimponible, r.totalleyessociales, r.otrosdescuentos, r.montocargaretroactiva, r.seginvalidez, pe.idasigfamiliar, r.valorpactado as valorpactadoperiodo, ap.id as idapv, pe.nrocontratoapv, pe.formapagoapv, pe.depconvapv, co.idmutual, r.aportepatronal, co.idcaja, pe.segcesantia as afilsegcesantia, r.aportesegcesantia, r.sueldoimponibleimposiciones, r.sueldoimponibleafc, r.sueldoimponibleips, pe.idregion, pe.idcomuna, pe.parttime, a.codlre, i.codlre as codlreisapre, ccaf.codlre as codlrecaja, m.codprevired as codlremutual, f.tramo as tramo_asig_familiar, r.sueldoimponibleafcnotrabajo, r.sueldoimponibleimposicionesnotrabajo, r.cotcapindividual, r.cotsegsocialprev, r.cotexpectvida')
             ->from('gc_periodo as p')
             ->join('gc_remuneracion as r', 'r.idperiodo = p.id')
             ->join('gc_personal as pe', 'pe.id = r.idpersonal')
@@ -3612,7 +3622,8 @@ limit 1		*/
                 $sueldoimponible_afp  = $linea_trabajador['tipo_linea'] == "00" ? $sueldoimponible_afp : 0;
                 $cot_obligatoria_afp  = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->cotizacionobligatoria + $remuneracion->comisionafp + $remuneracion->cotcapindividual : 0;
 
-                $cot_expectativa_vida  = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->cotsegsocialprev : 0;
+                $cot_expectativa_vida  = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->cotexpectvida: 0;
+                $cot_rentabilidad_protegida  = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->cotsegsocialprev: 0;
 
 
                 $seginvalidez = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->seginvalidez : 0;
@@ -3794,7 +3805,9 @@ limit 1		*/
                 $linea .= str_pad($rentaimponible_mes_anterior, 8, "0", STR_PAD_LEFT); //Renta Imponible Mes Anterior a la Licencia (RIMA)************  (*)
                 $linea .= $tipojornada; //Tipo de Jornada ***************** (*)
                 $linea .= str_pad($cot_expectativa_vida, 8, "0", STR_PAD_LEFT); //Cotización Expectativa de Vida ***************** (*)
-                $linea .= "                    "; //Código de Sucursal (Uso Futuro) (VER SI ES BLANCO O CEROS) *****************
+                $linea .= str_pad($cot_rentabilidad_protegida, 20, "0", STR_PAD_LEFT);; //Código de Sucursal (Uso Futuro) (VER SI ES BLANCO O CEROS) *****************
+                
+                //$linea .= "                    "; //Código de Sucursal (Uso Futuro) (VER SI ES BLANCO O CEROS) *****************
 
 
 

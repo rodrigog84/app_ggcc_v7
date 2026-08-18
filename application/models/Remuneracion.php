@@ -1621,7 +1621,7 @@ class Remuneracion extends CI_Model
             if((int)$periodo->anno.str_pad($periodo->mes,2,'0',STR_PAD_LEFT) >= 202508){
                 $porc_cap_individual = 0.1/100;
                 $porc_seg_social_prev = 0.9/100;
-                $porc_çot_exp_vida = 0.5/100;
+                $porc_çot_exp_vida = 0.72/100;
 
 
                 

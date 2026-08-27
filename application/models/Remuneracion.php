@@ -1727,6 +1727,7 @@ class Remuneracion extends CI_Model
 
             $cot_cap_individual = 0;
             $cot_seg_social_prev = 0;
+            $cot_expectativa_vida = 0;
             if($trabajador->pensionado == 0){
                 $cot_cap_individual = round($sueldo_imponible_afp * $porc_cap_individual, 0);
                 $cot_seg_social_prev = round($sueldo_imponible_afp * $porc_seg_social_prev, 0);
@@ -2107,7 +2108,7 @@ limit 1		*/
             //calculamos los montos detinados a afp
 
             if ($datos_afp->exregimen != 2) { // omitimos No Cotiza y Pensionado
-                $monto_afp = $cot_obligatoria + $comision_afp + $cot_cap_individual + $cot_seg_social_prev;
+                $monto_afp = $cot_obligatoria + $comision_afp + $cot_cap_individual + $cot_seg_social_prev + $cot_expectativa_vida;
                 if (!array_key_exists($trabajador->idafp, $array_pago_afp)) {
                     $array_pago_afp[$trabajador->idafp]['monto_afp'] = 0;
                     $array_pago_afp[$trabajador->idafp]['monto_sis'] = 0;

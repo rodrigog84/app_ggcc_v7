@@ -4528,188 +4528,204 @@ public function generar_contenido_ingreso($idpropiedad,$idingreso,$saldo){
 					//$datos_abono = $this->account->get_abono_by_id($cartola_propiedad_id);
 					$datos_abono = $this->account->get_listado_abono_by_id($listado_abonos_id);
 
-					$fechadeposito  = $datos_abono->fechadeposito != '00/00/0000' ? $datos_abono->fechadeposito : '';
-					//$nombre_periodo = $datos_abono->mes == '' ? '' : date2string($datos_abono->mes,$datos_abono->anno);
-
-					$firma = $datos_comunidad->firma == '' || is_null($datos_comunidad->firma) ? '&nbsp;' : '<center><img src="http://www.tugastocomun.cl/app/uploads/firmas/'. $this->session->userdata('comunidadid') . '/' . $datos_comunidad->firma . '" width="150px"></center> ';							
-
-					$this->load->library('email');
-
-					$messageBody = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<!-- saved from url=(0072)http://tutsplus.github.io/a-simple-responsive-html-email/HTML/index.html -->
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>A Simple Responsive HTML Email</title>
-
-</head>
-<body yahoo="" bgcolor="#f6f8f1">
-<table border="1" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
-    <tr>
-        <td align="center" valign="top">
-            <table border="0" cellpadding="10" cellspacing="0" width="100%" id="emailContainer">
-                <tr>
-                    <td align="center" valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%" id="emailHeader">
-                            <tr>
-                                <td width="20%" align="center" valign="top" style="font-size: 8px;text-align:left;vertical-align:text-top">
-								    <p><b>Condominio ' . $datos_comunidad->nombre.'</b></p>
-								    <p><b>'.$datos_comunidad->direccion.'</b></p>
-								    <p><b>'.$datos_comunidad->comuna.'</b></p>
-								    <p><b>RUT:'.number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv.'</b></p>
-                                </td>
-                                <td width="60%" align="center" valign="middle">
-                                    <img class="fix" src="http://www.tugastocomun.cl/app/' . $logo . '" border="0" alt="" style="height: auto;" />
-                                </td>
-                                <td width="20%" align="center" valign="top" style="font-size: 10px;vertical-align:middle">
-                                    <b>Comprobante N°<br>' . trackid($datos_abono->folio) . '</b>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" valign="top">
-                        <table border="1" cellpadding="0" cellspacing="0" width="100%" id="emailBody">
-                            <tr>
-                                <td align="center" valign="top">
-                                    <h3>COMPROBANTE DE PAGO</h3>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>                
-                <tr>
-                    <td align="center" valign="top">
-                        <table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailBody">
-                            <tr>
-                                <td width="20%" style="text-align:left;" valign="top">
-                                    <b>Copropietario:</b>
-                                </td>
-                                <td width="30%" style="text-align:left;" valign="top">
-                                    ' . $datos_propiedad->responsable . '
-                                </td>                                
-                                <td width="20%" style="text-align:left;" valign="top">
-                                    <b>Fecha de Pago:</b>
-                                </td>
-                                <td width="30%" style="text-align:left;" valign="top">
-                                    ' . $datos_abono->fechapago . '
-                                </td>                                                                
-                            </tr>
-                            <tr>
-                                <td width="20%" style="text-align:left;" valign="top">
-                                    <b>Número Propiedad:</b>
-                                </td>
-                                <td width="30%" style="text-align:left;" valign="top">
-                                    ' . $datos_propiedad->numero .'
-                                </td>                                
-                                <td width="20%" style="text-align:left;" valign="top">
-                                   &nbsp;
-                                </td>
-                                <td width="30%" style="text-align:left;" valign="top">
-                                    &nbsp;
-                                </td>                                                                
-                            </tr>                            
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" valign="top">
-                        <table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
-                        	<tr>
-	                        	<td width="70%">
-	                        		<table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
-			 							<tr>
-			                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
-			                                    <b>Forma de Pago:</b>
-			                                </td>
-			                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
-			                                    ' . $datos_abono->forma_pago . '
-			                                </td>                                
-			                            </tr>
-			                            <tr>
-			                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
-			                                    <b>Banco:</b>
-			                                </td>
-			                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
-			                                     ' . $datos_abono->banco . '
-			                                </td>                                
-			                            </tr>
-			                            <tr>
-			                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
-			                                    <b>Fecha Depósito:</b>
-			                                </td>
-			                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
-			                                    ' . $fechadeposito . '
-			                                </td>                                
-			                                <td width="10%" style="text-align:left;" valign="top">
-			                                    &nbsp;
-			                                </td>
-                            
-			                            </tr>
-			                            <tr>
-			                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-bottom:2pt solid black;border-left:2pt solid black;" valign="top">
-			                                    <b>Monto:</b>
-			                                </td>
-			                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-bottom:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
-			                                    $' . number_format($datos_abono->monto,0,".",".") . '
-			                                </td>                                
-			                            </tr>  
-
-	                        		</table>
-	                        	</td>
-	                        	<td width="30%">
-	                        		<table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
-										<tr>
-			                                <td width="50%" colspan="2" style="text-align:left;" valign="top">
-			                                    &nbsp;
-			                                </td>
-			                            </tr>
-			                            <tr>
-			                                <td width="50%" colspan="2"  style="text-align:left;" valign="top">
-			                                    &nbsp;
-			                                </td>
-			                            </tr>
-			                            <tr>
-			                                <td width="40%" style="border-bottom:1pt solid black;text-align:left;" valign="top">
-			                                    ' . $firma . '
-			                                </td>                                
-			                            </tr>
-			                            <tr>
-			                                <td width="40%" style="text-align:center;font-size: 10px;" valign="top">
-			                                    <b>FIRMA ADMINISTRADOR</b>
-			                                </td>   
-			                            </tr> 
-	                        		</table>
-	                        	</td>
-                        	</tr>
+					$existe_abono = isset($datos_abono->fechadeposito) ? true : false;
+					
+					if($existe_abono){
 
 
 
+										$fechadeposito  = $datos_abono->fechadeposito != '00/00/0000' ? $datos_abono->fechadeposito : '';
+										//$nombre_periodo = $datos_abono->mes == '' ? '' : date2string($datos_abono->mes,$datos_abono->anno);
 
-                                                       
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-</body>
-</html>';
-//echo $messageBody; exit;
-				if($datos_propiedad->mail != '' and $datos_propiedad->suscrito == 1){
-					//$this->admin->envia_mail('robot@tugastocomun.cl','rodrigog.84@gmail.com','Comprobante de Pago',$messageBody,'html');
+										$firma = $datos_comunidad->firma == '' || is_null($datos_comunidad->firma) ? '&nbsp;' : '<center><img src="http://www.tugastocomun.cl/app/uploads/firmas/'. $this->session->userdata('comunidadid') . '/' . $datos_comunidad->firma . '" width="150px"></center> ';							
 
-				$lista_email = $this->admin->get_propiedad_email_by_id($idpropiedad);
-				$array_email = array();
-				foreach ($lista_email as $lista) {
-					array_push($array_email,$lista->email);
-				}
-				  //$this->admin->envia_mail('robot@tugastocomun.cl',$datos_propiedad->mail,'Comprobante de Pago',$messageBody,'html');
-				//$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
-				$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
-				}
+										$this->load->library('email');
+
+										$messageBody = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+					<!-- saved from url=(0072)http://tutsplus.github.io/a-simple-responsive-html-email/HTML/index.html -->
+					<html xmlns="http://www.w3.org/1999/xhtml">
+					<head>
+					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+					  <title>A Simple Responsive HTML Email</title>
+
+					</head>
+					<body yahoo="" bgcolor="#f6f8f1">
+					<table border="1" cellpadding="0" cellspacing="0" height="100%" width="100%" id="bodyTable">
+					    <tr>
+					        <td align="center" valign="top">
+					            <table border="0" cellpadding="10" cellspacing="0" width="100%" id="emailContainer">
+					                <tr>
+					                    <td align="center" valign="top">
+					                        <table border="0" cellpadding="0" cellspacing="0" width="100%" id="emailHeader">
+					                            <tr>
+					                                <td width="20%" align="center" valign="top" style="font-size: 8px;text-align:left;vertical-align:text-top">
+													    <p><b>Condominio ' . $datos_comunidad->nombre.'</b></p>
+													    <p><b>'.$datos_comunidad->direccion.'</b></p>
+													    <p><b>'.$datos_comunidad->comuna.'</b></p>
+													    <p><b>RUT:'.number_format($datos_comunidad->rut,0,".",".") . '-' .$datos_comunidad->dv.'</b></p>
+					                                </td>
+					                                <td width="60%" align="center" valign="middle">
+					                                    <img class="fix" src="http://www.tugastocomun.cl/app/' . $logo . '" border="0" alt="" style="height: auto;" />
+					                                </td>
+					                                <td width="20%" align="center" valign="top" style="font-size: 10px;vertical-align:middle">
+					                                    <b>Comprobante N°<br>' . trackid($datos_abono->folio) . '</b>
+					                                </td>
+					                            </tr>
+					                        </table>
+					                    </td>
+					                </tr>
+					                <tr>
+					                    <td align="center" valign="top">
+					                        <table border="1" cellpadding="0" cellspacing="0" width="100%" id="emailBody">
+					                            <tr>
+					                                <td align="center" valign="top">
+					                                    <h3>COMPROBANTE DE PAGO</h3>
+					                                </td>
+					                            </tr>
+					                        </table>
+					                    </td>
+					                </tr>                
+					                <tr>
+					                    <td align="center" valign="top">
+					                        <table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailBody">
+					                            <tr>
+					                                <td width="20%" style="text-align:left;" valign="top">
+					                                    <b>Copropietario:</b>
+					                                </td>
+					                                <td width="30%" style="text-align:left;" valign="top">
+					                                    ' . $datos_propiedad->responsable . '
+					                                </td>                                
+					                                <td width="20%" style="text-align:left;" valign="top">
+					                                    <b>Fecha de Pago:</b>
+					                                </td>
+					                                <td width="30%" style="text-align:left;" valign="top">
+					                                    ' . $datos_abono->fechapago . '
+					                                </td>                                                                
+					                            </tr>
+					                            <tr>
+					                                <td width="20%" style="text-align:left;" valign="top">
+					                                    <b>Número Propiedad:</b>
+					                                </td>
+					                                <td width="30%" style="text-align:left;" valign="top">
+					                                    ' . $datos_propiedad->numero .'
+					                                </td>                                
+					                                <td width="20%" style="text-align:left;" valign="top">
+					                                   &nbsp;
+					                                </td>
+					                                <td width="30%" style="text-align:left;" valign="top">
+					                                    &nbsp;
+					                                </td>                                                                
+					                            </tr>                            
+					                        </table>
+					                    </td>
+					                </tr>
+					                <tr>
+					                    <td align="center" valign="top">
+					                        <table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
+					                        	<tr>
+						                        	<td width="70%">
+						                        		<table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
+								 							<tr>
+								                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
+								                                    <b>Forma de Pago:</b>
+								                                </td>
+								                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
+								                                    ' . $datos_abono->forma_pago . '
+								                                </td>                                
+								                            </tr>
+								                            <tr>
+								                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
+								                                    <b>Banco:</b>
+								                                </td>
+								                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
+								                                     ' . $datos_abono->banco . '
+								                                </td>                                
+								                            </tr>
+								                            <tr>
+								                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;" valign="top">
+								                                    <b>Fecha Depósito:</b>
+								                                </td>
+								                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
+								                                    ' . $fechadeposito . '
+								                                </td>                                
+								                                <td width="10%" style="text-align:left;" valign="top">
+								                                    &nbsp;
+								                                </td>
+					                            
+								                            </tr>
+								                            <tr>
+								                                <td width="20%" style="text-align:left;border-top:2pt solid black;border-bottom:2pt solid black;border-left:2pt solid black;" valign="top">
+								                                    <b>Monto:</b>
+								                                </td>
+								                                <td width="30%" style="text-align:left;border-top:2pt solid black;border-bottom:2pt solid black;border-left:2pt solid black;border-right:2pt solid black;" valign="top">
+								                                    $' . number_format($datos_abono->monto,0,".",".") . '
+								                                </td>                                
+								                            </tr>  
+
+						                        		</table>
+						                        	</td>
+						                        	<td width="30%">
+						                        		<table border="0" cellpadding="5" cellspacing="0" width="100%" id="emailFooter">
+															<tr>
+								                                <td width="50%" colspan="2" style="text-align:left;" valign="top">
+								                                    &nbsp;
+								                                </td>
+								                            </tr>
+								                            <tr>
+								                                <td width="50%" colspan="2"  style="text-align:left;" valign="top">
+								                                    &nbsp;
+								                                </td>
+								                            </tr>
+								                            <tr>
+								                                <td width="40%" style="border-bottom:1pt solid black;text-align:left;" valign="top">
+								                                    ' . $firma . '
+								                                </td>                                
+								                            </tr>
+								                            <tr>
+								                                <td width="40%" style="text-align:center;font-size: 10px;" valign="top">
+								                                    <b>FIRMA ADMINISTRADOR</b>
+								                                </td>   
+								                            </tr> 
+						                        		</table>
+						                        	</td>
+					                        	</tr>
+
+
+
+
+					                                                       
+					                        </table>
+					                    </td>
+					                </tr>
+					            </table>
+					        </td>
+					    </tr>
+					</table>
+					</body>
+					</html>';
+					//echo $messageBody; exit;
+									if($datos_propiedad->mail != '' and $datos_propiedad->suscrito == 1){
+										//$this->admin->envia_mail('robot@tugastocomun.cl','rodrigog.84@gmail.com','Comprobante de Pago',$messageBody,'html');
+
+									$lista_email = $this->admin->get_propiedad_email_by_id($idpropiedad);
+									$array_email = array();
+									foreach ($lista_email as $lista) {
+										array_push($array_email,$lista->email);
+									}
+									  //$this->admin->envia_mail('robot@tugastocomun.cl',$datos_propiedad->mail,'Comprobante de Pago',$messageBody,'html');
+									//$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
+									$this->admin->envia_mail('robot@tugastocomun.cl',$array_email,'Comprobante de Pago',$messageBody,'html');
+									}
+
+
+
+
+
+
+
+					}
+
+					
                   /*$this->email->set_mailtype("html");
                   $this->email->from('robot@tugastocomun.cl', 'Tu Gasto Común');
                   $this->email->to($datos_propiedad->mail);

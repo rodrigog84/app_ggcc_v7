@@ -1621,7 +1621,7 @@ class Remuneracion extends CI_Model
             if((int)$periodo->anno.str_pad($periodo->mes,2,'0',STR_PAD_LEFT) >= 202508){
                 $porc_cap_individual = 0.1/100;
                 $porc_seg_social_prev = 0.9/100;
-                $porc_çot_exp_vida = 0.72/100;
+                $porc_çot_exp_vida = 0.71/100;
 
 
                 
@@ -1738,7 +1738,7 @@ class Remuneracion extends CI_Model
 
             }
 
-
+                
 
             // SOLO SE PAGA POR 11 AÑOS
             $segcesantia = $trabajador->tipocontrato == 'I' && $trabajador->segcesantia == 1 && $trabajador->annos_afc <= 11 ? round($sueldo_imponible_afc * 0.006, 0) : 0;
@@ -3483,7 +3483,7 @@ limit 1		*/
 
     public function previred($datos_remuneracion)
     {
-
+        
         $nombre_archivo = $this->session->userdata('comunidadid') . "_previred_" . date("Ymd") . ".txt";
         $path_archivo = "./uploads/tmp/";
 
@@ -3609,7 +3609,7 @@ limit 1		*/
 
 
             foreach ($array_lineas_trabajador as $linea_trabajador) {
-
+                
 
                 $diastrabajo = $linea_trabajador['tipo_linea'] == "00" ? $remuneracion->diastrabajo : 0;
                 $tramo_asig_familiar = $linea_trabajador['tipo_linea'] == "00" ? $tramo_asig_familiar : " ";
